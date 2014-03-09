@@ -52,10 +52,16 @@ def init():
             "python",
             "sqlite3",
             "sqlite3-dev",
+            "uwsgi-plugin-python",
         )))
         if not fabric.contrib.files.exists(env.config["path"]):
             run("git clone {repository} -b {branch} {path}".format(**env.config))
 
+def commit():
+     local("git add -A")
+     local("git diff --quiet --exit-code --cached || git commit -m 'Update'")
+     local("git push")
+     print(green('Committed and pushed to git.', bold=False))
 
 def update():
     print(green("Updating packages."))
