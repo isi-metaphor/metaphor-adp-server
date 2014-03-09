@@ -65,8 +65,8 @@ MIDDLEWARE_CLASSES = (
 )
 
 
-ROOT_URLCONF = "yerba.urls"
-WSGI_APPLICATION = "yerba.wsgi.application"
+ROOT_URLCONF = "lccsrv.urls"
+WSGI_APPLICATION = "lccsrv.wsgi.application"
 
 import os
 TEMPLATE_DIRS = (os.path.join(os.path.dirname(__file__), "..", "templates").replace("\\","/"),)
