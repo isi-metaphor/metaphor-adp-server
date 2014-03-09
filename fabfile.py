@@ -45,12 +45,14 @@ def server():
 
 def init():
     if not env.local:
-        run("sudo aptitude install git")
-        run("sudo aptitude install uwsgi")
-        run("sudo aptitude install python")
-        run("sudo aptitude install nginx")
-        run("sudo aptitude install sqlite3")
-        run("sudo aptitude install sqlite3-dev")
+        run("sudo aptitude -f install %s" % " ".join((
+            "git",
+            "uwsgi",
+            "nginx",
+            "python",
+            "sqlite3",
+            "sqlite3-dev",
+        )))
         if not fabric.contrib.files.exists(env.config["path"]):
             run("git clone {repository} -b {branch} {path}".format(**env.config))
 
