@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+
 import os
 
-
 def project_dir(dir_name):
-    return os.path.join(os.path.dirname(__file__), "..", dir_name)\
+    return os.path.join(os.path.dirname(__file__), dir_name)\
         .replace("\\", "//")
 
 
@@ -66,8 +66,7 @@ MIDDLEWARE_CLASSES = (
 ROOT_URLCONF = "lccsrv.urls"
 WSGI_APPLICATION = "lccsrv.wsgi.application"
 
-import os
-TEMPLATE_DIRS = (os.path.join(os.path.dirname(__file__), "..", "templates").replace("\\","/"),)
+TEMPLATE_DIRS = (project_dir("templates"),)
 
 INSTALLED_APPS = (
     "django.contrib.auth",

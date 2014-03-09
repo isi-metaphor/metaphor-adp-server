@@ -1,12 +1,19 @@
-from django.conf.urls import patterns, include, url
+# coding: utf-8
+
+# Copyright (C) University of Southern California (http://usc.edu)
+# Author: Vladimir M. Zaytsev <zaytsev@usc.edu>
+# URL: <http://nlg.isi.edu/>
+# For more information, see README.md
+# For license information, see LICENSE
+
+from django.conf.urls import patterns
+from django.conf.urls import include
+from django.conf.urls import url
 
 from django.contrib import admin
 admin.autodiscover()
 
-urlpatterns = patterns('',
-    # Examples:
-    # url(r'^$', 'lcc_service.views.home', name='home'),
-    # url(r'^blog/', include('blog.urls')),
-
-    url(r'^admin/', include(admin.site.urls)),
+urlpatterns = patterns("",
+    url(r"^$", "pipeline.views.home", name="home"),
+    url(r"^admin/", include(admin.site.urls)),
 )

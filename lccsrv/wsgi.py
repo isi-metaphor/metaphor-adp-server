@@ -1,11 +1,11 @@
-"""
-WSGI config for lcc_service project.
+# coding: utf-8
 
-It exposes the WSGI callable as a module-level variable named ``application``.
+# Copyright (C) University of Southern California (http://usc.edu)
+# Author: Vladimir M. Zaytsev <zaytsev@usc.edu>
+# URL: <http://nlg.isi.edu/>
+# For more information, see README.md
+# For license information, see LICENSE
 
-For more information on this file, see
-https://docs.djangoproject.com/en/1.6/howto/deployment/wsgi/
-"""
 
 import os
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "lccsrv.settings")

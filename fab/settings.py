@@ -1,6 +1,12 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+# Copyright (C) University of Southern California (http://usc.edu)
+# Author: Vladimir M. Zaytsev <zaytsev@usc.edu>
+# URL: <http://nlg.isi.edu/>
+# For more information, see README.md
+# For license information, see LICENSE
+
 import os
 
 
@@ -68,8 +74,10 @@ MIDDLEWARE_CLASSES = (
 ROOT_URLCONF = "lccsrv.urls"
 WSGI_APPLICATION = "lccsrv.wsgi.application"
 
-import os
-TEMPLATE_DIRS = (os.path.join(os.path.dirname(__file__), "..", "templates").replace("\\","/"),)
+TEMPLATE_DIRS = (
+    project_dir("templates"),
+)
+
 
 INSTALLED_APPS = (
     "django.contrib.auth",
