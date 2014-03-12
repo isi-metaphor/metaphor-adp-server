@@ -80,24 +80,68 @@ INSTALLED_APPS = (
 
 LOGGING = {
     "version": 1,
-    "disable_existing_loggers": False,
-    "filters": {
-        "require_debug_false": {
-            "()": "django.utils.log.RequireDebugFalse"
-        }
+    "disable_existing_loggers": True,
+    "formatters": {
+        "verbose": {
+            "format": "%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s"
+        },
+        "simple": {
+            "format": "%(asctime)s %(levelname)s %(message)s"
+        },
     },
     "handlers": {
+        "console":{
+            "class": "logging.StreamHandler",
+            "formatter": "simple",
+        },
+
+        "pipeline-file": {
+            "class": "logging.FileHandler",
+            "filename": "pipeline.log",
+            "formatter": "verbose",
+        },
+        "django-file": {
+            "class": "logging.FileHandler",
+            "filename": "django.log",
+            "formatter": "verbose",
+        },
+        "requests-file": {
+            "class": "logging.FileHandler",
+            "filename": "requests.log",
+            "formatter": "verbose",
+        },
+
         "mail_admins": {
             "level": "ERROR",
-            "filters": ["require_debug_false"],
-            "class": "django.utils.log.AdminEmailHandler"
+            "class": "django.utils.log.AdminEmailHandler",
+            "include_html": True,
+            "email_backend": "django.core.mail.backends.filebased.EmailBackend",
         }
     },
     "loggers": {
+
+        "pipeline": {
+            "handlers": ["pipeline-file", "console"],
+            "propagate": True,
+            "level": "DEBUG",
+        },
+
+        "django": {
+            "handlers": ["django-file"],
+            "propagate": True,
+            "level": "DEBUG",
+        },
+
+        "django.requests": {
+            "handlers": ["requests-file"],
+            "propagate": True,
+            "level": "DEBUG",
+        },
+
         "django.request": {
             "handlers": ["mail_admins"],
-            "level": "ERROR",
             "propagate": True,
+            "level": "ERROR",
         },
     }
 }

@@ -16,8 +16,9 @@ from django.contrib.auth import login
 from django.contrib.auth import logout
 from django.contrib.auth import authenticate
 
+from django.views.decorators.csrf import csrf_exempt
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("pipeline")
 
 
 def app(request):
@@ -45,7 +46,6 @@ def app(request):
                 "message_level": "danger",
             })
     else:
-        print request.user
         if request.user.is_anonymous():
             return render(request, "login.html", {})
         else:
@@ -58,10 +58,11 @@ def user_logout(request):
     return HttpResponseRedirect("/app/")
 
 
+@csrf_exempt
 def run_pipeline(request):
 
     if request.method == "POST":
-        pass
+        return HttpResponse("{}", status=200, content_type="application/json")
     else:
         return HttpResponse("<b>Error: use POST method to submit query file.</b>",
                             status=405)
