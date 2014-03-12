@@ -96,19 +96,28 @@ LOGGING = {
         },
 
         "pipeline-file": {
-            "class": "logging.FileHandler",
-            "filename": "pipeline.log",
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": "logs/pipeline.log.bz2",
             "formatter": "verbose",
+            "backupCount": 10,
+            "maxBytes": 1024 * 1024 * 32,
+            "encoding": "bz2-codec",
         },
         "django-file": {
-            "class": "logging.FileHandler",
-            "filename": "django.log",
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": "logs/django.log.bz2",
             "formatter": "verbose",
+            "backupCount": 10,
+            "maxBytes": 1024 * 1024 * 128,
+            "encoding": "bz2-codec",
         },
         "requests-file": {
-            "class": "logging.FileHandler",
-            "filename": "requests.log",
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": "logs/requests.log.bz2",
             "formatter": "verbose",
+            "backupCount": 10,
+            "maxBytes": 1024 * 1024 * 10,
+            "encoding": "bz2-codec",
         },
 
         "mail_admins": {
