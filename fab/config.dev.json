@@ -18,6 +18,8 @@
     "LOGGING_DJANGO_FILE":		"/lfs1/vzaytsev/research/logs/lcc-service.dev/app.django.log",
     "LOGGING_PIPELINE_FILE":	"/lfs1/vzaytsev/research/logs/lcc-service.dev/app.pipeline.log",
 
+    "LOGGING_UWSGI_FILE":		"/lfs1/vzaytsev/research/logs/lcc-service.dev/uwsgi.log",
+
     "METAPHOR_ROOT":			""
 
 }
