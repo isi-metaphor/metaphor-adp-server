@@ -5,7 +5,7 @@
 	"ADMIN_NAME":			"Vova Zaytsev",
 	"ADMIN_EMAIL":			"vzaytsev@isi.edu",
 
-    "DJANGO_DEBUG": 		"True",
+    "DJANGO_DEBUG": 		"False",
     "DJANGO_DB_NAME": 		"/lfs1/vzaytsev/research/data/lcc_service/lcc-service.prod.db",
 
     "NGINX_PORT": 			8080,

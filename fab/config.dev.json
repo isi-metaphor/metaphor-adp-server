@@ -11,5 +11,7 @@
     "NGINX_PORT": 			8081,
     "NGINX_SERVER_NAME": 	"colo-vm19.isi.edu",
     "NGINX_LOG_ACCESS": 	"/lfs1/vzaytsev/research/logs/lcc-service.dev.access",
-    "NGINX_LOG_ERROR": 		"/lfs1/vzaytsev/research/logs/lcc-service.dev.error"
+    "NGINX_LOG_ERROR": 		"/lfs1/vzaytsev/research/logs/lcc-service.dev.error",
+
+    "METAPHOR_ROOT":		""
 }
