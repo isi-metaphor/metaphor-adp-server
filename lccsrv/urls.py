@@ -14,6 +14,9 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns("",
-    url(r"^$", "pipeline.views.home", name="home"),
-    url(r"^admin/", include(admin.site.urls)),
-)
+                       url(r"^$",                   "pipeline.views.run_pipeline",  name="pipeline"),
+                       url(r"^annotateDocument/$",  "pipeline.views.run_pipeline",  name="pipeline"),
+                       url(r"^app/$",               "pipeline.views.app",           name="app"),
+                       url(r"^logout/$",            "pipeline.views.user_logout",   name="logout"),
+                       url(r"^admin/",              include(admin.site.urls)),
+                       )
