@@ -107,7 +107,7 @@ LOGGING = {
         },
 
         "pipeline-file": {
-            "class": "logging.RotatingFileHandler",
+            "class": "logging.handlers.RotatingFileHandler",
             "filename": "{{LOGGING_PIPELINE_FILE}}",
             "formatter": "verbose",
             "backupCount": 32,
@@ -115,7 +115,7 @@ LOGGING = {
             "encoding": "bz2-codec",
         },
         "django-file": {
-            "class": "logging.RotatingFileHandler",
+            "class": "logging.handlers.RotatingFileHandler",
             "filename": "{{LOGGING_DJANGO_FILE}}",
             "formatter": "verbose",
             "backupCount": 32,
@@ -123,7 +123,7 @@ LOGGING = {
             "encoding": "bz2-codec",
         },
         "requests-file": {
-            "class": "logging.RotatingFileHandler",
+            "class": "logging.handlers.RotatingFileHandler",
             "filename": "{{LOGGING_REQUESTS_FILE}}",
             "formatter": "verbose",
             "backupCount": 32,
