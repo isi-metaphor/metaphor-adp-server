@@ -111,24 +111,21 @@ LOGGING = {
             "filename": "{{LOGGING_PIPELINE_FILE}}",
             "formatter": "verbose",
             "backupCount": 32,
-            "maxBytes": 1024 * 1024 * 32,
-            "encoding": "bz2-codec",
+            "maxBytes": 1024 * 1024 * 128,
         },
         "django-file": {
             "class": "logging.handlers.RotatingFileHandler",
             "filename": "{{LOGGING_DJANGO_FILE}}",
             "formatter": "verbose",
             "backupCount": 32,
-            "maxBytes": 1024 * 1024 * 32,
-            "encoding": "bz2-codec",
+            "maxBytes": 1024 * 1024 * 128,
         },
         "requests-file": {
             "class": "logging.handlers.RotatingFileHandler",
             "filename": "{{LOGGING_REQUESTS_FILE}}",
             "formatter": "verbose",
             "backupCount": 32,
-            "maxBytes": 1024 * 1024 * 32,
-            "encoding": "bz2-codec",
+            "maxBytes": 1024 * 1024 * 128,
         },
 
         "mail_admins": {
