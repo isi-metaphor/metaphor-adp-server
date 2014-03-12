@@ -10,6 +10,7 @@
 
 import os
 import json
+import glob
 import fabric
 
 from fabric.api import *
@@ -64,11 +65,13 @@ def init():
         if not fabric.contrib.files.exists(env.config["path"]):
             run("git clone {repository} -b {branch} {path}".format(**env.config))
 
+
 def commit():
      local("git add -A")
      local("git diff --quiet --exit-code --cached || git commit -m 'Update'")
      local("git push")
      print(green('Committed and pushed to git.', bold=False))
+
 
 def update():
     print(green("Updating packages."))
@@ -122,6 +125,15 @@ def deploy():
 
         print(green("Creating indexes."))
         # run("python manage.py syncdb --noinput")
+
+
+def test_client():
+    port = env.config["context"]["NGINX_PORT"]
+    host = env.config["context"]["NGINX_SERVER_NAME"]
+    for file_path in glob.glob("testdata/queries/*.json"):
+        cmd = "python oldclient/client.py -g %s -p %d -j %s" % (host, port, file_path)
+        print(green(cmd))
+        run(cmd)
 
 
 def devdeploy():
