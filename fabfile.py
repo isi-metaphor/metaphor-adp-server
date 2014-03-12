@@ -124,7 +124,7 @@ def deploy():
         # run("python manage.py syncdb --noinput")
 
         print(green("Creating indexes."))
-        # run("python manage.py syncdb --noinput")
+        run("python manage.py syncdb --noinput --settings=lccsrv.settings")
 
 
 def test_client():
