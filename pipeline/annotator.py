@@ -51,7 +51,7 @@ class Annotator(object):
         # 3. Get document language.
         self.logger.info("Getting document language. Task id=%d." % self.task.id)
         try:
-            lang = request_document["language"]
+            language = request_document["language"]
         except KeyError:
             error_msg = "No language information available. Task id=%d." % self.task.id
             return self.task_error(error_msg, 3)
@@ -87,7 +87,7 @@ class Annotator(object):
             # 5.2
             try:
                 metaphor = annotation["linguisticMetaphor"]
-                if lang == "EN":
+                if language == "EN":
                     # Replacing single quote, double quote (start/end), dash
                     ascii_metaphor = metaphor.replace(u"\u2019", u"\u0027")\
                                              .replace(u"\u201c", u"\u0022")\
@@ -107,8 +107,8 @@ class Annotator(object):
                 )
                 self.task_error(error_msg, error_code=None, count_error=True)
 
-        self.logger.info("Task %d language=%s" % (self.task.id, lang))
-        self.task.language = lang
+        self.logger.info("Task %d language=%s" % (self.task.id, language))
+        self.task.language = language
         self.task.task_status = TASK_STATUS.PREPROCESSED
         self.task.response_status = 200
 
@@ -116,6 +116,10 @@ class Annotator(object):
         if len(metaphors) == 0:
             error_msg = "Found 0 metaphors for annotation. Task id=#%d."
             return self.task_error(error_msg, 6)
+
+        output = adb.run_annotation(request_document_body, metaphors, language, self.task, self.logger, True)
+
+        self.task.response_body_blob = json.dumps(output, encoding="utf-8")
 
         return self.task
 
