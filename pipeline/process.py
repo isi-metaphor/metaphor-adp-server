@@ -102,15 +102,14 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
     logger.info("Running parsing command: '%s'." % parser_proc)
     logger.info("Input str: %r" % input_str)
 
-    parser_stderr = StringIO()
-    parser_pipeline = Popen(parser_proc, shell=True, stdin=PIPE, stdout=PIPE,
+    parser_pipeline, parser_stderr = Popen(parser_proc, shell=True, stdin=PIPE, stdout=PIPE,
                                 stderr=parser_stderr, close_fds=True)
-    parser_output = parser_pipeline.communicate(input=input_str)[0]
+    parser_output = parser_pipeline.communicate(input=input_str)
 
     # Parser processing time in seconds
     parser_time = (time.time() - start_time) * 0.001
     logger.info("Command finished. Processing time: %r." % parser_time)
-    logger.info("Command STDERR:\n %r" % parser_stderr.getvalue())
+    logger.info("Command STDERR:\n %r" % parser_stderr)
 
     # time to generate final output in seconds
     generate_output_time = 2
@@ -135,7 +134,6 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
                      "/models/h93.py -d 3 -t 4 -O proofgraph,statistics -T " + \
                      time_unit_henry
 
-    henry_stderr = StringIO()
     logger.info("Running Henry command: '%s'." % henry_proc)
     henry_pipeline = Popen(henry_proc,
                                shell=True,
@@ -143,10 +141,10 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
                                stdout=PIPE,
                                stderr=henry_stderr,
                                close_fds=True)
-    henry_output = henry_pipeline.communicate(input=parser_output)[0]
+    henry_output, henry_stderr = henry_pipeline.communicate(input=parser_output)
     hypotheses = extract_hypotheses(henry_output)
     logger.info("Parsing Henry output. %r" % parser_output)
-    logger.info("Henry STDERR:\n %r" % henry_stderr.getvalue())
+    logger.info("Henry STDERR:\n %r" % henry_stderr)
 
     parses = extract_parses(parser_output)
     processed, failed, empty = 0, 0, 0
