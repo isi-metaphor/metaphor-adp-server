@@ -102,9 +102,8 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
     logger.info("Running parsing command: '%s'." % parser_proc)
     logger.info("Input str: %r" % input_str)
 
-    parser_pipeline, parser_stderr = Popen(parser_proc, shell=True, stdin=PIPE, stdout=PIPE,
-                                stderr=parser_stderr, close_fds=True)
-    parser_output = parser_pipeline.communicate(input=input_str)
+    parser_pipeline = Popen(parser_proc, shell=True, stdin=PIPE, stdout=PIPE, stderr=None, close_fds=True)
+    parser_output, parser_stderr = parser_pipeline.communicate(input=input_str)
 
     # Parser processing time in seconds
     parser_time = (time.time() - start_time) * 0.001
@@ -139,7 +138,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
                                shell=True,
                                stdin=PIPE,
                                stdout=PIPE,
-                               stderr=henry_stderr,
+                               stderr=None,
                                close_fds=True)
     henry_output, henry_stderr = henry_pipeline.communicate(input=parser_output)
     hypotheses = extract_hypotheses(henry_output)
