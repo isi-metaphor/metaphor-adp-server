@@ -140,7 +140,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
     henry_output = henry_pipeline.communicate(input=parser_output)[0]
     hypotheses = extract_hypotheses(henry_output)
 
-    logger.info("Parsing Henry output.")
+    logger.info("Parsing Henry output. %r" % parser_output)
     parses = extract_parses(parser_output)
 
     processed, failed, empty = 0, 0, 0
