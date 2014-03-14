@@ -99,6 +99,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
         KBPATH = EN_KBPATH
 
     logger.info("Running parsing command: '%s'." % parser_proc)
+    logger.info("Input str: %r" % input_str)
     parser_pipeline = Popen(parser_proc, shell=True, stdin=PIPE, stdout=PIPE,
                                 stderr=None, close_fds=True)
     parser_output = parser_pipeline.communicate(input=input_str)[0]
