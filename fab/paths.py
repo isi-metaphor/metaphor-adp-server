@@ -8,12 +8,12 @@
 
 import os
 
-METAPHOR_DIR        =  "{{METAPHOR_DIR}}"
-HENRY_DIR           =  "{{HENRY_DIR}}"
-BOXER_DIR           =  "{{BOXER_DIR}}"
-TMP_DIR             =  "{{TMP_DIR}}"
-GUROBI_HOME         =  "{{GUROBI_HOME}}"
-GRB_LICENSE_FILE    =  "{{GRB_LICENSE_FILE}}"
+METAPHOR_DIR        =  "{{PIPELINE_CONFIG.METAPHOR_DIR}}"
+HENRY_DIR           =  "{{PIPELINE_CONFIG.HENRY_DIR}}"
+BOXER_DIR           =  "{{PIPELINE_CONFIG.BOXER_DIR}}"
+TMP_DIR             =  "{{PIPELINE_CONFIG.TMP_DIR}}"
+GUROBI_HOME         =  "{{PIPELINE_CONFIG.GUROBI_HOME}}"
+GRB_LICENSE_FILE    =  "{{PIPELINE_CONFIG.GRB_LICENSE_FILE}}"
 
 FARSI_PIPELINE      =  os.path.join(METAPHOR_DIR, "/pipelines/Farsi/LF_Pipeline")
 SPANISH_PIPELINE    =  os.path.join(METAPHOR_DIR, "/pipelines/Spanish/run_spanish.sh")
