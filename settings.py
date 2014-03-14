@@ -1,8 +1,13 @@
-#!/usr/bin/env python
 # coding: utf-8
 
+# Copyright (C) University of Southern California (http://usc.edu)
+# Author: Vladimir M. Zaytsev <zaytsev@usc.edu>
+# URL: <http://nlg.isi.edu/>
+# For more information, see README.md
+# For license information, see LICENSE
 
 import os
+
 
 def project_dir(dir_name):
     return os.path.join(os.path.dirname(__file__), dir_name)\
@@ -75,6 +80,7 @@ INSTALLED_APPS = (
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.admin",
+    "pipeline",
 )
 
 
@@ -97,24 +103,24 @@ LOGGING = {
 
         "pipeline-file": {
             "class": "logging.handlers.RotatingFileHandler",
-            "filename": "logs/pipeline.log.bz2",
+            "filename": "logs/pipeline.log",
             "formatter": "verbose",
-            "backupCount": 32,
-            "maxBytes": 1024 * 1024 * 128,
+            "backupCount": 3,
+            "maxBytes": 1024 * 1024 * 16,
         },
         "django-file": {
             "class": "logging.handlers.RotatingFileHandler",
-            "filename": "logs/django.log.bz2",
+            "filename": "logs/django.log",
             "formatter": "verbose",
-            "backupCount": 32,
-            "maxBytes": 1024 * 1024 * 128,
+            "backupCount": 3,
+            "maxBytes": 1024 * 1024 * 16,
         },
         "requests-file": {
             "class": "logging.handlers.RotatingFileHandler",
-            "filename": "logs/requests.log.bz2",
+            "filename": "logs/requests.log",
             "formatter": "verbose",
-            "backupCount": 10,
-            "maxBytes": 1024 * 1024 * 10,
+            "backupCount": 3,
+            "maxBytes": 1024 * 1024 * 16,
         },
 
         "mail_admins": {
@@ -142,12 +148,6 @@ LOGGING = {
             "handlers": ["requests-file"],
             "propagate": True,
             "level": "DEBUG",
-        },
-
-        "django.request": {
-            "handlers": ["mail_admins"],
-            "propagate": True,
-            "level": "ERROR",
         },
     }
 }

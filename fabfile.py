@@ -101,6 +101,10 @@ def deploy():
                                              "{path}/lccsrv/settings.py".format(**config),
                                              context=context,
                                              use_jinja=True)
+        fabric.contrib.files.upload_template("fab/paths.py",
+                                             "{path}/lccsrv/paths.py".format(**config),
+                                             context=context,
+                                             use_jinja=True)
 
         print(green("Uploading usgi.ini"))
         fabric.contrib.files.upload_template("fab/uwsgi.ini",

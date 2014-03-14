@@ -1,3 +1,4 @@
+lz4
 uwsgi
 jinja2
 fabric

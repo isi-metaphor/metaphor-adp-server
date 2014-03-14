@@ -20,6 +20,16 @@
 
     "LOGGING_UWSGI_FILE":		"/lfs1/vzaytsev/research/logs/lcc-service.dev/uwsgi.log",
 
-    "METAPHOR_ROOT":			""
+    "PIPELINE_CONFIG":			{
+		"METAPHOR_DIR":			"/lfs1/vzaytsev/research/repo/metaphor",
+    	"HENRY_DIR":			"/opt/adp-install/henry-n700",
+    	"BOXER_DIR":			"/opt/adp-install/boxer",
+    	"TMP_DIR":				"/lfs1/vzaytsev/research/temp/lcc_service_tmp/dev/"
+
+		"GUROBI_HOME":			"/opt/adp-install/gurobi501/linux64/",
+		"GRB_LICENSE_FILE":		"/opt/adp-install/gurobi.lic",
+    }
 
 }
+
+

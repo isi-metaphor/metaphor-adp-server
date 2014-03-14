@@ -7,6 +7,7 @@
 # For license information, see LICENSE
 
 import logging
+import traceback
 
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
@@ -17,6 +18,10 @@ from django.contrib.auth import logout
 from django.contrib.auth import authenticate
 
 from django.views.decorators.csrf import csrf_exempt
+
+from pipeline.models import AnnotationTask
+from pipeline.annotator import Annotator
+
 
 logger = logging.getLogger("pipeline")
 
@@ -55,6 +60,7 @@ def app(request):
 
 def user_logout(request):
     logout(request)
+    logger.info("User: %r. Logged out." % request.user)
     return HttpResponseRedirect("/app/")
 
 
@@ -62,7 +68,39 @@ def user_logout(request):
 def run_pipeline(request):
 
     if request.method == "POST":
-        return HttpResponse("{}", status=200, content_type="application/json")
+
+        try:
+            task = AnnotationTask()
+            task.request_body = request.body
+            task.save()
+            logger.info("Task created. Id=%d." % task.id)
+        except Exception:
+            msg = "Cannot create tack."
+            logger.error(msg + " Traceback: %s" % traceback.format_exc())
+            return HttpResponse(msg, status=500)
+
+        try:
+            pipeline = Annotator(logger, task)
+            logger.info("Pipeline initialized")
+        except Exception:
+            msg = "Cannot initialize pipeline."
+            logger.error(msg + " Traceback: %s" % traceback.format_exc())
+            return HttpResponse(msg, status=500)
+
+        try:
+            pipeline.annotate()
+        except Exception:
+            msg = "Error while annotating document. Traceback:\n%s." % traceback.format_exc()
+            logger.error(msg)
+            try:
+                task.log_error(msg)
+            except Exception:
+                logger.error("Error while saving failed task. Traceback: %s" % traceback.format_exc())
+
+            return task.to_response(save=True)
+
+        return task.to_response(save=True)
+
     else:
         return HttpResponse("<b>Error: use POST method to submit query file.</b>",
                             status=405)
