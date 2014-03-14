@@ -130,7 +130,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
                      "/models/h93.py -d 3 -t 4 -O proofgraph,statistics -T " + \
                      time_unit_henry
 
-    logger.infgo("Running Henry command: '%s'." % henry_proc)
+    logger.info("Running Henry command: '%s'." % henry_proc)
     henry_pipeline = Popen(henry_proc,
                                shell=True,
                                stdin=PIPE,
@@ -168,14 +168,14 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
                     logger.error(error_msg)
                     task.log_error(error_msg)
                     task.log_error("Failed annotation: %s" % str(annotation))
-                    task.error_count += 1
+                    task.task_error_count += 1
             else:
                 failed += 1
-                error_msg = "Failed sentence #%s (%r not in %r).\n %s" % (sID, sID, hkeys, traceback.format_exc())
+                error_msg = "Failed sentence #%s (%r not in %r)." % (sID, sID, hkeys)
                 logger.error(error_msg)
                 task.log_error(error_msg)
                 task.log_error("Failed annotation: %s" % str(annotation))
-                task.error_count += 1
+                task.task_error_count += 1
 
     logger.info("Processed: %d." % processed)
     logger.info("Failed: %d." % failed)

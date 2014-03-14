@@ -117,7 +117,7 @@ class Annotator(object):
             error_msg = "Found 0 metaphors for annotation. Task id=#%d."
             return self.task_error(error_msg, 6)
 
-        output = adb.run_annotation(request_document_body, metaphors, language, self.task, self.logger, True)
+        output = adb.run_annotation(request_document, metaphors, language, self.task, self.logger, True)
 
         self.task.response_body_blob = json.dumps(output, encoding="utf-8")
 
