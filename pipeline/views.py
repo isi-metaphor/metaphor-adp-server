@@ -20,7 +20,7 @@ from django.contrib.auth import authenticate
 from django.views.decorators.csrf import csrf_exempt
 
 from pipeline.models import AnnotationTask
-from pipeline.external import Annotator
+from pipeline.annotator import Annotator
 
 
 logger = logging.getLogger("pipeline")

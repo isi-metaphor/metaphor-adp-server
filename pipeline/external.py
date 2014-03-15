@@ -6,121 +6,192 @@
 # For more information, see README.md
 # For license information, see LICENSE
 
+import sys
+import time
+import traceback
 
-import os
-import json
-import pipeline.process as adb
+from lccsrv.paths import *
+from legacy.extractor import *
+from subprocess import Popen, PIPE
+from StringIO import StringIO
 
-from pipeline.models import TASK_STATUS
+ENV = sys.environ
+
+kbcompiled = True
+
+DESCRIPTION = "Abductive engine output; "                                                           \
+              "targetFrame: Is currently equal to targetConceptSubDomain;"                          \
+              "targetConceptDomain: Target concept domain defined by abduction; "                   \
+              "targetConceptSubDomain: Target concept subdomain defined by abduction ; "            \
+              "sourceFrame: Source frame proposed by abduction ; "                                  \
+              "sourceConceptSubDomain: Source subdomain proposed by abduction ; "                   \
+              "targetFrameElementSentence: List of words denoting the target found by abduction; "  \
+              "sourceFrameElementSentence: List of words denoting the source found by abduction; "  \
+              "annotationMappings: Target-Source mapping structures. "                              \
+              "isiAbductiveExplanation: Target-Source mapping (metaphor interpretation) as "        \
+              "logical form found by abduction."
 
 
-class Annotator(object):
+def extract_parses(input_string):
+    output_dict = dict()
+    pattern = re.compile('.+\(\s*name\s+([^\)]+)\)')
+    for line in input_string.splitlines():
+        match_obj = pattern.match(line)
+        if match_obj:
+            target = match_obj.group(1)
+            output_dict[target] = line
+    return output_dict
 
-    def __init__(self, logger, task):
-        self.logger = logger
-        self.task = task
 
-    def task_error(self, error_msg, error_code=None, count_error=False):
-        self.logger.error(error_msg)
-        self.task.log_error(error_msg)
-        self.task.task_error_message = error_msg
-        if error_code is not None:
-            self.task.error_code = error_code
-        if count_error:
-            self.task.task_error_count += 1
-        return self.task
+def extract_hypotheses(input_string):
+    output_dict = dict()
+    hypothesis_found = False
+    target_pattern = re.compile('<result-inference target="(.+)"')
+    target_string = ""
+    for line in input_string.splitlines():
+        match_obj = target_pattern.match(line)
+        if match_obj:
+            target_string = match_obj.group(1)
+        elif line.startswith("<hypothesis"):
+            hypothesis_found = True
+        elif line.startswith("</hypothesis>"):
+            hypothesis_found = False
+        elif hypothesis_found:
+            output_dict[target_string] = line
+            target_string = ""
+            hypothesis_found = False
+    return output_dict
 
-    def annotate(self):
 
-        self.logger.info("METAPHOR_DIR      = %s" % os.environ["METAPHOR_DIR"])
-        self.logger.info("HENRY_DIR         = %s" % os.environ["HENRY_DIR"])
-        self.logger.info("BOXER_DIR         = %s" % os.environ["BOXER_DIR"])
-        self.logger.info("TMP_DIR           = %s" % os.environ["TMP_DIR"])
-        self.logger.info("GUROBI_HOME       = %s" % os.environ["GUROBI_HOME"])
-        self.logger.info("GRB_LICENSE_FILE  = %s" % os.environ["GRB_LICENSE_FILE"])
+def generate_text_input(input_metaphors, language):
+    output_str = ""
+    for key in input_metaphors.keys():
+        output_str += "<META>" + key + "\n\n " + input_metaphors[key] + "\n\n"
 
-        # 1.
-        self.logger.info("Start annotating document.")
-        metaphors = {}
-        request_document_body = self.task.request_body
+    return output_str
 
-        # 2. Parse document JSON
-        self.logger.info("Parse document json. Task id=%d, document size=%d.." % (self.task.id, len(request_document_body)))
-        request_document = json.loads(request_document_body)
 
-        # 3. Get document language.
-        self.logger.info("Getting document language. Task id=%d." % self.task.id)
-        try:
-            language = request_document["language"]
-        except KeyError:
-            error_msg = "No language information available. Task id=%d." % self.task.id
-            return self.task_error(error_msg, 3)
+# withPDFContent=true; generate graphs and include PDF content
+# as base-64 in output
 
-        # 4. Get annotation records.
-        self.logger.info("Getting document annotations. Task id=%d." % self.task.id)
-        try:
-            annotations = request_document["metaphorAnnotationRecords"]
-        except KeyError:
-            self.logger.error("No annotations available. Task id=%d." % self.task.id)
-            error_msg = "No language information available. Task id=%d." % self.task.id
-            return self.task_error(error_msg, 4)
+def run_annotation(request_body_dict, input_metaphors, language, task, logger, with_pdf_content):
+    start_time = time.time()
+    input_str = generate_text_input(input_metaphors, language)
 
-        # 5. Extract annotations.
-        self.logger.info("Extracting metaphor entries from document. Task id=%d." % self.task.id)
-        annotation_id_index = 0
+    # Parser pipeline
+    parser_proc = ""
+    if language == "FA":
+        parser_proc = FARSI_PIPELINE + " | python " + PARSER2HENRY + " --nonmerge sameid freqpred"
+        KBPATH = FA_KBPATH
 
-        for annotation_no, annotation in enumerate(annotations):
-            self.logger.info("Extracting annotation #%d." % annotation_no)
+    elif language == "ES":
+        parser_proc = SPANISH_PIPELINE + " | python " + PARSER2HENRY + " --nonmerge sameid freqpred"
+        KBPATH = ES_KBPATH
 
-            # 5.1 Extracting annotation ID.
-            try:
-                annotation_id = annotation["sentenceId"]
-            except KeyError:
-                error_msg = "Ann #%d. No annotation id available (sentenceId). Task=%d" % (
-                    annotation_no,
-                    self.task.id,
-                )
-                self.task_error(error_msg, error_code=None, count_error=True)
-                annotation_id_index += 1
-                annotation_id = annotation_id_index
+    elif language == "RU":
+        parser_proc = RUSSIAN_PIPELINE + " | python " + PARSER2HENRY + " --nonmerge sameid freqpred"
+        KBPATH = RU_KBPATH
 
-            # 5.2
-            try:
-                metaphor = annotation["linguisticMetaphor"]
-                if language == "EN":
-                    # Replacing single quote, double quote (start/end), dash
-                    ascii_metaphor = metaphor.replace(u"\u2019", u"\u0027")\
-                                             .replace(u"\u201c", u"\u0022")\
-                                             .replace(u"\u201d", u"\u0022")\
-                                             .replace(u"\u2014", u"\u002d")
+    elif language == "EN":
+        tokenizer = BOXER_DIR + "/bin/tokkie --stdin"
+        candcParser = BOXER_DIR + "/bin/candc --models " + BOXER_DIR + "/models/boxer --candc-printer boxer"
+        boxer = BOXER_DIR + "/bin/boxer --semantics tacitus --resolve true --stdin"
+        b2h = "python " + BOXER2HENRY + " --nonmerge sameid freqpred"
+        parser_proc = tokenizer + " | " + candcParser + " | " + boxer + " | " + b2h
+        KBPATH = EN_KBPATH
 
-                    metaphors[str(annotation_id)] = ascii_metaphor.encode("utf-8")
+    logger.info("Running parsing command: '%s'." % parser_proc)
+    logger.info("Input str: %r" % input_str)
 
-                else:
+    parser_pipeline = Popen(parser_proc,
+                            env=ENV,
+                            shell=True,
+                            stdin=PIPE,
+                            stdout=PIPE,
+                            stderr=None,
+                            close_fds=True)
+    parser_output, parser_stderr = parser_pipeline.communicate(input=input_str)
 
-                    metaphors[str(annotation_id)] = metaphor.encode("utf-8")
+    # Parser processing time in seconds
+    parser_time = (time.time() - start_time) * 0.001
+    logger.info("Command finished. Processing time: %r." % parser_time)
+    logger.info("Command STDERR:\n %r" % parser_stderr)
 
-            except KeyError:
-                error_msg = "Ann #%d. No metaphor available (skip it). Task=%d" % (
-                    annotation_no,
-                    self.task.id,
-                )
-                self.task_error(error_msg, error_code=None, count_error=True)
+    # time to generate final output in seconds
+    generate_output_time = 2
 
-        self.logger.info("Task %d language=%s" % (self.task.id, language))
-        self.task.language = language
-        self.task.task_status = TASK_STATUS.PREPROCESSED
-        self.task.response_status = 200
+    # time left for Henry in seconds
+    time_all_henry = 600 - parser_time - generate_output_time
 
-        # 6. If there are no metaphors for annotation, return error.
-        if len(metaphors) == 0:
-            error_msg = "Found 0 metaphors for annotation. Task id=#%d."
-            return self.task_error(error_msg, 6)
+    if with_pdf_content:
+        # time for graph generation subtracted from Henry time in seconds
+        time_all_henry -= - 3
 
-        output = adb.run_annotation(request_document, metaphors, language, self.task, self.logger, True)
+    # time for one interpretation in Henry in seconds
+    time_unit_henry = str(int(time_all_henry / len(input_metaphors)))
 
-        self.task.response_body_blob = json.dumps(output, encoding="utf-8")
+    # Henry processing
+    if kbcompiled:
+        henry_proc = HENRY_DIR + "/bin/henry -m infer -e " + HENRY_DIR + \
+                     "/models/h93.py -d 3 -t 4 -O proofgraph,statistics -T " + \
+                     time_unit_henry + " -b " + KBPATH
+    else:
+        henry_proc = HENRY_DIR + "/bin/henry -m infer -e " + HENRY_DIR + \
+                     "/models/h93.py -d 3 -t 4 -O proofgraph,statistics -T " + \
+                     time_unit_henry
 
-        return self.task
+    logger.info("Running Henry command: '%s'." % henry_proc)
+    henry_pipeline = Popen(henry_proc,
+                           env=ENV,
+                           shell=True,
+                           stdin=PIPE,
+                           stdout=PIPE,
+                           stderr=None,
+                           close_fds=True)
+    henry_output, henry_stderr = henry_pipeline.communicate(input=parser_output)
+    hypotheses = extract_hypotheses(henry_output)
+    logger.info("Parsing Henry output. %r" % parser_output)
+    logger.info("Henry STDERR:\n %r" % henry_stderr)
+
+    parses = extract_parses(parser_output)
+    processed, failed, empty = 0, 0, 0
+
+    # merge ADB result and input json document
+    input_annotations = request_body_dict["metaphorAnnotationRecords"]
+
+    total = len(input_annotations)
+    hkeys = hypotheses.keys()
+    for annotation in input_annotations:
+        if "sentenceId" in annotation:
+            sID = str(annotation["sentenceId"])
+            if sID in hkeys:
+                CM_output = extract_CM_mapping(sID, hypotheses[sID], parses[sID], DESCRIPTION, annotation)
+                try:
+                    for annot_property in CM_output.keys():
+                        if CM_output.get(annot_property):
+                            annotation[annot_property] = CM_output[annot_property]
+                    processed += 1
+                    logger.info("Processed sentence #%s." % sID)
+
+                except Exception:
+                    failed += 1
+                    error_msg = "Failed sentence #%s.\n %s" % (sID, traceback.format_exc())
+                    logger.error(error_msg)
+                    task.log_error(error_msg)
+                    task.log_error("Failed annotation: %s" % str(annotation))
+                    task.task_error_count += 1
+            else:
+                failed += 1
+                error_msg = "Failed sentence #%s (%r not in %r)." % (sID, sID, hkeys)
+                logger.error(error_msg)
+                task.log_error(error_msg)
+                task.log_error("Failed annotation: %s" % str(annotation))
+                task.task_error_count += 1
+
+    logger.info("Processed: %d." % processed)
+    logger.info("Failed: %d." % failed)
+    logger.info("Total: %d." % total)
+
+    return request_body_dict
 
 
