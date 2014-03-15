@@ -65,4 +65,6 @@ os.environ["PYTHONPATH"]            =   "%s:%s:%s:%s:%s:$PYTHONPATH" % (
 sys.path.extend([CODE_RU, CODE_EN, CODE_ES, CODE_FA, CODE_COMMON])
 
 
-logger.info("Envieronment variables: %s." % "\n".join(os.environ))
+logger.info("Envieronment variables: %s." % "\n".join([
+    "%s=%s" % k,v for k,v in os.environ.items()
+]))

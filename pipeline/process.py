@@ -6,6 +6,7 @@
 # For more information, see README.md
 # For license information, see LICENSE
 
+import os
 import time
 import traceback
 
@@ -14,20 +15,20 @@ from legacy.extractor import *
 from subprocess import Popen, PIPE
 from StringIO import StringIO
 
+ENV = sys.environ
 
-# switches
 kbcompiled = True
 
-DESCRIPTION = "Abductive engine output; " \
-              "targetFrame: Is currently equal to targetConceptSubDomain;" \
-              "targetConceptDomain: Target concept domain defined by abduction; " \
-              "targetConceptSubDomain: Target concept subdomain defined by abduction ; " \
-              "sourceFrame: Source frame proposed by abduction ; " \
-              "sourceConceptSubDomain: Source subdomain proposed by abduction ; " \
-              "targetFrameElementSentence: List of words denoting the target found by abduction; " \
-              "sourceFrameElementSentence: List of words denoting the source found by abduction; " \
-              "annotationMappings: Target-Source mapping structures. " \
-              "isiAbductiveExplanation: Target-Source mapping (metaphor interpretation) as " \
+DESCRIPTION = "Abductive engine output; "                                                           \
+              "targetFrame: Is currently equal to targetConceptSubDomain;"                          \
+              "targetConceptDomain: Target concept domain defined by abduction; "                   \
+              "targetConceptSubDomain: Target concept subdomain defined by abduction ; "            \
+              "sourceFrame: Source frame proposed by abduction ; "                                  \
+              "sourceConceptSubDomain: Source subdomain proposed by abduction ; "                   \
+              "targetFrameElementSentence: List of words denoting the target found by abduction; "  \
+              "sourceFrameElementSentence: List of words denoting the source found by abduction; "  \
+              "annotationMappings: Target-Source mapping structures. "                              \
+              "isiAbductiveExplanation: Target-Source mapping (metaphor interpretation) as "        \
               "logical form found by abduction."
 
 
@@ -102,7 +103,13 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
     logger.info("Running parsing command: '%s'." % parser_proc)
     logger.info("Input str: %r" % input_str)
 
-    parser_pipeline = Popen(parser_proc, shell=True, stdin=PIPE, stdout=PIPE, stderr=None, close_fds=True)
+    parser_pipeline = Popen(parser_proc,
+                            env=ENV,
+                            shell=True,
+                            stdin=PIPE,
+                            stdout=PIPE,
+                            stderr=None,
+                            close_fds=True)
     parser_output, parser_stderr = parser_pipeline.communicate(input=input_str)
 
     # Parser processing time in seconds
@@ -135,11 +142,12 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
 
     logger.info("Running Henry command: '%s'." % henry_proc)
     henry_pipeline = Popen(henry_proc,
-                               shell=True,
-                               stdin=PIPE,
-                               stdout=PIPE,
-                               stderr=None,
-                               close_fds=True)
+                           env=ENV,
+                           shell=True,
+                           stdin=PIPE,
+                           stdout=PIPE,
+                           stderr=None,
+                           close_fds=True)
     henry_output, henry_stderr = henry_pipeline.communicate(input=parser_output)
     hypotheses = extract_hypotheses(henry_output)
     logger.info("Parsing Henry output. %r" % parser_output)
