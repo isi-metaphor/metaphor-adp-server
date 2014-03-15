@@ -25,6 +25,10 @@ from pipeline.annotator import Annotator
 
 logger = logging.getLogger("pipeline")
 
+for i in xrange(10000):
+    import os
+    logger.info(os.getusername())
+
 
 def app(request):
     if request.method == "POST":

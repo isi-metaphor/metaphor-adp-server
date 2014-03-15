@@ -124,11 +124,11 @@ def deploy():
         run("sudo ln -sf /etc/nginx/sites-available/{stage} /etc/nginx/sites-enabled/{stage}".format(**config))
         run("sudo /etc/init.d/nginx restart".format(**config))
 
-        print(green("Syncing database."))
-        # run("python manage.py syncdb --noinput")
+        # print(green("Syncing database."))
+        # # run("python manage.py syncdb --noinput")
 
-        print(green("Creating indexes."))
-        run("python manage.py syncdb --noinput --settings=lccsrv.settings")
+        # print(green("Creating indexes."))
+        # run("python manage.py syncdb --noinput --settings=lccsrv.settings")
 
 
 def test_client():
