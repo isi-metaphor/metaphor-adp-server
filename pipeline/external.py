@@ -116,6 +116,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
     parser_time = (time.time() - start_time) * 0.001
     logger.info("Command finished. Processing time: %r." % parser_time)
     logger.info("Command STDERR:\n %r" % parser_stderr)
+    logger.ingo("Parser output:\n%r\n" % parser_output)
 
     # time to generate final output in seconds
     generate_output_time = 2
@@ -150,14 +151,18 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
                            close_fds=True)
     henry_output, henry_stderr = henry_pipeline.communicate(input=parser_output)
     hypotheses = extract_hypotheses(henry_output)
-    logger.info("Parsing Henry output. %r" % parser_output)
-    logger.info("Henry STDERR:\n %r" % henry_stderr)
+    logger.info("Parsing Henry output. %r" % henry_output)
+    logger.info("Henry STDERR:\n%r\n" % henry_stderr)
 
     parses = extract_parses(parser_output)
     processed, failed, empty = 0, 0, 0
 
+    logger.info("Parsed Henry output:\n%r\n" % parses)
+
     # merge ADB result and input json document
     input_annotations = request_body_dict["metaphorAnnotationRecords"]
+
+    logger.info("Input annotations:\n%r\n" % input_annotations)
 
     total = len(input_annotations)
     hkeys = hypotheses.keys()
