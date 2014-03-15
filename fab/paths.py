@@ -68,3 +68,9 @@ sys.path.extend([CODE_RU, CODE_EN, CODE_ES, CODE_FA, CODE_COMMON])
 logger.info("Envieronment variables: %s." % "\n".join([
     "%s=%s" % (k, v) for k, v in os.environ.items()
 ]))
+
+logger.info("\n\n\nDONE\n\n\n")
+
+for i in xrange(10000):
+    import os
+    logger.info("User: %r" % os.getusername())
