@@ -6,7 +6,7 @@
 # For more information, see README.md
 # For license information, see LICENSE
 
-import sys
+import os
 import time
 import traceback
 
@@ -15,7 +15,7 @@ from legacy.extractor import *
 from subprocess import Popen, PIPE
 from StringIO import StringIO
 
-ENV = sys.environ
+ENV = os.environ
 
 kbcompiled = True
 
