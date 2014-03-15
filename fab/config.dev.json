@@ -2,8 +2,8 @@
     "STAGE":                    "dev",
     "ROOT":                     "/lfs1/vzaytsev/research/repo/lcc-dev",
 
-	"ADMIN_NAME":               "Vova Zaytsev",
-	"ADMIN_EMAIL":              "vzaytsev@isi.edu",
+    "ADMIN_NAME":               "Vova Zaytsev",
+    "ADMIN_EMAIL":              "vzaytsev@isi.edu",
 
     "DJANGO_DEBUG":             "True",
     "DJANGO_DB_NAME":           "/lfs1/vzaytsev/research/data/lcc_service/lcc-service.dev.db",
