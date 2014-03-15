@@ -116,7 +116,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
     parser_time = (time.time() - start_time) * 0.001
     logger.info("Command finished. Processing time: %r." % parser_time)
     logger.info("Command STDERR:\n %r" % parser_stderr)
-    logger.ingo("Parser output:\n%r\n" % parser_output)
+    logger.info("Parser output:\n%r\n" % parser_output)
 
     # time to generate final output in seconds
     generate_output_time = 2
