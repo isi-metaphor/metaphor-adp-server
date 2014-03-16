@@ -68,7 +68,9 @@ class AnnotationTask(models.Model):
             self.response_time = datetime.now()
             self.save()
 
-        return HttpResponse(response_body, content_type="application/json")
+        return HttpResponse(response_body,
+            content_type="application/json",
+            status=self.response_status)
 
 
     @property

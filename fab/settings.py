@@ -155,10 +155,5 @@ LOGGING = {
             "level": "DEBUG",
         },
 
-        "django.request": {
-            "handlers": ["mail_admins"],
-            "propagate": True,
-            "level": "ERROR",
-        },
     }
 }
