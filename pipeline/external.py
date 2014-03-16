@@ -157,12 +157,12 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
     henry_output, henry_stderr = henry_pipeline.communicate(input=parser_output)
     hypotheses = extract_hypotheses(henry_output)
     logger.info("Henry output:\n%s\n" % strcut(henry_output))
-    logger.info("Parsed Henry output:\n%s\n" % strcut(hypotheses))
+    logger.info("Hypotheses output:\n%s\n" % strcut(hypotheses))
 
     parses = extract_parses(parser_output)
     processed, failed, empty = 0, 0, 0
 
-    logger.info("Parsed Henry output:\n%r\n" % parses)
+    logger.info("Parsed Henry output:\n%r\n" % strcut(parses))
 
     # merge ADB result and input json document
     input_annotations = request_body_dict["metaphorAnnotationRecords"]
