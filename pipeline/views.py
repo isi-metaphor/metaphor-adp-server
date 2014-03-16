@@ -98,7 +98,12 @@ def run_pipeline(request):
 
             return task.to_response(save=True)
 
-        return task.to_response(save=True)
+        try:
+            response = task.to_response(save=True)
+            return response
+        except Exception:
+                logger.error("Error while saving failed task. Traceback: %s" % traceback.format_exc())
+            return HttpResponse("", status=500)
 
     else:
         return HttpResponse("<b>Error: use POST method to submit query file.</b>",
