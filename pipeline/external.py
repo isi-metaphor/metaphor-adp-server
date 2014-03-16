@@ -71,8 +71,14 @@ def generate_text_input(input_metaphors, language):
     return output_str
 
 
-# withPDFContent=true; generate graphs and include PDF content
-# as base-64 in output
+def strcut(some_str, max_size=120):
+    if some_str is not None:
+        some_str = str(some_str)
+        if len(some_str) > max_size:
+            return some_str[:max_size]
+        return some_str
+    return "<NONE>"
+
 
 def run_annotation(request_body_dict, input_metaphors, language, task, logger, with_pdf_content):
     start_time = time.time()
@@ -101,7 +107,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
         KBPATH = EN_KBPATH
 
     logger.info("Running parsing command: '%s'." % parser_proc)
-    logger.info("Input str: %r" % input_str)
+    logger.info("Input str: %r" % strcut(input_str))
 
     parser_pipeline = Popen(parser_proc,
                             env=ENV,
@@ -115,7 +121,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
     # Parser processing time in seconds
     parser_time = (time.time() - start_time) * 0.001
     logger.info("Command finished. Processing time: %r." % parser_time)
-    logger.info("Parser output:\n%r\n" % parser_output)
+    logger.info("Parser output:\n%s\n" % strcut(parser_output))
 
     # time to generate final output in seconds
     generate_output_time = 2
@@ -150,7 +156,8 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
                            close_fds=True)
     henry_output, henry_stderr = henry_pipeline.communicate(input=parser_output)
     hypotheses = extract_hypotheses(henry_output)
-    logger.info("Parsing Henry output. %r" % henry_output)
+    logger.info("Henry output:\n%s\n" % strcut(henry_output))
+    logger.info("Parsed Henry output:\n%s\n" % strcut(hypotheses))
 
     parses = extract_parses(parser_output)
     processed, failed, empty = 0, 0, 0
