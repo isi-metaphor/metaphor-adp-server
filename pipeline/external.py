@@ -199,10 +199,13 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
                 task.log_error("Failed annotation: %s" % str(annotation))
                 task.task_error_count += 1
 
+    result = json.dumps(request_body_dict, encoding="utf-8")
+
     logger.info("Processed: %d." % processed)
     logger.info("Failed: %d." % failed)
     logger.info("Total: %d." % total)
+    logger.info("Result size: %d." % len(result))
 
-    return request_body_dict
+    return result
 
 

@@ -69,8 +69,8 @@ class AnnotationTask(models.Model):
             self.save()
 
         return HttpResponse(response_body,
-            content_type="application/json",
-            status=self.response_status)
+                            content_type="application/json",
+                            status=self.response_status)
 
 
     @property

@@ -96,8 +96,6 @@ def run_pipeline(request):
             except Exception:
                 logger.error("Error while saving failed task. Traceback: %s" % traceback.format_exc())
 
-            return task.to_response(save=True)
-
         try:
             response = task.to_response(save=True)
             return response
