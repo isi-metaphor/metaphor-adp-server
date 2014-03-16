@@ -8,12 +8,12 @@
 
 import os
 import time
+import json
 import traceback
 
 from lccsrv.paths import *
 from legacy.extractor import *
 from subprocess import Popen, PIPE
-from StringIO import StringIO
 
 ENV = os.environ
 
