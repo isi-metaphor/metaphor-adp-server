@@ -103,7 +103,6 @@ def deploy():
                                              use_jinja=True)
         run("sudo cp -f {path}/bashrc.sh /root/metaphor.sh".format(**config))
 
-
         print(green("Uploading setting.py"))
         fabric.contrib.files.upload_template("fab/settings.py",
                                              "{path}/lccsrv/settings.py".format(**config),
@@ -121,7 +120,7 @@ def deploy():
                                              use_jinja=True)
         run("sudo cp -f {path}/uwsgi.ini /etc/uwsgi/apps-available/{stage}.ini".format(**config))
         run("sudo ln -sf /etc/uwsgi/apps-available/{stage}.ini /etc/uwsgi/apps-enabled/{stage}.ini".format(**config))
-        run("sudo /etc/init.d/uwsgi restart {stage}".format(**config))
+        run("sudo /etc/init.d/uwsgi stop {stage}".format(**config))
 
         print(green("Uploading nginx config"))
         fabric.contrib.files.upload_template("fab/nginx.conf",
@@ -130,7 +129,7 @@ def deploy():
                                              use_jinja=True)
         run("sudo cp -f {path}/nginx.conf /etc/nginx/sites-available/{stage}".format(**config))
         run("sudo ln -sf /etc/nginx/sites-available/{stage} /etc/nginx/sites-enabled/{stage}".format(**config))
-        run("sudo /etc/init.d/nginx restart".format(**config))
+        run("sudo /etc/init.d/nginx stop".format(**config))
 
         # print(green("Syncing database."))
         # # run("python manage.py syncdb --noinput")
