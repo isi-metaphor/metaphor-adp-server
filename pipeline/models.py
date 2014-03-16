@@ -55,10 +55,20 @@ class AnnotationTask(models.Model):
 
     def to_response(self, save=True):
 
+        if self.task_error_code != 0:
+            if self.response_body_blob is None:
+                response_body = self.request_body
+                self.response_body = response_body
+            else:
+                response_body = self.response_body
+        else:
+            response_body = self.response_body
+
         if save:
             self.response_time = datetime.now()
+            self.save()
 
-        return HttpResponse("{}", content_type="application/json")
+        return HttpResponse(response_body, content_type="application/json")
 
 
     @property
