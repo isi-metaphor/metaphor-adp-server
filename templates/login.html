@@ -12,8 +12,6 @@
     <!-- Bootstrap core CSS -->
     <link href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 
-
-
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
       <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
@@ -25,13 +23,18 @@
 
     <div class="container">
 
-      <form class="form-signin" role="form">
-        <h2 class="form-signin-heading">Please sign in</h2>
-        <input type="email" class="form-control" placeholder="Email address" required autofocus>
-        <input type="password" class="form-control" placeholder="Password" required>
-        <label class="checkbox">
-          <input type="checkbox" value="remember-me"> Remember me
-        </label>
+      <form class="form-signin" role="form" action="/app/" method="POST"> {% csrf_token %}
+
+        <h2 class="form-signin-heading">Please log in</h2>
+
+        {% if message %}
+        <div class="alert alert-{{message_level}}">
+          <a href="#" class="alert-link">{{ message }}</a>
+        </div>
+        {% endif %}
+
+        <input name="user-name" type="text" class="form-control" placeholder="Username" required autofocus>
+        <input name="user-pass" type="password" class="form-control" placeholder="Password" required>
         <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
       </form>
 

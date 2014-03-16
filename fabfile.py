@@ -10,6 +10,7 @@
 
 import os
 import json
+import glob
 import fabric
 
 from fabric.api import *
@@ -64,11 +65,13 @@ def init():
         if not fabric.contrib.files.exists(env.config["path"]):
             run("git clone {repository} -b {branch} {path}".format(**env.config))
 
+
 def commit():
      local("git add -A")
      local("git diff --quiet --exit-code --cached || git commit -m 'Update'")
      local("git push")
      print(green('Committed and pushed to git.', bold=False))
+
 
 def update():
     print(green("Updating packages."))
@@ -93,9 +96,20 @@ def deploy():
         print(green("Pulling from GitHub."))
         run("git pull")
 
+        print(green("Uploading bashrc"))
+        fabric.contrib.files.upload_template("fab/bashrc.sh",
+                                             "{path}/bashrc.sh".format(**config),
+                                             context=context,
+                                             use_jinja=True)
+        run("sudo cp -f {path}/bashrc.sh /root/metaphor.sh".format(**config))
+
         print(green("Uploading setting.py"))
         fabric.contrib.files.upload_template("fab/settings.py",
                                              "{path}/lccsrv/settings.py".format(**config),
+                                             context=context,
+                                             use_jinja=True)
+        fabric.contrib.files.upload_template("fab/paths.py",
+                                             "{path}/lccsrv/paths.py".format(**config),
                                              context=context,
                                              use_jinja=True)
 
@@ -106,7 +120,7 @@ def deploy():
                                              use_jinja=True)
         run("sudo cp -f {path}/uwsgi.ini /etc/uwsgi/apps-available/{stage}.ini".format(**config))
         run("sudo ln -sf /etc/uwsgi/apps-available/{stage}.ini /etc/uwsgi/apps-enabled/{stage}.ini".format(**config))
-        run("sudo /etc/init.d/uwsgi restart {stage}".format(**config))
+        run("sudo /etc/init.d/uwsgi stop {stage}".format(**config))
 
         print(green("Uploading nginx config"))
         fabric.contrib.files.upload_template("fab/nginx.conf",
@@ -115,13 +129,22 @@ def deploy():
                                              use_jinja=True)
         run("sudo cp -f {path}/nginx.conf /etc/nginx/sites-available/{stage}".format(**config))
         run("sudo ln -sf /etc/nginx/sites-available/{stage} /etc/nginx/sites-enabled/{stage}".format(**config))
-        run("sudo /etc/init.d/nginx restart".format(**config))
+        run("sudo /etc/init.d/nginx stop".format(**config))
 
-        print(green("Syncing database."))
-        # run("python manage.py syncdb --noinput")
+        # print(green("Syncing database."))
+        # # run("python manage.py syncdb --noinput")
 
-        print(green("Creating indexes."))
-        # run("python manage.py syncdb --noinput")
+        # print(green("Creating indexes."))
+        # run("python manage.py syncdb --noinput --settings=lccsrv.settings")
+
+
+def test_client():
+    port = env.config["context"]["NGINX_PORT"]
+    host = env.config["context"]["NGINX_SERVER_NAME"]
+    for file_path in glob.glob("testdata/queries/*.json"):
+        cmd = "python oldclient/client.py -g %s -p %d -j %s" % (host, port, file_path)
+        print(green(cmd))
+        run(cmd)
 
 
 def devdeploy():

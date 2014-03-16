@@ -1,8 +1,13 @@
-#!/usr/bin/env python
 # coding: utf-8
 
+# Copyright (C) University of Southern California (http://usc.edu)
+# Author: Vladimir M. Zaytsev <zaytsev@usc.edu>
+# URL: <http://nlg.isi.edu/>
+# For more information, see README.md
+# For license information, see LICENSE
 
 import os
+
 
 def project_dir(dir_name):
     return os.path.join(os.path.dirname(__file__), dir_name)\
@@ -75,7 +80,74 @@ INSTALLED_APPS = (
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.admin",
+    "pipeline",
 )
 
 
-LOGGING = {}
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": True,
+    "formatters": {
+        "verbose": {
+            "format": "%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s"
+        },
+        "simple": {
+            "format": "%(asctime)s %(levelname)s %(message)s"
+        },
+    },
+    "handlers": {
+        "console":{
+            "class": "logging.StreamHandler",
+            "formatter": "simple",
+        },
+
+        "pipeline-file": {
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": "logs/pipeline.log",
+            "formatter": "verbose",
+            "backupCount": 3,
+            "maxBytes": 1024 * 1024 * 16,
+        },
+        "django-file": {
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": "logs/django.log",
+            "formatter": "verbose",
+            "backupCount": 3,
+            "maxBytes": 1024 * 1024 * 16,
+        },
+        "requests-file": {
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": "logs/requests.log",
+            "formatter": "verbose",
+            "backupCount": 3,
+            "maxBytes": 1024 * 1024 * 16,
+        },
+
+        "mail_admins": {
+            "level": "ERROR",
+            "class": "django.utils.log.AdminEmailHandler",
+            "include_html": True,
+            "email_backend": "django.core.mail.backends.filebased.EmailBackend",
+        }
+    },
+    "loggers": {
+
+        "pipeline": {
+            "handlers": ["pipeline-file", "console"],
+            "propagate": True,
+            "level": "DEBUG",
+        },
+
+        "django": {
+            "handlers": ["django-file"],
+            "propagate": True,
+            "level": "DEBUG",
+        },
+
+        "django.requests": {
+            "handlers": ["requests-file"],
+            "propagate": True,
+            "level": "DEBUG",
+        },
+    }
+}

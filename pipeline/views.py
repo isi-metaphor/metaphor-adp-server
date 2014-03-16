@@ -6,8 +6,104 @@
 # For more information, see README.md
 # For license information, see LICENSE
 
-from django.shortcuts import render_to_response
+import logging
+import traceback
+
+from django.http import HttpResponse
+from django.http import HttpResponseRedirect
+
+from django.shortcuts import render
+from django.contrib.auth import login
+from django.contrib.auth import logout
+from django.contrib.auth import authenticate
+
+from django.views.decorators.csrf import csrf_exempt
+
+from pipeline.models import AnnotationTask
+from pipeline.annotator import Annotator
 
 
-def home(request):
-     return render_to_response("index.html", {})
+logger = logging.getLogger("pipeline")
+
+def app(request):
+    if request.method == "POST":
+        username = request.POST["user-name"]
+        password = request.POST["user-pass"]
+        user = authenticate(username=username, password=password)
+        if user is not None:
+            if user.is_active:
+                login(request, user)
+                return render(request, "app.html", {
+                    "message_level": "info",
+                    "message": "You successfully logged in.",
+                })
+            else:
+                logger.info("User: %s. Tried to log-in app. Error: Wrong username/password." % username)
+                return render(request, "login.html", {
+                    "message": "User is not active.",
+                    "message_level": "danger",
+                })
+        else:
+            logger.info("User: %s. Tried to log-in app. Error: Wrong username/password." % username)
+            return render(request, "login.html", {
+                "message": "Wrong username/password.",
+                "message_level": "danger",
+            })
+    else:
+        if request.user.is_anonymous():
+            return render(request, "login.html", {})
+        else:
+            logger.info("User: %s. Accessed app." % request.user.username)
+            return render(request, "app.html", {})
+
+
+def user_logout(request):
+    logout(request)
+    logger.info("User: %r. Logged out." % request.user)
+    return HttpResponseRedirect("/app/")
+
+
+@csrf_exempt
+def run_pipeline(request):
+
+    if request.method == "POST":
+
+        try:
+            task = AnnotationTask()
+            task.request_body = request.body
+            task.save()
+            logger.info("Task created. Id=%d." % task.id)
+        except Exception:
+            msg = "Cannot create tack."
+            logger.error(msg + " Traceback: %s" % traceback.format_exc())
+            return HttpResponse(msg, status=500)
+
+        try:
+            pipeline = Annotator(logger, task)
+            logger.info("Pipeline initialized")
+        except Exception:
+            msg = "Cannot initialize pipeline."
+            logger.error(msg + " Traceback: %s" % traceback.format_exc())
+            return HttpResponse(msg, status=500)
+
+        try:
+            pipeline.annotate()
+        except Exception:
+            msg = "Error while annotating document. Traceback:\n%s." % traceback.format_exc()
+            logger.error(msg)
+            try:
+                task.log_error(msg)
+            except Exception:
+                logger.error("Error while saving failed task. Traceback: %s" % traceback.format_exc())
+
+        try:
+            response = task.to_response(save=True)
+            return response
+        except Exception:
+            logger.error("Error while saving failed task. Traceback: %s" % traceback.format_exc())
+
+        return HttpResponse("", status=500)
+
+    else:
+        return HttpResponse("<b>Error: use POST method to submit query file.</b>",
+                            status=405)

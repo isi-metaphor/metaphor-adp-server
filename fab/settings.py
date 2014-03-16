@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # coding: utf-8
 
 # Copyright (C) University of Southern California (http://usc.edu)
@@ -86,29 +85,75 @@ INSTALLED_APPS = (
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.admin",
+    "pipeline",
 )
 
 
 LOGGING = {
     "version": 1,
-    "disable_existing_loggers": False,
-    "filters": {
-        "require_debug_false": {
-            "()": "django.utils.log.RequireDebugFalse"
-        }
+    "disable_existing_loggers": True,
+    "formatters": {
+        "verbose": {
+            "format": "%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s"
+        },
+        "simple": {
+            "format": "%(asctime)s %(levelname)s %(message)s"
+        },
     },
     "handlers": {
+        "console":{
+            "class": "logging.StreamHandler",
+            "formatter": "simple",
+        },
+
+        "pipeline-file": {
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": "{{LOGGING_PIPELINE_FILE}}",
+            "formatter": "verbose",
+            "backupCount": 32,
+            "maxBytes": 1024 * 1024 * 128,
+        },
+        "django-file": {
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": "{{LOGGING_DJANGO_FILE}}",
+            "formatter": "verbose",
+            "backupCount": 32,
+            "maxBytes": 1024 * 1024 * 128,
+        },
+        "requests-file": {
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": "{{LOGGING_REQUESTS_FILE}}",
+            "formatter": "verbose",
+            "backupCount": 32,
+            "maxBytes": 1024 * 1024 * 128,
+        },
+
         "mail_admins": {
             "level": "ERROR",
-            "filters": ["require_debug_false"],
-            "class": "django.utils.log.AdminEmailHandler"
+            "class": "django.utils.log.AdminEmailHandler",
+            "include_html": True,
+            "email_backend": "django.core.mail.backends.filebased.EmailBackend",
         }
     },
     "loggers": {
-        "django.request": {
-            "handlers": ["mail_admins"],
-            "level": "ERROR",
+
+        "pipeline": {
+            "handlers": ["pipeline-file", "console"],
             "propagate": True,
+            "level": "DEBUG",
         },
+
+        "django": {
+            "handlers": ["django-file"],
+            "propagate": True,
+            "level": "DEBUG",
+        },
+
+        "django.requests": {
+            "handlers": ["requests-file"],
+            "propagate": True,
+            "level": "DEBUG",
+        },
+
     }
 }
