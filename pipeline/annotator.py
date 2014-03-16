@@ -32,13 +32,6 @@ class Annotator(object):
 
     def annotate(self):
 
-        self.logger.info("METAPHOR_DIR      = %s" % os.environ["METAPHOR_DIR"])
-        self.logger.info("HENRY_DIR         = %s" % os.environ["HENRY_DIR"])
-        self.logger.info("BOXER_DIR         = %s" % os.environ["BOXER_DIR"])
-        self.logger.info("TMP_DIR           = %s" % os.environ["TMP_DIR"])
-        self.logger.info("GUROBI_HOME       = %s" % os.environ["GUROBI_HOME"])
-        self.logger.info("GRB_LICENSE_FILE  = %s" % os.environ["GRB_LICENSE_FILE"])
-
         # 1.
         self.logger.info("Start annotating document.")
         metaphors = {}
@@ -120,6 +113,7 @@ class Annotator(object):
         output = adb.run_annotation(request_document, metaphors, language, self.task, self.logger, True)
 
         self.task.response_body_blob = json.dumps(output, encoding="utf-8")
+        self.task.task_status = TASK_STATUS.PROCESSED
 
         return self.task
 

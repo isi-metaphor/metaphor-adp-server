@@ -115,7 +115,6 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
     # Parser processing time in seconds
     parser_time = (time.time() - start_time) * 0.001
     logger.info("Command finished. Processing time: %r." % parser_time)
-    logger.info("Command STDERR:\n %r" % parser_stderr)
     logger.info("Parser output:\n%r\n" % parser_output)
 
     # time to generate final output in seconds
@@ -152,7 +151,6 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
     henry_output, henry_stderr = henry_pipeline.communicate(input=parser_output)
     hypotheses = extract_hypotheses(henry_output)
     logger.info("Parsing Henry output. %r" % henry_output)
-    logger.info("Henry STDERR:\n%r\n" % henry_stderr)
 
     parses = extract_parses(parser_output)
     processed, failed, empty = 0, 0, 0
@@ -162,12 +160,13 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
     # merge ADB result and input json document
     input_annotations = request_body_dict["metaphorAnnotationRecords"]
 
-    logger.info("Input annotations:\n%r\n" % input_annotations)
+    logger.info("Input annotations count:\n%r\n" % len(input_annotations))
 
     total = len(input_annotations)
-    hkeys = hypotheses.keys()
+    hkeys = frozenset(hypotheses.keys())
+
     for annotation in input_annotations:
-        if "sentenceId" in annotation:
+        if u"sentenceId" in annotation:
             sID = str(annotation["sentenceId"])
             if sID in hkeys:
                 CM_output = extract_CM_mapping(sID, hypotheses[sID], parses[sID], DESCRIPTION, annotation)

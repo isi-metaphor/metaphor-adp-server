@@ -18,7 +18,8 @@ from django.http import HttpResponse
 class TASK_STATUS:
 
     DOCUMENT_RECEIVED = 0
-    PREPROCESSED = 1
+    PREPROCESSED      = 1
+    PROCESSED         = 2
 
 
 class AnnotationTask(models.Model):
@@ -26,19 +27,19 @@ class AnnotationTask(models.Model):
     class Meta:
         db_table = "t_tasks"
 
-    request_time = models.DateTimeField(auto_now_add=True, null=False)
-    request_lang = models.CharField(max_length=32, null=True)
-    request_body_blob = models.BinaryField(null=False)
+    request_time        = models.DateTimeField(auto_now_add=True, null=False)
+    request_lang        = models.CharField(max_length=32, null=True)
+    request_body_blob   = models.BinaryField(null=False)
 
-    response_body_blob = models.BinaryField(default=lz4.compressHC("{'message':'Response not set.'}"), null=True)
-    response_time = models.DateTimeField(null=True)
-    response_status = models.IntegerField(null=False, default=200)
+    response_body_blob  = models.BinaryField(default=None, null=True)
+    response_time       = models.DateTimeField(null=True)
+    response_status     = models.IntegerField(null=False, default=200)
 
-    task_status = models.SmallIntegerField(null=False, default=TASK_STATUS.DOCUMENT_RECEIVED)
-    task_error_count = models.IntegerField(default=0, null=False)
-    task_log_blob = models.BinaryField(null=False)
-    task_error_message = models.CharField(max_length=256, null=True, blank=True)
-    task_error_code = models.IntegerField(null=False, default=0)
+    task_status         = models.SmallIntegerField(null=False, default=TASK_STATUS.DOCUMENT_RECEIVED)
+    task_error_count    = models.IntegerField(default=0, null=False)
+    task_log_blob       = models.BinaryField(null=False)
+    task_error_message  = models.CharField(max_length=256, null=True, blank=True)
+    task_error_code     = models.IntegerField(null=False, default=0)
 
     def __init__(self, *args, **kwargs):
         super(AnnotationTask, self).__init__(*args, **kwargs)

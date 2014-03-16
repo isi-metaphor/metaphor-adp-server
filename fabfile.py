@@ -96,6 +96,14 @@ def deploy():
         print(green("Pulling from GitHub."))
         run("git pull")
 
+        print(green("Uploading bashrc"))
+        fabric.contrib.files.upload_template("fab/bashrc.sh",
+                                             "{path}/bashrc.sh".format(**config),
+                                             context=context,
+                                             use_jinja=True)
+        run("sudo cp -f {path}/bashrc.sh /root/metaphor.sh".format(**config))
+
+
         print(green("Uploading setting.py"))
         fabric.contrib.files.upload_template("fab/settings.py",
                                              "{path}/lccsrv/settings.py".format(**config),
