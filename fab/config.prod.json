@@ -1,15 +1,38 @@
 {
-    "STAGE": 				"prod",
-    "ROOT": 				"/lfs1/vzaytsev/research/repo/lcc-prod",
+    "STAGE":                    "prod",
+    "ROOT":                     "/lfs1/vzaytsev/research/repo/lcc-prod",
 
-	"ADMIN_NAME":			"Vova Zaytsev",
-	"ADMIN_EMAIL":			"vzaytsev@isi.edu",
+    "ADMIN_NAME":               "Vova Zaytsev",
+    "ADMIN_EMAIL":              "vzaytsev@isi.edu",
 
-    "DJANGO_DEBUG": 		"False",
-    "DJANGO_DB_NAME": 		"/lfs1/vzaytsev/research/data/lcc_service/lcc-service.prod.db",
+    "DJANGO_DEBUG":             "True",
+    "DJANGO_DB_NAME":           "/lfs1/vzaytsev/research/data/lcc_service/lcc-service.prod.db",
 
-    "NGINX_PORT": 			8080,
-    "NGINX_SERVER_NAME": 	"colo-vm19.isi.edu",
-    "NGINX_LOG_ACCESS": 	"/lfs1/vzaytsev/research/logs/lcc-service.prod.access",
-    "NGINX_LOG_ERROR": 		"/lfs1/vzaytsev/research/logs/lcc-service.prod.error"
+    "NGINX_PORT":               8081,
+    "NGINX_SERVER_NAME":        "colo-vm19.isi.edu",
+
+    "NGINX_LOG_ACCESS":         "/lfs1/vzaytsev/research/logs/lcc-service.prod/nginx.access.log",
+    "NGINX_LOG_ERROR":          "/lfs1/vzaytsev/research/logs/lcc-service.prod/nginx.error.log",
+
+    "LOGGING_REQUESTS_FILE":    "/lfs1/vzaytsev/research/logs/lcc-service.prod/app.requests.log",
+    "LOGGING_DJANGO_FILE":      "/lfs1/vzaytsev/research/logs/lcc-service.prod/app.django.log",
+    "LOGGING_PIPELINE_FILE":    "/lfs1/vzaytsev/research/logs/lcc-service.prod/app.pipeline.log",
+
+    "LOGGING_UWSGI_FILE":       "/lfs1/vzaytsev/research/logs/lcc-service.prod/uwsgi.log",
+
+    "PIPELINE_CONFIG":          {
+        "METAPHOR_DIR":         "/lfs1/vzaytsev/research/repo/metaphor",
+        "HENRY_DIR":            "/opt/adp-install/henry-n700",
+        "BOXER_DIR":            "/opt/adp-install/boxer",
+        "TMP_DIR":              "/lfs1/vzaytsev/research/temp/lcc-service.prod.tmp",
+        "GUROBI_HOME":          "/opt/adp-install/gurobi501/linux64/",
+        "GRB_LICENSE_FILE":     "/opt/adp-install/gurobi.lic",
+        "CPLUS_INCLUDE_PATH":   "/usr/include/python2.7/:/opt/adp-install/gurobi501/linux64/include",
+        "PATH":                 ".:${TEAM_LOCAL}/bin:${TEAM_PUBLIC}/bin:${PATH}:/usr/sbin:/sbin:/usr/bin:${GUROBI_HOME}/bin:${JAVA_HOME}/bin",
+        "LD_LIBRARY_PATH":      ":${GUROBI_HOME}/lib/:${LD_LIBRARY_PATH}",
+        "LIBRARY_PATH":         "${GUROBI_HOME}/lib"
+   }
+
 }
+
+
