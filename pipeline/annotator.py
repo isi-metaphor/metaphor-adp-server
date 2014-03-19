@@ -8,7 +8,7 @@
 
 
 import os
-import json
+import simplejson as json
 import pipeline.external as adb
 
 from pipeline.models import TASK_STATUS

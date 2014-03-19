@@ -8,7 +8,7 @@
 
 import os
 import time
-import json
+import simplejson as json
 import traceback
 
 from lccsrv.paths import *
