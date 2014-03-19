@@ -33,20 +33,44 @@ class AnnotationTask(models.Model):
 
     response_body_blob  = models.BinaryField(default=None, null=True)
     response_time       = models.DateTimeField(null=True)
-    response_status     = models.IntegerField(null=False, default=200)
+    response_status     = models.IntegerField(null=False, default=500)
 
     task_status         = models.SmallIntegerField(null=False, default=TASK_STATUS.DOCUMENT_RECEIVED)
     task_error_count    = models.IntegerField(default=0, null=False)
     task_log_blob       = models.BinaryField(null=False)
     task_error_message  = models.CharField(max_length=256, null=True, blank=True)
-    task_error_code     = models.IntegerField(null=False, default=0)
+    task_error_code     = models.IntegerField(null=False, default=1)
 
     def __init__(self, *args, **kwargs):
         super(AnnotationTask, self).__init__(*args, **kwargs)
         self.log = stringio.StringIO()
 
+    def status_str(self):
+        if self.task_status == TASK_STATUS.DOCUMENT_RECEIVED:
+            return "RECEIVED"
+        if self.task_status == TASK_STATUS.PREPROCESSED:
+            return "PREPROCESSED"
+        if self.task_status == TASK_STATUS.PROCESSED:
+            return "PROCESSED"
+        return "UNKNOWN"
+
+    def error_code_str(self):
+        if self.task_error_code == 0:
+            return "OK"
+        if self.task_error_code == 1:
+            return "SERVER_ERR"
+        if self.task_error_code == 3:
+            return "NO_LANG_ERR"
+        if self.task_error_code == 4:
+            return "NO_ANNO_ERR"
+        if self.task_error_code == 6:
+            return "NO_META_ERR"
+        return "UNKNOWN"
+
     def save(self, *args, **kwargs):
-        self.task_log_blob = lz4.compressHC(self.log.getvalue())
+        log_str = self.log.getvalue()
+        self.task_log_blob = lz4.compressHC(log_str)
+        print len(log_str)
         super(AnnotationTask, self).save(*args, **kwargs)
 
     def log_error(self, error_msg):
@@ -80,6 +104,10 @@ class AnnotationTask(models.Model):
     @request_body.setter
     def request_body(self, value):
         self.request_body_blob = lz4.compressHC(value)
+
+    @property
+    def log_body(self):
+        return lz4.decompress(self.task_log_blob)
 
     @property
     def response_body(self):

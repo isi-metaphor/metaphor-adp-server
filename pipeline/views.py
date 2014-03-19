@@ -70,6 +70,20 @@ def app_status(request):
         "paths":    paths,
     })
 
+def app_logs(request):
+    tasks = AnnotationTask.objects.order_by("-request_time")
+    return render(request, "app_logs.html", {
+        "tasks": tasks,
+    })
+
+def app_item(request):
+    try:
+        item = AnnotationTask.objects.get(id=request.GET.get("id"))
+    except:
+        item = None
+    return render(request, "app_item.html", {
+        "item": item,
+    })
 
 
 def user_logout(request):
