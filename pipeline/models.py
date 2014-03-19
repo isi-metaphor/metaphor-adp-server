@@ -39,7 +39,7 @@ class AnnotationTask(models.Model):
     task_error_count    = models.IntegerField(default=0, null=False)
     task_log_blob       = models.BinaryField(null=False)
     task_error_message  = models.CharField(max_length=256, null=True, blank=True)
-    task_error_code     = models.IntegerField(null=False, default=1)
+    task_error_code     = models.IntegerField(null=False, default=0)
 
     def __init__(self, *args, **kwargs):
         super(AnnotationTask, self).__init__(*args, **kwargs)
