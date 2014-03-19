@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Pipeline Status</title>
+    <title>Status</title>
 
     <!-- Bootstrap core CSS -->
     <link href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -41,11 +41,13 @@
               <a href="#">Status</a>
             </li>
             <li>
-              <a href="#">Logs</a>
+              <a href="#">Show Logs</a>
             </li>
             <li>
-              <a href="#">Contact</a>
+              <a href="#">Make Request</a>
             </li>
+          </ul>
+          <ul class="nav navbar-nav pull-right">
             <li>
               <a href="/logout/">Logout</a>
             </li>
@@ -57,10 +59,68 @@
     <!-- Begin page content -->
     <div class="container">
       <div class="page-header">
-        <h1>Sticky footer with fixed navbar</h1>
+        <h1>Status</h1>
       </div>
-      <p class="lead">Pin a fixed-height footer to the bottom of the viewport in desktop browsers with this custom HTML and CSS. A fixed navbar has been added with <code>padding-top: 60px;</code> on the <code>body > .container</code>.</p>
-      <p>Back to <a href="../sticky-footer">the default sticky footer</a> minus the navbar.</p>
+
+      <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col-md-8">
+
+          <h4>LCC Service</h4>
+          <table class="table table-bordered">
+            <tbody>
+              <tr>
+                <td>Path</td><td>{{settings.PATH}}</td>
+              </tr>
+              <tr>
+                <td>Branch</td><td>{{branch}}</td>
+              </tr>
+              <tr>
+                <td>Commit</td><td>{{commit}}</td>
+              </tr>
+              <tr>
+                <td>Database</td><td>{{settings.DATABASES.default.NAME}}</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h4>ADP Pipeline</h4>
+          <table class="table table-bordered">
+            <tbody>
+              <tr>
+                <td>METAPHOR_DIR</td><td>{{paths.METAPHOR_DIR}}</td>
+              </tr>
+              <tr>
+                <td>HENRY_DIR</td><td>{{paths.HENRY_DIR}}</td>
+              </tr>
+              <tr>
+                <td>TMP_DIR</td><td>{{paths.TMP_DIR}}</td>
+              </tr>
+              <tr>
+                <td>GRB_LICENSE_FILE</td><td>{{paths.GRB_LICENSE_FILE}}</td>
+              </tr>
+              <tr>
+                <td>CPLUS_INCLUDE_PATH</td><td>{{paths.CPLUS_INCLUDE_PATH}}</td>
+              </tr>
+              <tr>
+                <td>LD_LIBRARY_PATH</td><td>{{paths.LD_LIBRARY_PATH}}</td>
+              </tr>
+              <tr>
+                <td>LIBRARY_PATH</td><td>{{paths.LIBRARY_PATH}}</td>
+              </tr>
+              <tr>
+                <td>METAPHOR_DIR</td><td>{{paths.METAPHOR_DIR}}</td>
+              </tr>
+              <tr>
+                <td>METAPHOR_DIR</td><td>{{paths.METAPHOR_DIR}}</td>
+              </tr>
+            </tbody>
+          </table>
+
+        </div>
+        <div class="col-md-2"></div>
+      </div>
+
     </div>
 
     <div id="footer">

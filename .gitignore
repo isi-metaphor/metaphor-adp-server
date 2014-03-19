@@ -38,3 +38,5 @@ nosetests.xml
 local.db
 *.log
 logs/*
+paths.py
+settings.py

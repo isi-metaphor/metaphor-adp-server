@@ -17,6 +17,8 @@ urlpatterns = patterns("",
                        url(r"^$",                   "pipeline.views.run_pipeline",  name="pipeline"),
                        url(r"^annotateDocument",    "pipeline.views.run_pipeline",  name="pipeline"),
                        url(r"^app/$",               "pipeline.views.app",           name="app"),
+                       url(r"^app/status/$",        "pipeline.views.app_status",    name="app_status"),
                        url(r"^logout/$",            "pipeline.views.user_logout",   name="logout"),
                        url(r"^admin/",              include(admin.site.urls)),
+                       url(r"^watchman/",           include("watchman.urls")),
                        )
