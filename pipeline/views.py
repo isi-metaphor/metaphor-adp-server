@@ -62,6 +62,8 @@ def app(request):
 
 
 def app_status(request):
+    if request.user.is_anonymous():
+        return redirect("/app/")
     repo = git.Repo(".")
     return render(request, "app_status.html", {
         "branch":   repo.active_branch.name,
@@ -71,12 +73,16 @@ def app_status(request):
     })
 
 def app_logs(request):
+    if request.user.is_anonymous():
+        return redirect("/app/")
     tasks = AnnotationTask.objects.order_by("-request_time")
     return render(request, "app_logs.html", {
         "tasks": tasks,
     })
 
 def app_item(request):
+    if request.user.is_anonymous():
+        return redirect("/app/")
     try:
         item = AnnotationTask.objects.get(id=request.GET.get("id"))
     except:
