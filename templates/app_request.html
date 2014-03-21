@@ -83,7 +83,7 @@
                     type: "POST",
                     data: JSON.stringify(request),
                     success: function(response, textStatus, xhr){
-                        $("#responseBody").html(JSON.stringify(response, null, "    "));
+                        $("#responseBody").html(JSON.stringify(response, null, 4));
                         $("#imgLoading").fadeOut(200);
                         $("#runButton").removeClass("disabled");
 
@@ -92,7 +92,7 @@
                     },
                     error: function(xhr, textStatus){
 
-                        $("#responseBody").html(JSON.stringify(textStatus, null, "    "));
+                        $("#responseBody").html(JSON.stringify(textStatus, null, 4));
                         $("#imgLoading").fadeOut(200);
                         $("#runButton").removeClass("disabled");
 
