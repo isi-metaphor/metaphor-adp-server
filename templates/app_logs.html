@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Pipeline Status</title>
+    <title>Logs</title>
 
     <!-- Bootstrap core CSS -->
     <link href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -37,15 +37,17 @@
         </div>
         <div class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
+            <li>
+              <a href="/app/status/">Status</a>
+            </li>
             <li class="active">
-              <a href="#">Status</a>
+              <a href="/app/logs/">Show Logs</a>
             </li>
             <li>
-              <a href="#">Logs</a>
+              <a href="/app/request/">Make Request</a>
             </li>
-            <li>
-              <a href="#">Contact</a>
-            </li>
+          </ul>
+          <ul class="nav navbar-nav pull-right">
             <li>
               <a href="/logout/">Logout</a>
             </li>
@@ -57,10 +59,54 @@
     <!-- Begin page content -->
     <div class="container">
       <div class="page-header">
-        <h1>Sticky footer with fixed navbar</h1>
+        <h1>Logs</h1>
       </div>
-      <p class="lead">Pin a fixed-height footer to the bottom of the viewport in desktop browsers with this custom HTML and CSS. A fixed navbar has been added with <code>padding-top: 60px;</code> on the <code>body > .container</code>.</p>
-      <p>Back to <a href="../sticky-footer">the default sticky footer</a> minus the navbar.</p>
+      <br/>
+
+      <div class="row">
+        <div class="col-md-12">
+
+          <table class="table table-bordered table-condensed">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Req.Time</th>
+                <th>Err.Code</th>
+                <th>Err.Cnt</th>
+                <th>Status</th>
+                <th>Resp.Code</th>
+                <th>Resp.Time</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in tasks %}
+              <tr>
+                <td>{{item.id}}</td>
+                <td>{{item.request_time|date:"Y.m.d H:i:s"}}</td>
+                <td>{{item.error_code_str}}</td>
+                <td>{{item.task_error_count}}</td>
+                <td>{{item.status_str}}</td>
+                <td>{{item.response_status}}</td>
+                {% if item.response_time %}
+                    <td>{{item.response_time|date:"Y.m.d H:i:s"}}</td>
+                {% else %}
+                    <td>NULL</td>
+                {% endif %}
+                <td>
+                    <a href="/app/item/?id={{item.id}}" type="button" class="btn btn-default btn-sm">Details</a>
+<!--                     <button type="button" class="btn btn-default btn-sm">Error msg</button>
+                    <button type="button" class="btn btn-default btn-sm">Input</button>
+                    <button type="button" class="btn btn-default btn-sm">Output</button>
+ -->                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+
+        </div>
+      </div>
+
     </div>
 
     <div id="footer">

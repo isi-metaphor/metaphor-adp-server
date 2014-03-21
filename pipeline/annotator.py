@@ -8,7 +8,7 @@
 
 
 import os
-import json
+import simplejson as json
 import pipeline.external as adb
 
 from pipeline.models import TASK_STATUS
@@ -33,29 +33,35 @@ class Annotator(object):
     def annotate(self):
 
         # 1.
-        self.logger.info("Start annotating document.")
+        log_msg = "Start annotating document."
+        self.logger.info(log_msg)
+        self.task.log_error(log_msg)
         metaphors = {}
         request_document_body = self.task.request_body
 
         # 2. Parse document JSON
-        self.logger.info("Parse document json. Task id=%d, document size=%d.." % (self.task.id, len(request_document_body)))
+        log_msg = "Parse document json. Task id=%d, document size=%d.." % (self.task.id, len(request_document_body))
+        self.logger.info(log_msg)
+        self.task.log_error(log_msg)
         request_document = json.loads(request_document_body)
 
         # 3. Get document language.
-        self.logger.info("Getting document language. Task id=%d." % self.task.id)
+        log_msg = "Getting document language. Task id=%d." % self.task.id
+        self.logger.info(log_msg)
+        self.task.log_error(log_msg)
         try:
             language = request_document["language"]
         except KeyError:
             error_msg = "No language information available. Task id=%d." % self.task.id
             return self.task_error(error_msg, 3)
+        self.task.request_lang = language
 
         # 4. Get annotation records.
         self.logger.info("Getting document annotations. Task id=%d." % self.task.id)
         try:
             annotations = request_document["metaphorAnnotationRecords"]
         except KeyError:
-            self.logger.error("No annotations available. Task id=%d." % self.task.id)
-            error_msg = "No language information available. Task id=%d." % self.task.id
+            error_msg = "No annotations available. Task id=%d." % self.task.id
             return self.task_error(error_msg, 4)
 
         # 5. Extract annotations.

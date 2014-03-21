@@ -6,6 +6,8 @@
 # For more information, see README.md
 # For license information, see LICENSE
 
+import git
+import base64
 import logging
 import traceback
 
@@ -13,11 +15,16 @@ from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 
 from django.shortcuts import render
+from django.shortcuts import redirect
+
 from django.contrib.auth import login
 from django.contrib.auth import logout
 from django.contrib.auth import authenticate
 
 from django.views.decorators.csrf import csrf_exempt
+
+from lccsrv import paths
+from lccsrv import settings
 
 from pipeline.models import AnnotationTask
 from pipeline.annotator import Annotator
@@ -33,10 +40,7 @@ def app(request):
         if user is not None:
             if user.is_active:
                 login(request, user)
-                return render(request, "app.html", {
-                    "message_level": "info",
-                    "message": "You successfully logged in.",
-                })
+                return redirect("/app/status/")
             else:
                 logger.info("User: %s. Tried to log-in app. Error: Wrong username/password." % username)
                 return render(request, "login.html", {
@@ -54,7 +58,38 @@ def app(request):
             return render(request, "login.html", {})
         else:
             logger.info("User: %s. Accessed app." % request.user.username)
-            return render(request, "app.html", {})
+            return redirect("/app/status/")
+
+
+def app_status(request):
+    if request.user.is_anonymous():
+        return redirect("/app/")
+    repo = git.Repo(".")
+    return render(request, "app_status.html", {
+        "branch":   repo.active_branch.name,
+        "commit":   base64.b64encode(repo.active_branch.commit.binsha),
+        "settings": settings,
+        "paths":    paths,
+    })
+
+def app_logs(request):
+    if request.user.is_anonymous():
+        return redirect("/app/")
+    tasks = AnnotationTask.objects.order_by("-request_time")
+    return render(request, "app_logs.html", {
+        "tasks": tasks,
+    })
+
+def app_item(request):
+    if request.user.is_anonymous():
+        return redirect("/app/")
+    try:
+        item = AnnotationTask.objects.get(id=request.GET.get("id"))
+    except:
+        item = None
+    return render(request, "app_item.html", {
+        "item": item,
+    })
 
 
 def user_logout(request):

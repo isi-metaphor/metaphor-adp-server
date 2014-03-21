@@ -23,18 +23,11 @@ body {
 -------------------------------------------------- */
 /* Not required for template or sticky footer method. */
 
-body > .container {
-  padding: 60px 15px 0;
+.container {
+  width: auto;
+  max-width: 1200px;
+  padding: 0 15px;
 }
 .container .text-muted {
   margin: 20px 0;
-}
-
-#footer > .container {
-  padding-right: 15px;
-  padding-left: 15px;
-}
-
-code {
-  font-size: 80%;
 }
