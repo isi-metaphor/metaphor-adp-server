@@ -1,6 +1,8 @@
 {
     "STAGE":                    "dev",
     "ROOT":                     "/lfs1/vzaytsev/research/repo/lcc-dev",
+    "USER":                     "root",
+    "GROUP":                    "root",
 
     "ADMIN_NAME":               "Vova Zaytsev",
     "ADMIN_EMAIL":              "vzaytsev@isi.edu",

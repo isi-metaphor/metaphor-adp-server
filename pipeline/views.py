@@ -32,6 +32,7 @@ from pipeline.annotator import Annotator
 
 logger = logging.getLogger("pipeline")
 
+
 def app(request):
     if request.method == "POST":
         username = request.POST["user-name"]
@@ -72,6 +73,7 @@ def app_status(request):
         "paths":    paths,
     })
 
+
 def app_logs(request):
     if request.user.is_anonymous():
         return redirect("/app/")
@@ -79,6 +81,7 @@ def app_logs(request):
     return render(request, "app_logs.html", {
         "tasks": tasks,
     })
+
 
 def app_item(request):
     if request.user.is_anonymous():
@@ -90,6 +93,15 @@ def app_item(request):
     return render(request, "app_item.html", {
         "item": item,
     })
+
+
+def app_request(request):
+    if request.user.is_anonymous():
+        return redirect("/app/")
+    return render(request, "app_request.html", {
+
+    })
+
 
 
 def user_logout(request):

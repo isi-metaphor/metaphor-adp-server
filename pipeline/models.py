@@ -7,6 +7,7 @@
 # For license information, see LICENSE
 
 import lz4
+import json
 import StringIO as stringio
 
 from  datetime import datetime
@@ -67,12 +68,6 @@ class AnnotationTask(models.Model):
             return "NO_META_ERR"
         return "UNKNOWN"
 
-    def save(self, *args, **kwargs):
-        log_str = self.log.getvalue()
-        self.task_log_blob = lz4.compressHC(log_str)
-        print len(log_str)
-        super(AnnotationTask, self).save(*args, **kwargs)
-
     def log_error(self, error_msg):
         self.log.write(error_msg)
         self.log.write("\n")
@@ -86,9 +81,19 @@ class AnnotationTask(models.Model):
             else:
                 response_body = self.response_body
         else:
-            response_body = self.response_body
+            if self.response_body_blob is None:
+                response_body = json.dumps({
+                    "error_code": self.task_error_code,
+                    "error_message": self.task_error_message,
+                })
+                self.response_body = response_body
+            else:
+                response_body = self.response_body
 
         if save:
+            log_str = self.log.getvalue()
+            self.task_log_blob = lz4.compressHC(log_str)
+            print self.task_log_blob
             self.response_time = datetime.now()
             self.save()
 

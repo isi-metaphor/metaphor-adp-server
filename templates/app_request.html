@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Request</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="/static/css/app.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="/static/js/jquery-2.1.0.min.js"></script>
+    <script src="/static/bootstrap/js/bootstrap.min.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function(){
+            var text = "";
+            var step = 3;
+            var lang = "EN";
+
+            $(".dropdown-toggle").dropdown();
+
+            $("#selectRus").click(function(){
+                lang = "RU";
+                $("#langLabel").html("Russian");
+                $("#imgTick").fadeIn(100).fadeOut(400);
+            });
+            $("#selectEng").click(function(){
+                lang = "EN";
+                $("#langLabel").html("English");
+                $("#imgTick").fadeIn(100).fadeOut(400);
+            });
+            $("#selectSpa").click(function(){
+                lang = "ES";
+                $("#langLabel").html("Spanish");
+                $("#imgTick").fadeIn(100).fadeOut(400);
+            });
+            $("#selectFar").click(function(){
+                lang = "FA";
+                $("#langLabel").html("Farsi");
+                $("#imgTick").fadeIn(100).fadeOut(400);
+            });
+
+            $("#runButton").click(function(){
+
+                text = $("#requestText").val();
+
+                if ($("#requestStep_1").prop("checked"))
+                    step = 1;
+                if ($("#requestStep_2").prop("checked"))
+                    step = 2;
+                if ($("#requestStep_3").prop("checked"))
+                    step = 3;
+
+
+                var request = {
+                    "step": step,
+                    "language": lang,
+                    "metaphorAnnotationRecords":[
+                        {
+                            "sentenceId": 1,
+                            "linguisticMetaphor": text
+                        }
+                    ]
+                };
+
+                $("#imgLoading").fadeIn(100);
+                $("#runButton").addClass("disabled");
+                $("#responseBody").html("");
+
+                $.ajax({
+                    url: "/",
+                    type: "POST",
+                    data: JSON.stringify(request),
+                    dataType: "text",
+                    success: function(response, textStatus, xhr){
+                        $("#responseBody").html(response);
+                        $("#imgLoading").fadeOut(200);
+                        $("#runButton").removeClass("disabled");
+
+                        $("#responseCode_1").html(xhr.status);
+                        $("#response_1").fadeIn(100).fadeOut(1000);
+                    },
+                    error: function(xhr, textStatus){
+                        $("#imgLoading").fadeOut(200);
+                        $("#runButton").removeClass("disabled");
+
+                        $("#responseCode_2").html(xhr.status);
+                        $("#response_2").fadeIn(100).fadeOut(1000);
+                    }
+                })
+
+
+
+                console.log(request);
+
+            });
+        });
+
+    </script>
+
+
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">Pipeline</a>
+        </div>
+        <div class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li>
+              <a href="/app/status/">Status</a>
+            </li>
+            <li>
+              <a href="/app/logs/">Show Logs</a>
+            </li>
+            <li class="active">
+              <a href="/app/request/">Make Request</a>
+            </li>
+          </ul>
+          <ul class="nav navbar-nav pull-right">
+            <li>
+              <a href="/logout/">Logout</a>
+            </li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
+
+
+
+
+    <!-- Begin page content -->
+    <div class="container">
+      <div class="page-header">
+        <h1>Test Pipeline</h1>
+      </div>
+      <br/>
+
+      <div class="row" role="form">
+        <div class="col-md-6">
+
+          <form>
+            <textarea id="requestText" class="form-control" rows="10">we should cure poverty</textarea>
+
+            <br/>
+
+            <div class="radio-inline">
+              <label>
+                <input id="requestStep_1" type="radio" name="optionsRadios" id="optionsRadios1" value="option1">
+                Parse
+              </label>
+            </div>
+
+            <div class="radio-inline">
+              <label>
+                <input id="requestStep_2" type="radio" name="optionsRadios" id="optionsRadios2" value="option2">
+                Abduct
+              </label>
+            </div>
+
+            <div class="radio-inline">
+              <label>
+                <input id="requestStep_3" type="radio" name="optionsRadios" id="optionsRadios2" value="option2" checked>
+                All steps
+              </label>
+            </div>
+
+            <br/>
+
+            <div class="btn-group">
+              <div class="btn-group">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                  <span id="langLabel">English</span>
+                  <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                  <li><a id="selectEng">English</a></li>
+                  <li><a id="selectRus">Russian</a></li>
+                  <li><a id="selectSpa">Spanish</a></li>
+                  <li><a id="selectFar">Farsi</a></li>
+                </ul>
+              </div>
+              <button type="button" class="btn btn-success" id="runButton">
+                Run
+                <span class="glyphicon glyphicon-tree-conifer"></span>
+              </button>
+            </div>
+              <img id="imgLoading" src="/static/img/loading.gif" style="display:none;margin-left:8px;"/>
+              <img id="imgTick" src="/static/img/tick.png" style="display:none;margin-left:8px;"/>
+          </form>
+
+        <br/>
+        <div style="display:none;" id="response_1" class="alert alert-success">Response code: <span id="responseCode_1"></span></div>
+        <div style="display:none;" id="response_2" class="alert alert-danger">Response code: <span id="responseCode_2"></span></div>
+
+
+        </div>
+        <div class="col-md-6">
+
+            <pre style="height:400px;" id="responseBody">
+            </pre>
+
+        </div>
+      </div>
+
+    </div>
+
+    <div id="footer">
+      <div class="container">
+        <p class="text-muted">2014 © University of Southern California. Information Sciences Institute</p>
+      </div>
+    </div>
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="/static/bootstrap/js/bootstrap.min.js"></script>
+  </body>
+</html>

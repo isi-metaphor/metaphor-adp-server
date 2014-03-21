@@ -25,7 +25,7 @@ class Annotator(object):
         self.task.log_error(error_msg)
         self.task.task_error_message = error_msg
         if error_code is not None:
-            self.task.error_code = error_code
+            self.task.task_error_code = error_code
         if count_error:
             self.task.task_error_count += 1
         return self.task
