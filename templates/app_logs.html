@@ -60,7 +60,24 @@
       <div class="page-header">
         <h1>Logs</h1>
       </div>
-      <br/>
+
+      <div class="row">
+        <div class="col-md-12">
+        <ul class="pagination">
+          {% for page_skip in skip_options %}
+            {% if page_skip == skip %}
+              <li class="active">
+                <a href="/app/logs/?skip={{forloop.counter0}}">{{forloop.counter}}</a>
+              </li>
+            {% else %}
+              <li>
+                <a href="/app/logs/?skip={{forloop.counter0}}">{{forloop.counter}}</a>
+              </li>
+            {% endif %}
+          {% endfor %}
+        </ul>
+        </div>
+      </div>
 
       <div class="row">
         <div class="col-md-12">
@@ -69,6 +86,7 @@
             <thead>
               <tr>
                 <th>ID</th>
+                <th>IP</th>
                 <th>Req.Time</th>
                 <th>Err.Code</th>
                 <th>Err.Cnt</th>
@@ -79,9 +97,10 @@
               </tr>
             </thead>
             <tbody>
-              {% for item in tasks %}
+              {% for item in items %}
               <tr>
                 <td>{{item.id}}</td>
+                <td>{{item.request_addr}}</td>
                 <td>{{item.request_time|date:"Y.m.d H:i:s"}}</td>
                 <td>{{item.error_code_str}}</td>
                 <td>{{item.task_error_count}}</td>
@@ -93,16 +112,32 @@
                     <td>NULL</td>
                 {% endif %}
                 <td>
-                    <a href="/app/item/?id={{item.id}}" type="button" class="btn btn-default btn-sm">Details</a>
-<!--                     <button type="button" class="btn btn-default btn-sm">Error msg</button>
-                    <button type="button" class="btn btn-default btn-sm">Input</button>
-                    <button type="button" class="btn btn-default btn-sm">Output</button>
- -->                </td>
+                  <a href="/app/item/?id={{item.id}}" type="button" class="btn btn-default btn-sm">
+                    Details
+                  </a>
+                </td>
               </tr>
               {% endfor %}
             </tbody>
           </table>
+        </div>
+      </div>
 
+      <div class="row">
+        <div class="col-md-12">
+        <ul class="pagination">
+          {% for page_skip in skip_options %}
+            {% if page_skip == skip %}
+              <li class="active">
+                <a href="/app/logs/?skip={{forloop.counter0}}">{{forloop.counter}}</a>
+              </li>
+            {% else %}
+              <li>
+                <a href="/app/logs/?skip={{forloop.counter0}}">{{forloop.counter}}</a>
+              </li>
+            {% endif %}
+          {% endfor %}
+        </ul>
         </div>
       </div>
 

@@ -77,9 +77,17 @@ def app_status(request):
 def app_logs(request):
     if request.user.is_anonymous():
         return redirect("/app/")
-    tasks = AnnotationTask.objects.order_by("-request_time")
+    page_size = 30
+    skip = int(request.GET.get("skip", "0"))
+    total_items = AnnotationTask.objects.count()
+    total_pages = total_items / page_size + 1
+    items = AnnotationTask.objects.order_by("-request_time")[(skip*page_size):((skip+1)*page_size)]
     return render(request, "app_logs.html", {
-        "tasks": tasks,
+        "items": items,
+        "total_items": total_items,
+        "total_pages": total_pages,
+        "skip": skip*page_size,
+        "skip_options": [s * page_size for s in xrange(total_pages)],
     })
 
 
@@ -116,7 +124,7 @@ def run_pipeline(request):
     if request.method == "POST":
 
         try:
-            task = AnnotationTask()
+            task = AnnotationTask(request_addr=request.META.get("REMOTE_ADDR"))
             task.request_body = request.body
             task.save()
             logger.info("Task created. Id=%d." % task.id)

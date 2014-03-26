@@ -28,6 +28,7 @@ class AnnotationTask(models.Model):
     class Meta:
         db_table = "t_tasks"
 
+    request_addr        = models.CharField(null=True, blank=True, max_length=16)
     request_time        = models.DateTimeField(auto_now_add=True, null=False)
     request_lang        = models.CharField(max_length=32, null=True)
     request_body_blob   = models.BinaryField(null=False)
