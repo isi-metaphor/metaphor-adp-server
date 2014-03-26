@@ -8,7 +8,7 @@
 
 import os
 import time
-import json
+import simplejson as json
 import traceback
 
 from lccsrv.paths import *
@@ -199,7 +199,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
                 task.log_error("Failed annotation: %s" % str(annotation))
                 task.task_error_count += 1
 
-    result = json.dumps(request_body_dict, encoding="utf-8")
+    result = json.dumps(request_body_dict, encoding="utf-8", indent=4)
 
     logger.info("Processed: %d." % processed)
     logger.info("Failed: %d." % failed)

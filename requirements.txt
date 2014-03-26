@@ -3,3 +3,4 @@ uwsgi
 jinja2
 fabric
 django
+gitpython
