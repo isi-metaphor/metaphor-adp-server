@@ -135,7 +135,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
     logger.info("Parser output:\n%s\n" % strcut(parser_output))
 
     if last_step == 1:
-        return json.dumps(parser_output, encoding="utf-8", indent=4)
+        return parser_output
 
     parses = extract_parses(parser_output)
     logger.info("Parses:\n%r\n" % strcut(parses))
