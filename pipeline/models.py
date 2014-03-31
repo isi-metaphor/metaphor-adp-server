@@ -94,12 +94,11 @@ class AnnotationTask(models.Model):
         if save:
             log_str = self.log.getvalue()
             self.task_log_blob = lz4.compressHC(log_str)
-            print self.task_log_blob
             self.response_time = datetime.now()
             self.save()
 
         return HttpResponse(response_body,
-                            content_type="text/plain",
+                            content_type="application/json",
                             status=self.response_status)
 
 
