@@ -86,15 +86,24 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
     # Parser pipeline
     parser_proc = ""
     if language == "FA":
-        parser_proc = FARSI_PIPELINE + " | python " + PARSER2HENRY + " --nonmerge sameid freqpred"
+        if last_step == 1:
+            parser_proc = FARSI_PIPELINE
+        else:
+            parser_proc = FARSI_PIPELINE + " | python " + PARSER2HENRY + " --nonmerge sameid freqpred"
         KBPATH = FA_KBPATH
 
     elif language == "ES":
-        parser_proc = SPANISH_PIPELINE + " | python " + PARSER2HENRY + " --nonmerge sameid freqpred"
+        if last_step == 1:
+            parser_proc = SPANISH_PIPELINE
+        else:
+            parser_proc = SPANISH_PIPELINE + " | python " + PARSER2HENRY + " --nonmerge sameid freqpred"
         KBPATH = ES_KBPATH
 
     elif language == "RU":
-        parser_proc = RUSSIAN_PIPELINE + " | python " + PARSER2HENRY + " --nonmerge sameid freqpred"
+        if last_step == 1:
+            parser_proc = RUSSIAN_PIPELINE
+        else:
+            parser_proc = RUSSIAN_PIPELINE + " | python " + PARSER2HENRY + " --nonmerge sameid freqpred"
         KBPATH = RU_KBPATH
 
     elif language == "EN":
@@ -102,7 +111,10 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
         candcParser = BOXER_DIR + "/bin/candc --models " + BOXER_DIR + "/models/boxer --candc-printer boxer"
         boxer = BOXER_DIR + "/bin/boxer --semantics tacitus --resolve true --stdin"
         b2h = "python " + BOXER2HENRY + " --nonmerge sameid freqpred"
-        parser_proc = tokenizer + " | " + candcParser + " | " + boxer + " | " + b2h
+        if last_step == 1:
+            parser_proc = tokenizer + " | " + candcParser + " | " + boxer
+        else:
+            parser_proc = tokenizer + " | " + candcParser + " | " + boxer + " | " + b2h
         KBPATH = EN_KBPATH
 
     logger.info("Running parsing command: '%s'." % parser_proc)
@@ -116,16 +128,17 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
                             stderr=None,
                             close_fds=True)
     parser_output, parser_stderr = parser_pipeline.communicate(input=input_str)
-    parses = extract_parses(parser_output)
 
     # Parser processing time in seconds
     parser_time = (time.time() - start_time) * 0.001
     logger.info("Command finished. Processing time: %r." % parser_time)
     logger.info("Parser output:\n%s\n" % strcut(parser_output))
-    logger.info("Parses:\n%r\n" % strcut(parses))
 
     if last_step == 1:
         return json.dumps(parser_output, encoding="utf-8", indent=4)
+
+    parses = extract_parses(parser_output)
+    logger.info("Parses:\n%r\n" % strcut(parses))
 
     # time to generate final output in seconds
     generate_output_time = 2
