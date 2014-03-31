@@ -6,7 +6,6 @@
 # For more information, see README.md
 # For license information, see LICENSE
 
-import os
 import time
 import simplejson as json
 import traceback
@@ -80,7 +79,7 @@ def strcut(some_str, max_size=120):
     return "<NONE>"
 
 
-def run_annotation(request_body_dict, input_metaphors, language, task, logger, with_pdf_content):
+def run_annotation(request_body_dict, input_metaphors, language, task, logger, with_pdf_content, last_step=3):
     start_time = time.time()
     input_str = generate_text_input(input_metaphors, language)
 
@@ -117,11 +116,16 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
                             stderr=None,
                             close_fds=True)
     parser_output, parser_stderr = parser_pipeline.communicate(input=input_str)
+    parses = extract_parses(parser_output)
 
     # Parser processing time in seconds
     parser_time = (time.time() - start_time) * 0.001
     logger.info("Command finished. Processing time: %r." % parser_time)
     logger.info("Parser output:\n%s\n" % strcut(parser_output))
+    logger.info("Parses:\n%r\n" % strcut(parses))
+
+    if last_step == 1:
+        return json.dumps(parser_output, encoding="utf-8", indent=4)
 
     # time to generate final output in seconds
     generate_output_time = 2
@@ -159,10 +163,10 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
     logger.info("Henry output:\n%s\n" % strcut(henry_output))
     logger.info("Hypotheses output:\n%s\n" % strcut(hypotheses))
 
-    parses = extract_parses(parser_output)
-    processed, failed, empty = 0, 0, 0
+    if last_step == 2:
+        return json.dumps(henry_output, encoding="utf-8", indent=4)
 
-    logger.info("Parsed Henry output:\n%r\n" % strcut(parses))
+    processed, failed, empty = 0, 0, 0
 
     # merge ADB result and input json document
     input_annotations = request_body_dict["metaphorAnnotationRecords"]

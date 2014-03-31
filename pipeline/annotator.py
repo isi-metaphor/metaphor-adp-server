@@ -7,7 +7,6 @@
 # For license information, see LICENSE
 
 
-import os
 import simplejson as json
 import pipeline.external as adb
 
@@ -38,6 +37,13 @@ class Annotator(object):
         self.task.log_error(log_msg)
         metaphors = {}
         request_document_body = self.task.request_body
+
+        last_step = request_document_body.get("step", 3)
+        if last_step not in (1, 2, 3):
+            log_msg = "Wrong last step value: %r" % last_step
+            self.logger.info(log_msg)
+            self.task.log_error(log_msg)
+            last_step = 3
 
         # 2. Parse document JSON
         log_msg = "Parse document json. Task id=%d, document size=%d.." % (self.task.id, len(request_document_body))
@@ -116,7 +122,13 @@ class Annotator(object):
             error_msg = "Found 0 metaphors for annotation. Task id=#%d."
             return self.task_error(error_msg, 6)
 
-        result = adb.run_annotation(request_document, metaphors, language, self.task, self.logger, True)
+        result = adb.run_annotation(request_document,
+                                    metaphors,
+                                    language,
+                                    self.task,
+                                    self.logger,
+                                    with_pdf_content=True,
+                                    last_step=last_step)
 
         self.task.response_body = result
         self.task.task_status = TASK_STATUS.PROCESSED
