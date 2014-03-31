@@ -38,6 +38,13 @@ class Annotator(object):
         metaphors = {}
         request_document_body = self.task.request_body
 
+
+        # 2. Parse document JSON
+        log_msg = "Parse document json. Task id=%d, document size=%d.." % (self.task.id, len(request_document_body))
+        self.logger.info(log_msg)
+        self.task.log_error(log_msg)
+        request_document = json.loads(request_document_body)
+
         last_step = request_document_body.get("step", 3)
         if last_step not in (1, 2, 3):
             log_msg = "Wrong last step value: %r" % last_step
@@ -45,11 +52,6 @@ class Annotator(object):
             self.task.log_error(log_msg)
             last_step = 3
 
-        # 2. Parse document JSON
-        log_msg = "Parse document json. Task id=%d, document size=%d.." % (self.task.id, len(request_document_body))
-        self.logger.info(log_msg)
-        self.task.log_error(log_msg)
-        request_document = json.loads(request_document_body)
 
         # 3. Get document language.
         log_msg = "Getting document language. Task id=%d." % self.task.id
