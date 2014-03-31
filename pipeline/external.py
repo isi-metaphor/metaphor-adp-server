@@ -128,6 +128,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
                             stderr=None,
                             close_fds=True)
     parser_output, parser_stderr = parser_pipeline.communicate(input=input_str)
+    task.log_error("Parser output:\n%r" % parser_output)
 
     # Parser processing time in seconds
     parser_time = (time.time() - start_time) * 0.001
@@ -139,6 +140,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
 
     parses = extract_parses(parser_output)
     logger.info("Parses:\n%r\n" % strcut(parses))
+    task.log_error("Parses:\n%r" % parses)
 
     # time to generate final output in seconds
     generate_output_time = 2
@@ -174,7 +176,9 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
     henry_output, henry_stderr = henry_pipeline.communicate(input=parser_output)
     hypotheses = extract_hypotheses(henry_output)
     logger.info("Henry output:\n%s\n" % strcut(henry_output))
+    task.log_error("Henry output: \n%r" % henry_output)
     logger.info("Hypotheses output:\n%s\n" % strcut(hypotheses))
+    task.log_error("Hypotheses: \n%r" % hypotheses)
 
     if last_step == 2:
         return json.dumps(henry_output, encoding="utf-8", indent=4)
