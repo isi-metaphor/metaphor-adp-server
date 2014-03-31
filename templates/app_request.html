@@ -83,7 +83,13 @@
                     type: "POST",
                     data: JSON.stringify(request),
                     success: function(response, textStatus, xhr){
-                        $("#responseBody").html(JSON.stringify(response, null, 4));
+
+                        if (step == 3) {
+                          $("#responseBody").html(JSON.stringify(response, null, 4));
+                        } else {
+                          $("#responseBody").html(response);
+                        }
+
                         $("#imgLoading").fadeOut(200);
                         $("#runButton").removeClass("disabled");
 
