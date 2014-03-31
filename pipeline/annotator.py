@@ -45,7 +45,7 @@ class Annotator(object):
         self.task.log_error(log_msg)
         request_document = json.loads(request_document_body)
 
-        last_step = request_document_body.get("step", 3)
+        last_step = request_document.get("step", 3)
         if last_step not in (1, 2, 3):
             log_msg = "Wrong last step value: %r" % last_step
             self.logger.info(log_msg)
