@@ -91,7 +91,7 @@
                     success: function(response, textStatus, xhr){
 
                         if (step == 3) {
-                          $("#responseBody").html(response);
+                          $("#responseBody").html(json.stringify(JSON.parse(response), null, "\t"));
                         } else {
                           $("#responseBody").html(response);
                         }
