@@ -34,21 +34,25 @@
                 lang = "RU";
                 $("#langLabel").html("Russian");
                 $("#imgTick").fadeIn(100).fadeOut(400);
+                $("#selectedKB").val("KBs/Russian/Russian_compiled_KB.da");
             });
             $("#selectEng").click(function(){
                 lang = "EN";
                 $("#langLabel").html("English");
                 $("#imgTick").fadeIn(100).fadeOut(400);
+                $("#selectedKB").val("KBs/English/English_compiled_KB.da");
             });
             $("#selectSpa").click(function(){
                 lang = "ES";
                 $("#langLabel").html("Spanish");
                 $("#imgTick").fadeIn(100).fadeOut(400);
+                $("#selectedKB").val("KBs/Spanish/Spanish_compiled_KB.da");
             });
             $("#selectFar").click(function(){
                 lang = "FA";
                 $("#langLabel").html("Farsi");
                 $("#imgTick").fadeIn(100).fadeOut(400);
+                $("#selectedKB").val("KBs/Farsi/Farsi_compiled_KB.da");
             });
 
             $("#runButton").click(function(){
@@ -65,6 +69,7 @@
 
                 var request = {
                     "step": step,
+                    "kb": $("#selectedKB").val(),
                     "language": lang,
                     "metaphorAnnotationRecords":[
                         {
@@ -214,8 +219,14 @@
                 <span class="glyphicon glyphicon-tree-conifer"></span>
               </button>
             </div>
-              <img id="imgLoading" src="/static/img/loading.gif" style="display:none;margin-left:8px;"/>
-              <img id="imgTick" src="/static/img/tick.png" style="display:none;margin-left:8px;"/>
+            <img id="imgLoading" src="/static/img/loading.gif" style="display:none;margin-left:8px;"/>
+            <img id="imgTick" src="/static/img/tick.png" style="display:none;margin-left:8px;"/>
+
+            <div class="col-xs-7 pull-right">
+              <input id="selectedKB" type="text" class="form-control" value="KBs/English/English_compiled_KB.da">
+            </div>
+
+
           </form>
 
         <br/>
