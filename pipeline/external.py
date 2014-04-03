@@ -79,7 +79,7 @@ def strcut(some_str, max_size=120):
     return "<NONE>"
 
 
-def run_annotation(request_body_dict, input_metaphors, language, task, logger, with_pdf_content, last_step=3):
+def run_annotation(request_body_dict, input_metaphors, language, task, logger, with_pdf_content, last_step=3, kb=None):
     start_time = time.time()
     input_str = generate_text_input(input_metaphors, language)
 
@@ -90,21 +90,30 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
             parser_proc = FARSI_PIPELINE
         else:
             parser_proc = FARSI_PIPELINE + " | python " + PARSER2HENRY + " --nonmerge sameid freqpred"
-        KBPATH = FA_KBPATH
+        if kb is None:
+            KBPATH = FA_KBPATH
+        else:
+            KBPATH = os.path.join(METAPHOR_DIR, kb)
 
     elif language == "ES":
         if last_step == 1:
             parser_proc = SPANISH_PIPELINE
         else:
             parser_proc = SPANISH_PIPELINE + " | python " + PARSER2HENRY + " --nonmerge sameid freqpred"
-        KBPATH = ES_KBPATH
+        if kb is None:
+            KBPATH = ES_KBPATH
+        else:
+            KBPATH = os.path.join(METAPHOR_DIR, kb)
 
     elif language == "RU":
         if last_step == 1:
             parser_proc = RUSSIAN_PIPELINE
         else:
             parser_proc = RUSSIAN_PIPELINE + " | python " + PARSER2HENRY + " --nonmerge sameid freqpred"
-        KBPATH = RU_KBPATH
+        if kb is None:
+            KBPATH = RU_KBPATH
+        else:
+            KBPATH = os.path.join(METAPHOR_DIR, kb)
 
     elif language == "EN":
         tokenizer = BOXER_DIR + "/bin/tokkie --stdin"
@@ -115,7 +124,10 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
             parser_proc = tokenizer + " | " + candcParser + " | " + boxer
         else:
             parser_proc = tokenizer + " | " + candcParser + " | " + boxer + " | " + b2h
-        KBPATH = EN_KBPATH
+        if kb is None:
+            KBPATH = EN_KBPATH
+        else:
+            KBPATH = os.path.join(METAPHOR_DIR, kb)
 
     logger.info("Running parsing command: '%s'." % parser_proc)
     logger.info("Input str: %r" % strcut(input_str))
