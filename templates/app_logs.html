@@ -64,17 +64,44 @@
       <div class="row">
         <div class="col-md-12">
         <ul class="pagination">
-          {% for page_skip in skip_options %}
-            {% if page_skip == skip %}
+
+
+          {% if page.has_previous %}
+            <li><a href="/app/logs/?page=1">&laquo;&laquo;</a></li>
+          {% else %}
+            <li class="disabled"><a>&laquo;&laquo;</a></li>
+          {% endif %}
+
+          {% if page.has_previous %}
+            <li><a href="/app/logs/?page={{page.previous_page_number}}">&laquo;</a></li>
+          {% else %}
+            <li class="disabled"><a>&laquo;</a></li>
+          {% endif %}
+
+          {% for new_page in page_range %}
+            {% if new_page == page.number %}
               <li class="active">
-                <a href="/app/logs/?skip={{forloop.counter0}}">{{forloop.counter}}</a>
+                <a href="/app/logs/?page={{new_page}}">{{new_page}}</a>
               </li>
             {% else %}
               <li>
-                <a href="/app/logs/?skip={{forloop.counter0}}">{{forloop.counter}}</a>
+                <a href="/app/logs/?page={{new_page}}">{{new_page}}</a>
               </li>
             {% endif %}
           {% endfor %}
+
+          {% if page.has_next %}
+            <li><a href="/app/logs/?page={{page.next_page_number}}">&raquo;</a></li>
+          {% else %}
+            <li class="disabled"><a>&raquo;</a></li>
+          {% endif %}
+
+          {% if page.has_next %}
+            <li><a href="/app/logs/?page={{page.paginator.num_pages}}">&raquo;&raquo;</a></li>
+          {% else %}
+            <li class="disabled"><a>&raquo;&raquo;</a></li>
+          {% endif %}
+
         </ul>
         </div>
       </div>
@@ -97,7 +124,7 @@
               </tr>
             </thead>
             <tbody>
-              {% for item in items %}
+              {% for item in page %}
               <tr>
                 <td>{{item.id}}</td>
                 <td>{{item.request_addr}}</td>
@@ -123,24 +150,50 @@
         </div>
       </div>
 
-      <div class="row">
+<div class="row">
         <div class="col-md-12">
         <ul class="pagination">
-          {% for page_skip in skip_options %}
-            {% if page_skip == skip %}
+
+
+          {% if page.has_previous %}
+            <li><a href="/app/logs/?page=1">&laquo;&laquo;</a></li>
+          {% else %}
+            <li class="disabled"><a>&laquo;&laquo;</a></li>
+          {% endif %}
+
+          {% if page.has_previous %}
+            <li><a href="/app/logs/?page={{page.previous_page_number}}">&laquo;</a></li>
+          {% else %}
+            <li class="disabled"><a>&laquo;</a></li>
+          {% endif %}
+
+          {% for new_page in page_range %}
+            {% if new_page == page.number %}
               <li class="active">
-                <a href="/app/logs/?skip={{forloop.counter0}}">{{forloop.counter}}</a>
+                <a href="/app/logs/?page={{new_page}}">{{new_page}}</a>
               </li>
             {% else %}
               <li>
-                <a href="/app/logs/?skip={{forloop.counter0}}">{{forloop.counter}}</a>
+                <a href="/app/logs/?page={{new_page}}">{{new_page}}</a>
               </li>
             {% endif %}
           {% endfor %}
+
+          {% if page.has_next %}
+            <li><a href="/app/logs/?page={{page.next_page_number}}">&raquo;</a></li>
+          {% else %}
+            <li class="disabled"><a>&raquo;</a></li>
+          {% endif %}
+
+          {% if page.has_next %}
+            <li><a href="/app/logs/?page={{page.paginator.num_pages}}">&raquo;&raquo;</a></li>
+          {% else %}
+            <li class="disabled"><a>&raquo;&raquo;</a></li>
+          {% endif %}
+
         </ul>
         </div>
       </div>
-
     </div>
 
     <div id="footer">

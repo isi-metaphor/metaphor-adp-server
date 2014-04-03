@@ -14,6 +14,10 @@ import traceback
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 
+from django.core.paginator import EmptyPage
+from django.core.paginator import Paginator
+from django.core.paginator import PageNotAnInteger
+
 from django.shortcuts import render
 from django.shortcuts import redirect
 
@@ -77,17 +81,23 @@ def app_status(request):
 def app_logs(request):
     if request.user.is_anonymous():
         return redirect("/app/")
+
     page_size = 30
-    skip = int(request.GET.get("skip", "0"))
-    total_items = AnnotationTask.objects.count()
-    total_pages = total_items / page_size + 1
-    items = AnnotationTask.objects.order_by("-request_time")[(skip*page_size):((skip+1)*page_size)]
+    page_num = request.GET.get("page", "1")
+    items = AnnotationTask.objects.order_by("-request_time")
+    pages = Paginator(items, page_size)
+
+    try:
+        page  = pages.page(page_num)
+    except PageNotAnInteger:
+        page  = pages.page(1)
+    except EmptyPage:
+        page = pages.page(pages.num_pages)
+
+
     return render(request, "app_logs.html", {
-        "items": items,
-        "total_items": total_items,
-        "total_pages": total_pages,
-        "skip": skip*page_size,
-        "skip_options": [s * page_size for s in xrange(total_pages)],
+        "page": page,
+        "page_range": xrange(max(1, page.number - 7), min(pages.num_pages+1, page.number + 7)),
     })
 
 

@@ -101,7 +101,6 @@ class AnnotationTask(models.Model):
                             content_type="application/json",
                             status=self.response_status)
 
-
     @property
     def request_body(self):
         return lz4.decompress(self.request_body_blob)
