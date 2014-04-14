@@ -141,7 +141,7 @@ def app_list_kbs(request):
 
     uploaded_kbs = [
         os.path.basename(f)
-        for f in glob.glob(paths.UPLOADS_DIR + "*.da")
+        for f in glob.glob(paths.UPLOADS_DIR + "/*.da")
     ]
 
     return HttpResponse(json.dumps({
