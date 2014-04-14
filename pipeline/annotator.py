@@ -6,10 +6,11 @@
 # For more information, see README.md
 # For license information, see LICENSE
 
-
+import os
 import simplejson as json
 import pipeline.external as adb
 
+from lccsrv import paths
 from pipeline.models import TASK_STATUS
 
 
@@ -61,7 +62,15 @@ class Annotator(object):
         log_msg = "Selected KB is '%r'" % selected_kb
         self.logger.info(log_msg)
         self.task.log_error(log_msg)
-
+        if selected_kb is not None:
+            # Default KB
+            if "/" in selected_kb:
+                selected_kb = os.path.join(paths.METAPHOR_DIR, selected_kb)
+            else:
+                selected_kb = os.path.join(paths.UPLOADS_DIR, selected_kb)
+            log_msg = "Selected KB full path is '%r'" % selected_kb
+            self.logger.info(log_msg)
+            self.task.log_error(log_msg)
 
         # 3. Get document language.
         log_msg = "Getting document language. Task id=%d." % self.task.id

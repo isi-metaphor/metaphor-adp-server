@@ -12,6 +12,7 @@
 
     <!-- Custom styles for this template -->
     <link href="/static/css/app.css" rel="stylesheet">
+    <link href="/static/css/jquery.fileupload.css" rel="stylesheet">
 
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -20,15 +21,21 @@
     <![endif]-->
 
     <script src="/static/js/jquery-2.1.0.min.js"></script>
+    <script src="/static/js/jquery.ui.widget.js"></script>
+    <script src="/static/js/jquery.iframe-transport.js"></script>
+    <script src="/static/js/jquery.fileupload.js"></script>
     <script src="/static/bootstrap/js/bootstrap.min.js"></script>
 
     <script type="text/javascript">
+        'use strict';
         $(document).ready(function(){
             var text = "";
             var step = 3;
             var lang = "EN";
+            var upload_url = "/app/upload/"
 
             $(".dropdown-toggle").dropdown();
+            $(".btn").button();
 
             $("#selectRus").click(function(){
                 lang = "RU";
@@ -54,6 +61,75 @@
                 $("#imgTick").fadeIn(100).fadeOut(400);
                 $("#selectedKB").val("KBs/Farsi/Farsi_compiled_KB.da");
             });
+            $("#selectEng").click();
+
+
+            // console.log($(".fileinput").fileinput);
+
+            $("#fileupload").fileupload({
+              url: upload_url,
+              dataType: "json",
+              done: function (e, data) {
+                  if (data.result && data.result.error_code == 0) {
+                      $("#selectedKB").val(data.result.kb_name);
+                      $("#responseCode_3").html(data.result.file_name);
+                      $("#response_3").fadeIn(100).delay(4000).fadeOut(400);
+                  } else {
+                    alert(JSON.stringify(data.result));
+                  }
+
+              },
+              progressall: function (e, data) {
+                  var progress = parseInt(data.loaded / data.total * 100, 10);
+                  $('#progress .progress-bar').css(
+                      'width',
+                      progress + '%'
+                  );
+              }
+          }).prop('disabled', !$.support.fileInput)
+              .parent().addClass($.support.fileInput ? undefined : 'disabled');
+
+
+            $("#selectKbButton").on("show.bs.dropdown", function() {
+              var selectKbList = $("#selectKbList");
+              var loadingHtml = '\
+                <img id="imgLoading"                                   \
+                     src="/static/img/loading.gif"                     \
+                     style="margin:32px 32px 32px 74px;opacity:0.7;"/>';
+              selectKbList.html(loadingHtml);
+              $.ajax({
+                    url: "/app/list_kbs",
+                    type: "GET",
+                    dataType: "json",
+                    success: function(response){
+                      selectKbList.html("");
+                      selectKbList.append('<li role="presentation" class="dropdown-header">Default KBs</li>');
+                      for (var i=0; i<response.default_kbs.length; ++i) {
+                          selectKbList.append(
+                            '<li role="presentation"><a class="select_KB" style="cursor:pointer;">'
+                            + response.default_kbs[i]
+                            + '</a></li>');
+                      }
+                      selectKbList.append('<li role="presentation" class="divider"></li>');
+                      selectKbList.append('<li role="presentation" class="dropdown-header">Uploaded KBs</li>');
+                      for (var i=0; i<response.uploaded_kbs.length; ++i) {
+                          selectKbList.append(
+                            '<li role="presentation"><a class="select_KB" style="cursor:pointer;">'
+                            + response.uploaded_kbs[i]
+                            + '</a></li>');
+                      }
+
+                    },
+                    error: function(xhr, textStatus){
+
+                    }
+                })
+            });
+
+            $("#selectKbList").on("click", ".select_KB", function(){
+              $("#selectedKB").val($(this).text());
+            })
+
 
             $("#runButton").click(function(){
 
@@ -81,6 +157,8 @@
 
                 $("#imgLoading").fadeIn(100);
                 $("#runButton").addClass("disabled");
+
+                $("#requestBody").html(JSON.stringify(request, null, 2));
                 $("#responseBody").html("");
 
                 $.ajax({
@@ -91,7 +169,7 @@
                     success: function(response, textStatus, xhr){
 
                         if (step == 3) {
-                          $("#responseBody").html(JSON.stringify(JSON.parse(response), null, "\t"));
+                          $("#responseBody").html(JSON.stringify(JSON.parse(response), null, 2));
                         } else {
                           $("#responseBody").html(response);
                         }
@@ -104,7 +182,7 @@
                     },
                     error: function(xhr, textStatus){
 
-                        $("#responseBody").html(JSON.stringify(textStatus, null, 4));
+                        $("#responseBody").html(JSON.stringify(textStatus, null, 2));
                         $("#imgLoading").fadeOut(200);
                         $("#runButton").removeClass("disabled");
 
@@ -150,6 +228,9 @@
             <li class="active">
               <a href="/app/request/">Make Request</a>
             </li>
+            <li>
+              <a href="/app/kbs/">Manage KBs</a>
+            </li>
           </ul>
           <ul class="nav navbar-nav pull-right">
             <li>
@@ -161,83 +242,131 @@
     </div>
 
 
-
-
     <!-- Begin page content -->
     <div class="container">
       <div class="page-header">
-        <h1>Test Pipeline</h1>
+        <h1>Query Pipeline</h1>
       </div>
       <br/>
 
       <div class="row" role="form">
         <div class="col-md-6">
 
-          <form>
-            <textarea id="requestText" class="form-control" rows="10">we should cure poverty</textarea>
+          <textarea id="requestText" class="form-control" rows="6">we should cure poverty</textarea>
+          <br/>
 
-            <br/>
+          <div class="btn-group btn-group-justified" data-toggle="buttons">
+            <label class="btn btn-default" id="selectEng">
+              <input type="radio"> English
+            </label>
+            <label class="btn btn-default" id="selectRus">
+              <input type="radio"> Russian
+            </label>
+            <label class="btn btn-default" id="selectSpa">
+              <input type="radio"> Spanish
+            </label>
+            <label class="btn btn-default" id="selectFar">
+              <input type="radio"> Farsi
+            </label>
+          </div>
 
-            <div class="radio-inline">
-              <label>
-                <input id="requestStep_1" type="radio" name="optionsRadios" id="optionsRadios1" value="option1">
-                Parse
-              </label>
-            </div>
+          <br/>
 
-            <div class="radio-inline">
-              <label>
-                <input id="requestStep_2" type="radio" name="optionsRadios" id="optionsRadios2" value="option2">
-                Abduct
-              </label>
-            </div>
+          <div id="progress" class="progress">
+            <div class="progress-bar progress-bar-success"></div>
+          </div>
 
-            <div class="radio-inline">
-              <label>
-                <input id="requestStep_3" type="radio" name="optionsRadios" id="optionsRadios2" value="option2" checked>
-                All steps
-              </label>
-            </div>
+          <div id="files" class="files"></div>
 
-            <br/>
-
-            <div class="btn-group">
-              <div class="btn-group">
-                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-                  <span id="langLabel">English</span>
-                  <span class="caret"></span>
-                </button>
-                <ul class="dropdown-menu">
-                  <li><a id="selectEng">English</a></li>
-                  <li><a id="selectRus">Russian</a></li>
-                  <li><a id="selectSpa">Spanish</a></li>
-                  <li><a id="selectFar">Farsi</a></li>
-                </ul>
-              </div>
-              <button type="button" class="btn btn-success" id="runButton">
-                Run
-                <span class="glyphicon glyphicon-tree-conifer"></span>
+          <div class="input-group dropup">
+            <span class="input-group-btn">
+              <button type="button" class="btn btn-default fileinput-button" id="uploadButton">
+                  <span class="glyphicon glyphicon-cloud-upload"></span>
+                  Upload
+                  <input id="fileupload" type="file" name="files[]" multiple>
               </button>
-            </div>
-            <img id="imgLoading" src="/static/img/loading.gif" style="display:none;margin-left:8px;"/>
-            <img id="imgTick" src="/static/img/tick.png" style="display:none;margin-left:8px;"/>
+            </span>
+            <input id="selectedKB" type="text" value="KBs/English/English_compiled_KB.da" class="form-control">
+            <span class="input-group-btn" id="selectKbButton">
+              <button type="button" class="btn btn-default dropdown-toggle"  data-toggle="dropdown">
+                Change KB <span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu pull-right" role="menu" id="selectKbList">
 
-            <div class="col-xs-7 pull-right">
-              <input id="selectedKB" type="text" class="form-control" value="KBs/English/English_compiled_KB.da">
-            </div>
+              </ul>
+            </span>
+          </div>
+
+          <br/>
+
+          <div class="radio">
+            <label>
+              <input id="requestStep_1" type="radio" name="optionsRadios" id="optionsRadios1" value="option1">
+              Parse
+            </label>
+          </div>
+          <div class="radio">
+            <label>
+              <input id="requestStep_2" type="radio" name="optionsRadios" id="optionsRadios2" value="option2">
+              Abduct <small class="text-muted">(not supported)</small>
+            </label>
+          </div>
+          <div class="radio">
+            <label>
+              <input id="requestStep_3" type="radio" name="optionsRadios" id="optionsRadios2" value="option2" checked>
+              Perform all steps
+            </label>
+          </div>
+          <br/>
+
+          <button type="button" class="btn btn-success" id="runButton">
+            Run
+            <span class="glyphicon glyphicon-tree-conifer"></span>
+          </button>
+          <br/>
 
 
-          </form>
+
+<!--             <div class="col-xs-7 pull-right">
+            <input id="selectedKB" type="text" class="form-control" value="KBs/English/English_compiled_KB.da">
+          </div>
+-->
+
+
+        <!--<div class="btn-group">
+            <button type="button" style="width:96px;" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+              <span id="langLabel">English</span>
+              <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+              <li><a id="selectEng">English</a></li>
+              <li><a id="selectRus">Russian</a></li>
+              <li><a id="selectSpa">Spanish</a></li>
+              <li><a id="selectFar">Farsi</a></li>
+            </ul>
+          </div>
+          <img id="imgLoading" src="/static/img/loading.gif" style="display:none;margin-left:8px;"/>
+          <img id="imgTick" src="/static/img/tick.png" style="display:none;margin-left:8px;"/>
+          <br/>
+          <br/>
+          -->
+
 
         <br/>
+
         <div style="display:none;" id="response_1" class="alert alert-success">Response code: <span id="responseCode_1"></span></div>
         <div style="display:none;" id="response_2" class="alert alert-danger">Response code: <span id="responseCode_2"></span></div>
+
+        <div style="display:none;" id="response_3" class="alert alert-success">File uploaded<span id="responseCode_3"></span></div>
 
 
         </div>
         <div class="col-md-6">
 
-            <pre style="height:400px;" id="responseBody">
+            <pre style="height:216px;" id="requestBody">
+            </pre>
+
+            <pre style="height:280px;" id="responseBody">
             </pre>
 
         </div>
@@ -251,11 +380,5 @@
       </div>
     </div>
 
-
-    <!-- Bootstrap core JavaScript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-    <script src="/static/bootstrap/js/bootstrap.min.js"></script>
   </body>
 </html>

@@ -93,7 +93,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
         if kb is None:
             KBPATH = FA_KBPATH
         else:
-            KBPATH = os.path.join(METAPHOR_DIR, kb)
+            KBPATH = kb
 
     elif language == "ES":
         if last_step == 1:
@@ -103,7 +103,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
         if kb is None:
             KBPATH = ES_KBPATH
         else:
-            KBPATH = os.path.join(METAPHOR_DIR, kb)
+            KBPATH = kb
 
     elif language == "RU":
         if last_step == 1:
@@ -113,7 +113,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
         if kb is None:
             KBPATH = RU_KBPATH
         else:
-            KBPATH = os.path.join(METAPHOR_DIR, kb)
+            KBPATH = kb
 
     elif language == "EN":
         tokenizer = BOXER_DIR + "/bin/tokkie --stdin"
@@ -127,7 +127,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
         if kb is None:
             KBPATH = EN_KBPATH
         else:
-            KBPATH = os.path.join(METAPHOR_DIR, kb)
+            KBPATH = kb
 
     logger.info("Running parsing command: '%s'." % parser_proc)
     logger.info("Input str: %r" % strcut(input_str))
@@ -232,6 +232,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
                 task.log_error("Failed annotation: %s" % str(annotation))
                 task.task_error_count += 1
 
+    request_body_dict["kb"] = KBPATH
     result = json.dumps(request_body_dict, encoding="utf-8", indent=4)
 
     logger.info("Processed: %d." % processed)

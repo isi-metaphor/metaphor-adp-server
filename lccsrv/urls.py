@@ -21,6 +21,8 @@ urlpatterns = patterns("",
                        url(r"^app/logs/$",          "pipeline.views.app_logs",      name="app_logs"),
                        url(r"^app/item/$",          "pipeline.views.app_item",      name="app_item"),
                        url(r"^app/request/$",       "pipeline.views.app_request",   name="app_request"),
+                       url(r"^app/list_kbs/$",      "pipeline.views.app_list_kbs",  name="list_kbs"),
+                       url(r"^app/upload/$",        "pipeline.views.app_upload",    name="upload"),
                        url(r"^logout/$",            "pipeline.views.user_logout",   name="logout"),
                        url(r"^admin/",              include(admin.site.urls)),
                        )

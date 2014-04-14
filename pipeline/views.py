@@ -6,7 +6,10 @@
 # For more information, see README.md
 # For license information, see LICENSE
 
+import os
 import git
+import glob
+import json
 import base64
 import logging
 import traceback
@@ -121,6 +124,33 @@ def app_request(request):
     })
 
 
+def app_list_kbs(request):
+    default_kbs = glob.glob(paths.KBS_DIR + "/*/*.da")
+    default_kbs = [
+        paths.EN_KBPATH,
+        paths.RU_KBPATH,
+        paths.ES_KBPATH,
+        paths.FA_KBPATH,
+    ]
+    default_kbs = [
+        os.path.join(
+            os.path.relpath(os.path.basename(os.path.dirname(f))),
+            os.path.basename(f)
+        )
+        for f in default_kbs]
+
+    uploaded_kbs = [
+        os.path.basename(f)
+        for f in glob.glob(paths.UPLOADS_DIR + "*.da")
+    ]
+
+    return HttpResponse(json.dumps({
+        "kbs_dir": paths.KBS_DIR,
+        "uploads_dir": paths.UPLOADS_DIR,
+        "default_kbs": default_kbs,
+        "uploaded_kbs": uploaded_kbs,
+    }), content_type="application/json")
+
 
 def user_logout(request):
     logout(request)
@@ -172,3 +202,30 @@ def run_pipeline(request):
     else:
         return HttpResponse("<b>Error: use POST method to submit query file.</b>",
                             status=405)
+
+@csrf_exempt
+def app_upload(request):
+    try:
+        if request.method == "POST" and request.is_ajax():
+            for uploaded in request.FILES.values():
+                file_name = os.path.join(paths.UPLOADS_DIR, uploaded.name)
+                kb_name = uploaded.name
+                with open(file_name, "wb") as fl:
+                    fl.write(uploaded.read())
+                return HttpResponse(json.dumps({
+                    "error_code": 0,
+                    "file_name": file_name,
+                    "kb_name": kb_name
+                }))
+
+        else:
+            return HttpResponse(json.dumps({
+                "error_code": 2,
+                "error_msg": "This is not POST"
+            }))
+    except:
+        traceback.print_exc()
+        return HttpResponse(json.dumps({
+            "error_code": 1,
+            "error_msg": traceback.format_exc()
+        }))
