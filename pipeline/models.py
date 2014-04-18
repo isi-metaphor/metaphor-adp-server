@@ -33,6 +33,8 @@ class AnnotationTask(models.Model):
     request_lang        = models.CharField(max_length=32, null=True)
     request_body_blob   = models.BinaryField(null=False)
 
+    henry_out_blob      = models.BinaryField(null=True)
+
     response_body_blob  = models.BinaryField(default=None, null=True)
     response_time       = models.DateTimeField(null=True)
     response_status     = models.IntegerField(null=False, default=500)
@@ -108,6 +110,14 @@ class AnnotationTask(models.Model):
     @request_body.setter
     def request_body(self, value):
         self.request_body_blob = lz4.compressHC(value)
+
+    @property
+    def henry_out(self):
+        return lz4.decompress(self.henry_out_blob)
+
+    @henry_out.setter
+    def henry_out(self, value):
+        self.henry_out_blob = lz4.compressHC(value)
 
     @property
     def log_body(self):

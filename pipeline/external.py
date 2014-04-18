@@ -187,8 +187,9 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
                            close_fds=True)
     henry_output, henry_stderr = henry_pipeline.communicate(input=parser_output)
     hypotheses = extract_hypotheses(henry_output)
-    logger.info("Henry output:\n%s\n" % strcut(henry_output))
+    logger.info("Henry output:\n%s\n" % str(henry_output))
     task.log_error("Henry output: \n%r" % henry_output)
+    task.henry_out = henry_output
     logger.info("Hypotheses output:\n%s\n" % strcut(hypotheses))
     task.log_error("Hypotheses: \n%r" % hypotheses)
 
