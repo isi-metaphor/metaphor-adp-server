@@ -7,6 +7,7 @@
 # For license information, see LICENSE
 
 import lz4
+import json
 import StringIO as stringio
 
 from  datetime import datetime
@@ -27,9 +28,12 @@ class AnnotationTask(models.Model):
     class Meta:
         db_table = "t_tasks"
 
+    request_addr        = models.CharField(null=True, blank=True, max_length=16)
     request_time        = models.DateTimeField(auto_now_add=True, null=False)
     request_lang        = models.CharField(max_length=32, null=True)
     request_body_blob   = models.BinaryField(null=False)
+
+    henry_out_blob      = models.BinaryField(null=True)
 
     response_body_blob  = models.BinaryField(default=None, null=True)
     response_time       = models.DateTimeField(null=True)
@@ -67,12 +71,6 @@ class AnnotationTask(models.Model):
             return "NO_META_ERR"
         return "UNKNOWN"
 
-    def save(self, *args, **kwargs):
-        log_str = self.log.getvalue()
-        self.task_log_blob = lz4.compressHC(log_str)
-        print len(log_str)
-        super(AnnotationTask, self).save(*args, **kwargs)
-
     def log_error(self, error_msg):
         self.log.write(error_msg)
         self.log.write("\n")
@@ -86,16 +84,24 @@ class AnnotationTask(models.Model):
             else:
                 response_body = self.response_body
         else:
-            response_body = self.response_body
+            if self.response_body_blob is None:
+                response_body = json.dumps({
+                    "error_code": self.task_error_code,
+                    "error_message": self.task_error_message,
+                })
+                self.response_body = response_body
+            else:
+                response_body = self.response_body
 
         if save:
+            log_str = self.log.getvalue()
+            self.task_log_blob = lz4.compressHC(log_str)
             self.response_time = datetime.now()
             self.save()
 
         return HttpResponse(response_body,
                             content_type="application/json",
                             status=self.response_status)
-
 
     @property
     def request_body(self):
@@ -104,6 +110,14 @@ class AnnotationTask(models.Model):
     @request_body.setter
     def request_body(self, value):
         self.request_body_blob = lz4.compressHC(value)
+
+    @property
+    def henry_out(self):
+        return lz4.decompress(self.henry_out_blob)
+
+    @henry_out.setter
+    def henry_out(self, value):
+        self.henry_out_blob = lz4.compressHC(value)
 
     @property
     def log_body(self):

@@ -6,7 +6,6 @@
 # For more information, see README.md
 # For license information, see LICENSE
 
-import os
 import time
 import simplejson as json
 import traceback
@@ -80,31 +79,55 @@ def strcut(some_str, max_size=120):
     return "<NONE>"
 
 
-def run_annotation(request_body_dict, input_metaphors, language, task, logger, with_pdf_content):
+def run_annotation(request_body_dict, input_metaphors, language, task, logger, with_pdf_content, last_step=3, kb=None):
     start_time = time.time()
     input_str = generate_text_input(input_metaphors, language)
 
     # Parser pipeline
     parser_proc = ""
     if language == "FA":
-        parser_proc = FARSI_PIPELINE + " | python " + PARSER2HENRY + " --nonmerge sameid freqpred"
-        KBPATH = FA_KBPATH
+        if last_step == 1:
+            parser_proc = FARSI_PIPELINE
+        else:
+            parser_proc = FARSI_PIPELINE + " | python " + PARSER2HENRY + " --nonmerge sameid freqpred"
+        if kb is None:
+            KBPATH = FA_KBPATH
+        else:
+            KBPATH = kb
 
     elif language == "ES":
-        parser_proc = SPANISH_PIPELINE + " | python " + PARSER2HENRY + " --nonmerge sameid freqpred"
-        KBPATH = ES_KBPATH
+        if last_step == 1:
+            parser_proc = SPANISH_PIPELINE
+        else:
+            parser_proc = SPANISH_PIPELINE + " | python " + PARSER2HENRY + " --nonmerge sameid freqpred"
+        if kb is None:
+            KBPATH = ES_KBPATH
+        else:
+            KBPATH = kb
 
     elif language == "RU":
-        parser_proc = RUSSIAN_PIPELINE + " | python " + PARSER2HENRY + " --nonmerge sameid freqpred"
-        KBPATH = RU_KBPATH
+        if last_step == 1:
+            parser_proc = RUSSIAN_PIPELINE
+        else:
+            parser_proc = RUSSIAN_PIPELINE + " | python " + PARSER2HENRY + " --nonmerge sameid freqpred"
+        if kb is None:
+            KBPATH = RU_KBPATH
+        else:
+            KBPATH = kb
 
     elif language == "EN":
         tokenizer = BOXER_DIR + "/bin/tokkie --stdin"
         candcParser = BOXER_DIR + "/bin/candc --models " + BOXER_DIR + "/models/boxer --candc-printer boxer"
         boxer = BOXER_DIR + "/bin/boxer --semantics tacitus --resolve true --stdin"
         b2h = "python " + BOXER2HENRY + " --nonmerge sameid freqpred"
-        parser_proc = tokenizer + " | " + candcParser + " | " + boxer + " | " + b2h
-        KBPATH = EN_KBPATH
+        if last_step == 1:
+            parser_proc = tokenizer + " | " + candcParser + " | " + boxer
+        else:
+            parser_proc = tokenizer + " | " + candcParser + " | " + boxer + " | " + b2h
+        if kb is None:
+            KBPATH = EN_KBPATH
+        else:
+            KBPATH = kb
 
     logger.info("Running parsing command: '%s'." % parser_proc)
     logger.info("Input str: %r" % strcut(input_str))
@@ -117,11 +140,19 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
                             stderr=None,
                             close_fds=True)
     parser_output, parser_stderr = parser_pipeline.communicate(input=input_str)
+    task.log_error("Parser output:\n%r" % parser_output)
 
     # Parser processing time in seconds
     parser_time = (time.time() - start_time) * 0.001
     logger.info("Command finished. Processing time: %r." % parser_time)
     logger.info("Parser output:\n%s\n" % strcut(parser_output))
+
+    if last_step == 1:
+        return parser_output
+
+    parses = extract_parses(parser_output)
+    logger.info("Parses:\n%r\n" % strcut(parses))
+    task.log_error("Parses:\n%r" % parses)
 
     # time to generate final output in seconds
     generate_output_time = 2
@@ -156,13 +187,16 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
                            close_fds=True)
     henry_output, henry_stderr = henry_pipeline.communicate(input=parser_output)
     hypotheses = extract_hypotheses(henry_output)
-    logger.info("Henry output:\n%s\n" % strcut(henry_output))
+    logger.info("Henry output:\n%s\n" % str(henry_output))
+    task.log_error("Henry output: \n%r" % henry_output)
+    task.henry_out = henry_output
     logger.info("Hypotheses output:\n%s\n" % strcut(hypotheses))
+    task.log_error("Hypotheses: \n%r" % hypotheses)
 
-    parses = extract_parses(parser_output)
+    if last_step == 2:
+        return json.dumps(henry_output, encoding="utf-8", indent=4)
+
     processed, failed, empty = 0, 0, 0
-
-    logger.info("Parsed Henry output:\n%r\n" % strcut(parses))
 
     # merge ADB result and input json document
     input_annotations = request_body_dict["metaphorAnnotationRecords"]
@@ -199,6 +233,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
                 task.log_error("Failed annotation: %s" % str(annotation))
                 task.task_error_count += 1
 
+    request_body_dict["kb"] = KBPATH
     result = json.dumps(request_body_dict, encoding="utf-8", indent=4)
 
     logger.info("Processed: %d." % processed)
