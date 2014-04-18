@@ -175,7 +175,7 @@
                           $("#responseBody").html(response.response);
                         }
 
-                        $("#henryOutXml").html(response.henry);
+                        $("#henryOutXml").html($('<div/>').text(response.henry).html());
                         $("#requestLogBody").html(response.log);
 
                         $("#imgLoading").fadeOut(200);
