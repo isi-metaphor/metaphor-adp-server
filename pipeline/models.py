@@ -75,7 +75,7 @@ class AnnotationTask(models.Model):
         self.log.write(error_msg)
         self.log.write("\n")
 
-    def to_response(self, save=True):
+    def to_response(self, save=True, enable_debug=False):
 
         if self.task_error_code != 0:
             if self.response_body_blob is None:
@@ -98,6 +98,13 @@ class AnnotationTask(models.Model):
             self.task_log_blob = lz4.compressHC(log_str)
             self.response_time = datetime.now()
             self.save()
+
+        if enable_debug:
+            response_body = json.dumps({
+                "log": self.log_body,
+                "henry": self.henry_out,
+                "response": json.loads(response_body),
+            }, indent=4)
 
         return HttpResponse(response_body,
                             content_type="application/json",
