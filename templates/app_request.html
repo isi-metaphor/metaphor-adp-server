@@ -179,7 +179,7 @@
                         $("#parserOut").html(response.parse);
                         $("#requestLogBody").html(response.log);
 
-                        if (response.graph && response.graph.length > 0)
+                        if (response.graph)
                           $("#graphImg").html("<img src='data:image/png;base64," + response.graph["1"] + "' />");
 
                         $("#imgLoading").fadeOut(200);
