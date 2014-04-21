@@ -151,7 +151,7 @@ class Annotator(object):
                                     language,
                                     self.task,
                                     self.logger,
-                                    with_pdf_content=True,
+                                    with_pdf_content=debug_option,
                                     last_step=last_step,
                                     kb=selected_kb)
 

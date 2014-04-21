@@ -205,6 +205,13 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
     # merge ADB result and input json document
     input_annotations = request_body_dict["metaphorAnnotationRecords"]
 
+
+    if with_pdf_content:
+        logger.info("Generating proofgraphs.")
+        unique_id = get_unique_id()
+        proofgraphs = generate_graph(input_metaphors, henry_output, unique_id)
+        task.dot_out = proofgraphs
+
     logger.info("Input annotations count:\n%r\n" % len(input_annotations))
 
     total = len(input_annotations)
@@ -248,3 +255,38 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
     return result
 
 
+
+def generate_graph(input_dict, henry_output, unique_id):
+
+    # create proofgraphs directory if it doesn't exist
+    graph_dir = TMP_DIR + "/proofgraphs"
+
+    if not os.path.exists(graph_dir):
+        os.makedirs(graph_dir)
+
+    out_data = {}
+
+    for key in input_dict.keys():
+        print "Generating a proofgraph for " + key
+        graph_output = os.path.join(graph_dir, unique_id + "_" + key + ".pdf")
+
+        viz = "python " + HENRY_DIR + "/tools/proofgraph.py --graph " + key + \
+              " | dot -T png > " + graph_output
+
+        graphical_processing = Popen(viz, shell=True, stdin=PIPE, stdout=PIPE,
+                                     stderr=None, close_fds=True)
+
+        graphical_processing.communicate(input=henry_output)
+        #print "sleep"
+        #time.sleep(3)
+
+        with open(graph_output, "rb") as fl:
+           out_data[key] = fl.read().encode("base64")
+
+    return out_data
+
+
+def get_unique_id():
+    current_time = int(time.time())
+    unique_id = str(current_time)[5:]
+    return unique_id
