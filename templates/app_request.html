@@ -180,7 +180,7 @@
                         $("#requestLogBody").html(response.log);
 
                         if (response.graph)
-                          $("#graphImg").html("<img src='data:image/png;base64," + response.graph["1"] + "' />");
+                          $("#graphImg").html("<img style='width:650px;' src='data:image/png;base64," + response.graph["1"] + "' />");
 
                         $("#imgLoading").fadeOut(200);
                         $("#runButton").removeClass("disabled");
