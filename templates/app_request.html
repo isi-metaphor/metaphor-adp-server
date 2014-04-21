@@ -180,7 +180,7 @@
                         $("#requestLogBody").html(response.log);
 
                         if (response.graph && response.graph.length > 0)
-                          $("#graphImg").attr("src").replace("data:image/png;base64," + response.graph["1"]);
+                          $("#graphImg").html("<img src='data:image/png;base64," + response.graph["1"] + "' />");
 
                         $("#imgLoading").fadeOut(200);
                         $("#runButton").removeClass("disabled");
@@ -335,30 +335,6 @@
 
 
 
-<!--             <div class="col-xs-7 pull-right">
-            <input id="selectedKB" type="text" class="form-control" value="KBs/English/English_compiled_KB.da">
-          </div>
--->
-
-
-        <!--<div class="btn-group">
-            <button type="button" style="width:96px;" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-              <span id="langLabel">English</span>
-              <span class="caret"></span>
-            </button>
-            <ul class="dropdown-menu">
-              <li><a id="selectEng">English</a></li>
-              <li><a id="selectRus">Russian</a></li>
-              <li><a id="selectSpa">Spanish</a></li>
-              <li><a id="selectFar">Farsi</a></li>
-            </ul>
-          </div>
-          <img id="imgTick" src="/static/img/tick.png" style="display:none;margin-left:8px;"/>
-          <br/>
-          <br/>
-          -->
-
-
         <br/>
 
         <div style="display:none;margin-top:8px;" id="response_1" class="alert alert-success">Response code: <span id="responseCode_1"></span></div>
@@ -388,7 +364,7 @@
               <a href="#requestLog_tab" data-toggle="tab">Log</a>
             </li>
             <li>
-              <a href="#requestGraph_tab" data-toggle="tab">Log</a>
+              <a href="#requestGraph_tab" data-toggle="tab">Graph</a>
             </li>
           </ul>
 
@@ -417,7 +393,7 @@
             </div>
 
             <div class="tab-pane" id="requestGraph_tab">
-              <img id="graphImg">
+              <div id="graphImg"></div>
             </div>
 
           </div>
