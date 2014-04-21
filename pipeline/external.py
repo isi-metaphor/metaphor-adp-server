@@ -145,7 +145,11 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
     # Parser processing time in seconds
     parser_time = (time.time() - start_time) * 0.001
     logger.info("Command finished. Processing time: %r." % parser_time)
-    logger.info("Parser output:\n%s\n" % strcut(parser_output))
+
+    logger.info("Parser output:\n%s\n" % parser_output)
+    task.log_error("Parser output: \n%r" % parser_output)
+    task.parse_out = parser_output
+
 
     if last_step == 1:
         return parser_output

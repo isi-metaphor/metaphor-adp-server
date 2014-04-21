@@ -34,6 +34,7 @@ class AnnotationTask(models.Model):
     request_body_blob   = models.BinaryField(null=False)
 
     henry_out_blob      = models.BinaryField(null=True)
+    parse_out_blob      = models.BinaryField(null=True)
 
     response_body_blob  = models.BinaryField(default=None, null=True)
     response_time       = models.DateTimeField(null=True)
@@ -103,6 +104,7 @@ class AnnotationTask(models.Model):
             response_body = json.dumps({
                 "log": self.log_body,
                 "henry": self.henry_out,
+                "parse": self.parse_out,
                 "response": json.loads(response_body),
             }, indent=4)
 
@@ -125,6 +127,14 @@ class AnnotationTask(models.Model):
     @henry_out.setter
     def henry_out(self, value):
         self.henry_out_blob = lz4.compressHC(value)
+
+    @property
+    def parse_out(self):
+        return lz4.decompress(self.parse_out_blob)
+
+    @parse_out.setter
+    def parse_out(self, value):
+        self.parse_out_blob = lz4.compressHC(value)
 
     @property
     def log_body(self):

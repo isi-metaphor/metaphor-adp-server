@@ -176,6 +176,7 @@
                         }
 
                         $("#henryOutXml").html($('<div/>').text(response.henry).html());
+                        $("#parserOut").html(response.parse);
                         $("#requestLogBody").html(response.log);
 
                         $("#imgLoading").fadeOut(200);
@@ -375,6 +376,9 @@
               <a href="#henryOut_tab" data-toggle="tab">Henry</a>
             </li>
             <li>
+              <a href="#parserOut_tab" data-toggle="tab">Parser</a>
+            </li>
+            <li>
               <a href="#requestJSON_tab" data-toggle="tab">Request</a>
             </li>
             <li>
@@ -392,6 +396,10 @@
 
             <div class="tab-pane" id="henryOut_tab">
               <pre style="height:400px;font-size:10px;" id="henryOutXml"></pre>
+            </div>
+
+            <div class="tab-pane" id="parserOut_tab">
+              <pre style="height:400px;font-size:10px;" id="parserOut"></pre>
             </div>
 
             <div class="tab-pane" id="requestJSON_tab">
