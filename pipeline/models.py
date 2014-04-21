@@ -106,6 +106,7 @@ class AnnotationTask(models.Model):
                 "log": self.log_body,
                 "henry": self.henry_out,
                 "parse": self.parse_out,
+                "graph": self.dot_out,
                 "response": json.loads(response_body),
             }, indent=4)
 
