@@ -179,6 +179,9 @@
                         $("#parserOut").html(response.parse);
                         $("#requestLogBody").html(response.log);
 
+                        if (response.graph && response.graph.length > 0)
+                          $("#graphImg").attr("src").replace("data:image/png;base64," + response.graph["1"]);
+
                         $("#imgLoading").fadeOut(200);
                         $("#runButton").removeClass("disabled");
 
@@ -384,6 +387,9 @@
             <li>
               <a href="#requestLog_tab" data-toggle="tab">Log</a>
             </li>
+            <li>
+              <a href="#requestGraph_tab" data-toggle="tab">Log</a>
+            </li>
           </ul>
 
           <br/>
@@ -408,6 +414,10 @@
 
             <div class="tab-pane" id="requestLog_tab">
               <pre style="height:400px;" id="requestLogBody"></pre>
+            </div>
+
+            <div class="tab-pane" id="requestGraph_tab">
+              <img id="graphImg">
             </div>
 
           </div>
