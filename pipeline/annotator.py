@@ -6,11 +6,11 @@
 # For more information, see README.md
 # For license information, see LICENSE
 
-
 import os
-import json
+import simplejson as json
 import pipeline.external as adb
 
+from lccsrv import paths
 from pipeline.models import TASK_STATUS
 
 
@@ -25,7 +25,7 @@ class Annotator(object):
         self.task.log_error(error_msg)
         self.task.task_error_message = error_msg
         if error_code is not None:
-            self.task.error_code = error_code
+            self.task.task_error_code = error_code
         if count_error:
             self.task.task_error_count += 1
         return self.task
@@ -39,11 +39,41 @@ class Annotator(object):
         metaphors = {}
         request_document_body = self.task.request_body
 
+
         # 2. Parse document JSON
         log_msg = "Parse document json. Task id=%d, document size=%d.." % (self.task.id, len(request_document_body))
         self.logger.info(log_msg)
         self.task.log_error(log_msg)
         request_document = json.loads(request_document_body)
+
+        # 2.1 Get last processing step
+        last_step = request_document.get("step", 3)
+        log_msg = "Last processing step will be %r" % last_step
+        self.logger.info(log_msg)
+        self.task.log_error(log_msg)
+        if last_step not in (1, 2, 3):
+            log_msg = "Wrong last step value: %r" % last_step
+            self.logger.info(log_msg)
+            self.task.log_error(log_msg)
+            last_step = 3
+
+        # 2.2 Get selected KB
+        selected_kb = request_document.get("kb", None)
+        log_msg = "Selected KB is '%r'" % selected_kb
+        self.logger.info(log_msg)
+        self.task.log_error(log_msg)
+        if selected_kb is not None:
+            # Default KB
+            if "/" in selected_kb:
+                selected_kb = os.path.join(paths.METAPHOR_DIR, selected_kb)
+            else:
+                selected_kb = os.path.join(paths.UPLOADS_DIR, selected_kb)
+            log_msg = "Selected KB full path is '%r'" % selected_kb
+            self.logger.info(log_msg)
+            self.task.log_error(log_msg)
+
+        # 2.3 Get debug option
+        debug_option = request_document.get("enableDebug", False)
 
         # 3. Get document language.
         log_msg = "Getting document language. Task id=%d." % self.task.id
@@ -116,11 +146,18 @@ class Annotator(object):
             error_msg = "Found 0 metaphors for annotation. Task id=#%d."
             return self.task_error(error_msg, 6)
 
-        result = adb.run_annotation(request_document, metaphors, language, self.task, self.logger, True)
+        result = adb.run_annotation(request_document,
+                                    metaphors,
+                                    language,
+                                    self.task,
+                                    self.logger,
+                                    with_pdf_content=debug_option,
+                                    last_step=last_step,
+                                    kb=selected_kb)
 
         self.task.response_body = result
         self.task.task_status = TASK_STATUS.PROCESSED
 
-        return self.task
+        return debug_option
 
 

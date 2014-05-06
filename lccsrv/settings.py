@@ -15,24 +15,22 @@ def project_dir(dir_name):
 
 PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
-DEBUG = {{DJANGO_DEBUG}}
+DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 
-ADMINS = (
-    ("{{ADMIN_NAME}}", "{{ADMIN_EMAIL}}"),
-)
+ADMINS = ()
 
 
 MANAGERS = ADMINS
 DATABASES = {
     "default": {
         "ENGINE":   "django.db.backends.sqlite3",
-        "NAME":     "{{DJANGO_DB_NAME}}",
+        "NAME":     "local.db",
     }
 }
 
-TIME_ZONE = "America/Los_Angeles"
+TIME_ZONE = "America/Chicago"
 LANGUAGE_CODE = "en-us"
 
 SITE_ID = 1
@@ -74,10 +72,7 @@ MIDDLEWARE_CLASSES = (
 ROOT_URLCONF = "lccsrv.urls"
 WSGI_APPLICATION = "lccsrv.wsgi.application"
 
-TEMPLATE_DIRS = (
-    project_dir("templates"),
-)
-
+TEMPLATE_DIRS = (project_dir("templates"),)
 
 INSTALLED_APPS = (
     "django.contrib.auth",
@@ -109,24 +104,24 @@ LOGGING = {
 
         "pipeline-file": {
             "class": "logging.handlers.RotatingFileHandler",
-            "filename": "{{LOGGING_PIPELINE_FILE}}",
+            "filename": "logs/pipeline.log",
             "formatter": "verbose",
-            "backupCount": 32,
-            "maxBytes": 1024 * 1024 * 128,
+            "backupCount": 3,
+            "maxBytes": 1024 * 1024 * 16,
         },
         "django-file": {
             "class": "logging.handlers.RotatingFileHandler",
-            "filename": "{{LOGGING_DJANGO_FILE}}",
+            "filename": "logs/django.log",
             "formatter": "verbose",
-            "backupCount": 32,
-            "maxBytes": 1024 * 1024 * 128,
+            "backupCount": 3,
+            "maxBytes": 1024 * 1024 * 16,
         },
         "requests-file": {
             "class": "logging.handlers.RotatingFileHandler",
-            "filename": "{{LOGGING_REQUESTS_FILE}}",
+            "filename": "logs/requests.log",
             "formatter": "verbose",
-            "backupCount": 32,
-            "maxBytes": 1024 * 1024 * 128,
+            "backupCount": 3,
+            "maxBytes": 1024 * 1024 * 16,
         },
 
         "mail_admins": {
@@ -155,6 +150,5 @@ LOGGING = {
             "propagate": True,
             "level": "DEBUG",
         },
-
     }
 }
