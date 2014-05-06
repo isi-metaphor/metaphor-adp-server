@@ -1,0 +1,183 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Item #{{item.id}}</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="/static/css/item.css" rel="stylesheet">
+
+    <script src="/static/js/jquery-2.1.0.min.js"></script>
+    <script src="/static/bootstrap/js/bootstrap.min.js"></script>
+
+
+    <!-- Just for debugging purposes. Don't actually copy this line! -->
+    <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+
+  </head>
+
+  <body>
+
+    <!-- Begin page content -->
+    <div class="container">
+      <div class="page-header">
+        <h1><a href="/app/logs">←</a> Log Item #{{item.id}}</h1>
+        <br/>
+
+        <div class="col-md-12">
+
+
+<div class="panel-group" id="accordion">
+
+
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordion" href="#requetJSON">
+          Request JSON
+        </a>
+      </h4>
+    </div>
+    <div id="requetJSON" class="panel-collapse collapse">
+      <div class="panel-body">
+        <pre>{{item.request_body}}</pre>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordion" href="#responseJSON">
+          Response JSON
+        </a>
+      </h4>
+    </div>
+    <div id="responseJSON" class="panel-collapse collapse">
+      <div class="panel-body">
+        <pre>{{item.response_body}}</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordion" href="#parseOutput">
+          Parser Output
+        </a>
+      </h4>
+    </div>
+    <div id="parseOutput" class="panel-collapse collapse">
+      <div class="panel-body">
+        <pre>{{item.parse_out}}</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordion" href="#graphOutput">
+          Prooph Graphs
+        </a>
+      </h4>
+    </div>
+    <div id="graphOutput" class="panel-collapse collapse">
+      <div class="panel-body">
+
+        <ul>
+        {% for key,value in item.dot_out.items %}
+
+          <li> {{key}}<br/>
+
+               <img src="data:image/png;base64,{{value}}" style="width:1024px;" />
+          </li>
+
+        {% endfor %}
+        </ul>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordion" href="#henryOutput">
+          Henry Output
+        </a>
+      </h4>
+    </div>
+    <div id="henryOutput" class="panel-collapse collapse">
+      <div class="panel-body">
+        <pre>{{item.henry_out}}</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordion" href="#responseError">
+          Error Message
+        </a>
+      </h4>
+    </div>
+    <div id="responseError" class="panel-collapse collapse">
+      <div class="panel-body">
+        <pre>{{item.task_error_message}}</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordion" href="#itemLog">
+          Log
+        </a>
+      </h4>
+    </div>
+    <div id="itemLog" class="panel-collapse collapse">
+      <div class="panel-body">
+        <pre>{{item.log_body}}</pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+        </div>
+
+      </div>
+    </div>
+
+    <div id="footer">
+      <div class="container">
+        <p class="text-muted">Place sticky footer content here.</p>
+      </div>
+    </div>
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+  </body>
+</html>

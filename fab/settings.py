@@ -13,6 +13,7 @@ def project_dir(dir_name):
     return os.path.join(os.path.dirname(__file__), "..", dir_name)\
         .replace("\\", "//")
 
+PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
 DEBUG = {{DJANGO_DEBUG}}
 TEMPLATE_DEBUG = DEBUG
@@ -31,7 +32,7 @@ DATABASES = {
     }
 }
 
-TIME_ZONE = "America/Chicago"
+TIME_ZONE = "America/Los_Angeles"
 LANGUAGE_CODE = "en-us"
 
 SITE_ID = 1

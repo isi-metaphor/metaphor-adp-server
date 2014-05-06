@@ -10,9 +10,10 @@ import os
 
 
 def project_dir(dir_name):
-    return os.path.join(os.path.dirname(__file__), dir_name)\
+    return os.path.join(os.path.dirname(__file__), "..", dir_name)\
         .replace("\\", "//")
 
+PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
