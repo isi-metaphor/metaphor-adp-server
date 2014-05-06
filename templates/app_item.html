@@ -80,6 +80,62 @@
   <div class="panel panel-default">
     <div class="panel-heading">
       <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordion" href="#parseOutput">
+          Parser Output
+        </a>
+      </h4>
+    </div>
+    <div id="parseOutput" class="panel-collapse collapse">
+      <div class="panel-body">
+        <pre>{{item.parse_out}}</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordion" href="#graphOutput">
+          Prooph Graphs
+        </a>
+      </h4>
+    </div>
+    <div id="graphOutput" class="panel-collapse collapse">
+      <div class="panel-body">
+
+        <ul>
+        {% for key,value in item.dot_out.items %}
+
+          <li> {{key}}<br/>
+
+               <img src="data:image/png;base64,{{value}}" style="width:1024px;" />
+          </li>
+
+        {% endfor %}
+        </ul>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordion" href="#henryOutput">
+          Henry Output
+        </a>
+      </h4>
+    </div>
+    <div id="henryOutput" class="panel-collapse collapse">
+      <div class="panel-body">
+        <pre>{{item.henry_out}}</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="panel-title">
         <a data-toggle="collapse" data-parent="#accordion" href="#responseError">
           Error Message
         </a>

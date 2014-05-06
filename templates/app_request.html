@@ -147,6 +147,7 @@
                     "step": step,
                     "kb": $("#selectedKB").val(),
                     "language": lang,
+                    "enableDebug": true,
                     "metaphorAnnotationRecords":[
                         {
                             "sentenceId": 1,
@@ -164,15 +165,22 @@
                 $.ajax({
                     url: "/",
                     type: "POST",
-                    dataType: "text",
+                    dataType: "json",
                     data: JSON.stringify(request),
                     success: function(response, textStatus, xhr){
 
                         if (step == 3) {
-                          $("#responseBody").html(JSON.stringify(JSON.parse(response), null, 2));
+                          $("#responseBody").html(JSON.stringify(response.response, null, 2));
                         } else {
-                          $("#responseBody").html(response);
+                          $("#responseBody").html(response.response);
                         }
+
+                        $("#henryOutXml").html($('<div/>').text(response.henry).html());
+                        $("#parserOut").html(response.parse);
+                        $("#requestLogBody").html(response.log);
+
+                        if (response.graph)
+                          $("#graphImg").html("<img style='width:650px;' src='data:image/png;base64," + response.graph["1"] + "' />");
 
                         $("#imgLoading").fadeOut(200);
                         $("#runButton").removeClass("disabled");
@@ -250,7 +258,7 @@
       <br/>
 
       <div class="row" role="form">
-        <div class="col-md-6">
+        <div class="col-md-5">
 
           <textarea id="requestText" class="form-control" rows="6">we should cure poverty</textarea>
           <br/>
@@ -327,30 +335,6 @@
 
 
 
-<!--             <div class="col-xs-7 pull-right">
-            <input id="selectedKB" type="text" class="form-control" value="KBs/English/English_compiled_KB.da">
-          </div>
--->
-
-
-        <!--<div class="btn-group">
-            <button type="button" style="width:96px;" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-              <span id="langLabel">English</span>
-              <span class="caret"></span>
-            </button>
-            <ul class="dropdown-menu">
-              <li><a id="selectEng">English</a></li>
-              <li><a id="selectRus">Russian</a></li>
-              <li><a id="selectSpa">Spanish</a></li>
-              <li><a id="selectFar">Farsi</a></li>
-            </ul>
-          </div>
-          <img id="imgTick" src="/static/img/tick.png" style="display:none;margin-left:8px;"/>
-          <br/>
-          <br/>
-          -->
-
-
         <br/>
 
         <div style="display:none;margin-top:8px;" id="response_1" class="alert alert-success">Response code: <span id="responseCode_1"></span></div>
@@ -360,13 +344,60 @@
 
 
         </div>
-        <div class="col-md-6">
+        <div class="col-md-7">
 
-            <pre style="height:216px;" id="requestBody">
-            </pre>
 
-            <pre style="height:280px;" id="responseBody">
-            </pre>
+          <ul class="nav nav-tabs">
+            <li class="active">
+              <a href="#responseJSON_tab" data-toggle="tab">Response</a>
+            </li>
+            <li>
+              <a href="#henryOut_tab" data-toggle="tab">Henry</a>
+            </li>
+            <li>
+              <a href="#parserOut_tab" data-toggle="tab">Parser</a>
+            </li>
+            <li>
+              <a href="#requestJSON_tab" data-toggle="tab">Request</a>
+            </li>
+            <li>
+              <a href="#requestLog_tab" data-toggle="tab">Log</a>
+            </li>
+            <li>
+              <a href="#requestGraph_tab" data-toggle="tab">Graph</a>
+            </li>
+          </ul>
+
+          <br/>
+
+          <div class="tab-content">
+
+            <div class="tab-pane active" id="responseJSON_tab">
+              <pre style="height:400px;" id="responseBody"></pre>
+            </div>
+
+            <div class="tab-pane" id="henryOut_tab">
+              <pre style="height:400px;font-size:10px;" id="henryOutXml"></pre>
+            </div>
+
+            <div class="tab-pane" id="parserOut_tab">
+              <pre style="height:400px;font-size:10px;" id="parserOut"></pre>
+            </div>
+
+            <div class="tab-pane" id="requestJSON_tab">
+              <pre style="height:400px;" id="requestBody"></pre>
+            </div>
+
+            <div class="tab-pane" id="requestLog_tab">
+              <pre style="height:400px;" id="requestLogBody"></pre>
+            </div>
+
+            <div class="tab-pane" id="requestGraph_tab">
+              <div id="graphImg"></div>
+            </div>
+
+          </div>
+
 
         </div>
       </div>

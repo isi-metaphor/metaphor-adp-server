@@ -182,8 +182,9 @@ def run_pipeline(request):
             return HttpResponse(msg, status=500)
 
         try:
-            pipeline.annotate()
+            debug_option = pipeline.annotate()
         except Exception:
+            debug_option = False
             msg = "Error while annotating document. Traceback:\n%s." % traceback.format_exc()
             logger.error(msg)
             try:
@@ -192,7 +193,7 @@ def run_pipeline(request):
                 logger.error("Error while saving failed task. Traceback: %s" % traceback.format_exc())
 
         try:
-            response = task.to_response(save=True)
+            response = task.to_response(save=True, enable_debug=debug_option)
             return response
         except Exception:
             logger.error("Error while saving failed task. Traceback: %s" % traceback.format_exc())

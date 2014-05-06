@@ -34,6 +34,8 @@ class AnnotationTask(models.Model):
     request_body_blob   = models.BinaryField(null=False)
 
     henry_out_blob      = models.BinaryField(null=True)
+    parse_out_blob      = models.BinaryField(null=True)
+    dot_out_blob        = models.BinaryField(null=True)
 
     response_body_blob  = models.BinaryField(default=None, null=True)
     response_time       = models.DateTimeField(null=True)
@@ -75,7 +77,7 @@ class AnnotationTask(models.Model):
         self.log.write(error_msg)
         self.log.write("\n")
 
-    def to_response(self, save=True):
+    def to_response(self, save=True, enable_debug=False):
 
         if self.task_error_code != 0:
             if self.response_body_blob is None:
@@ -99,6 +101,15 @@ class AnnotationTask(models.Model):
             self.response_time = datetime.now()
             self.save()
 
+        if enable_debug:
+            response_body = json.dumps({
+                "log": self.log_body,
+                "henry": self.henry_out,
+                "parse": self.parse_out,
+                "graph": self.dot_out,
+                "response": json.loads(response_body),
+            }, indent=4)
+
         return HttpResponse(response_body,
                             content_type="application/json",
                             status=self.response_status)
@@ -118,6 +129,23 @@ class AnnotationTask(models.Model):
     @henry_out.setter
     def henry_out(self, value):
         self.henry_out_blob = lz4.compressHC(value)
+
+    @property
+    def parse_out(self):
+        return lz4.decompress(self.parse_out_blob)
+
+    @parse_out.setter
+    def parse_out(self, value):
+        self.parse_out_blob = lz4.compressHC(value)
+
+    @property
+    def dot_out(self):
+        return json.loads(lz4.decompress(self.dot_out_blob))
+
+    @dot_out.setter
+    def dot_out(self, value):
+        self.dot_out_blob = lz4.compressHC(json.dumps(value))
+
 
     @property
     def log_body(self):

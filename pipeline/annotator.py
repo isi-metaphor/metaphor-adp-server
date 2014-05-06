@@ -57,7 +57,7 @@ class Annotator(object):
             self.task.log_error(log_msg)
             last_step = 3
 
-        # 2.1 Get selected KB
+        # 2.2 Get selected KB
         selected_kb = request_document.get("kb", None)
         log_msg = "Selected KB is '%r'" % selected_kb
         self.logger.info(log_msg)
@@ -71,6 +71,9 @@ class Annotator(object):
             log_msg = "Selected KB full path is '%r'" % selected_kb
             self.logger.info(log_msg)
             self.task.log_error(log_msg)
+
+        # 2.3 Get debug option
+        debug_option = request_document.get("enableDebug", False)
 
         # 3. Get document language.
         log_msg = "Getting document language. Task id=%d." % self.task.id
@@ -148,13 +151,13 @@ class Annotator(object):
                                     language,
                                     self.task,
                                     self.logger,
-                                    with_pdf_content=True,
+                                    with_pdf_content=debug_option,
                                     last_step=last_step,
                                     kb=selected_kb)
 
         self.task.response_body = result
         self.task.task_status = TASK_STATUS.PROCESSED
 
-        return self.task
+        return debug_option
 
 
