@@ -282,33 +282,34 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
         answer[key]=answer[key]/count
     best=-1
     bestkey=''
-    for key in answer:
-        if answer[key]>=best:
-            best=answer[key]
-            bestkey=key
-    msg="best: %s,%s" % (bestkey,best)
-    logger.info(msg)
-    task.log_error(msg)
-    for annotation in input_annotations:
-        if u"isiAbductiveExplanation" in annotation:
-            exp = str(annotation["isiAbductiveExplanation"])
-            start=-1
-            end=-1
-            lines=exp.split('\n');
-            for idx, line in enumerate(lines):
-                if line == "%%BEGIN_CM_LIST":
-                    start=idx
-                elif line == "%%END_CM_LIST":
-                    end=idx
-                    break
-            if start>=0 and end>=0:
-                exp="\n".join(lines[0:start+1]+[bestkey+","+`best`]+[lines[end]])
-            else:
-                exp=exp+"\n"+"%%BEGIN_CM_LIST"+"\n"+bestkey+","+`best`+"\n"+"%%END_CM_LIST"
-            msg="changing interpretation from:\n%s\n to:\n%s" % (annotation["isiAbductiveExplanation"],exp)
-            logger.info(msg)
-            task.log_error(msg)
-            annotation["isiAbductiveExplanation"]=exp
+    if answer:
+        for key in answer:
+            if answer[key]>=best:
+                best=answer[key]
+                bestkey=key
+        msg="best: %s,%s" % (bestkey,best)
+        logger.info(msg)
+        task.log_error(msg)
+        for annotation in input_annotations:
+            if u"isiAbductiveExplanation" in annotation:
+                exp = str(annotation["isiAbductiveExplanation"])
+                start=-1
+                end=-1
+                lines=exp.split('\n');
+                for idx, line in enumerate(lines):
+                    if line == "%%BEGIN_CM_LIST":
+                        start=idx
+                    elif line == "%%END_CM_LIST":
+                        end=idx
+                        break
+                if start>=0 and end>=0:
+                    exp="\n".join(lines[0:start+1]+[bestkey+","+`best`]+[lines[end]])
+                else:
+                    exp=exp+"\n"+"%%BEGIN_CM_LIST"+"\n"+bestkey+","+`best`+"\n"+"%%END_CM_LIST"
+                msg="changing interpretation from:\n%s\n to:\n%s" % (annotation["isiAbductiveExplanation"],exp)
+                logger.info(msg)
+                task.log_error(msg)
+                annotation["isiAbductiveExplanation"]=exp
 
     #request_body_dict["kb"] = KBPATH
     if "kb" in request_body_dict:
