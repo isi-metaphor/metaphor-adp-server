@@ -74,7 +74,7 @@ def app_status(request):
         return redirect("/app/")
     repo = git.Repo(".")
     return render(request, "app_status.html", {
-        "branch":   repo.active_branch.name,
+        "branch":   repo.active_branch,
         "commit":   base64.b64encode(repo.active_branch.commit.binsha),
         "settings": settings,
         "paths":    paths,
