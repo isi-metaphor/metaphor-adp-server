@@ -19,7 +19,7 @@ from fabric.colors import green, red
 
 def dev():
     env.config = {
-        "repository":   "https://github.com/zaycev/lcc-service.git",
+        "repository":   "https://github.com/isi-metaphor/lcc-service.git",
         "branch":       "dev",
         "context":       json.load(open("fab/config.dev.json", "r")),
     }
@@ -29,7 +29,7 @@ def dev():
 
 def prod():
     env.config = {
-        "repository":   "https://github.com/zaycev/lcc-service.git",
+        "repository":   "https://github.com/isi-metaphor/lcc-service.git",
         "branch":       "prod",
         "context":      json.load(open("fab/config.prod.json", "r")),
     }
@@ -46,7 +46,7 @@ def run_local():
 
 def server():
     env.host_string = "colo-vm19.isi.edu"
-    env.user = "vzaytsev"
+    env.user = "metaphor"
     env.key_filename = "~/.ssh/id_dsa"
     env.local = False
 
