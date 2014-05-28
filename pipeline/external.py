@@ -30,7 +30,6 @@ DESCRIPTION = "Abductive engine output; "                                       
               "isiAbductiveExplanation: Target-Source mapping (metaphor interpretation) as "        \
               "logical form found by abduction."
 
-lang_to_parser = {}
 
 def extract_parses(input_string):
     output_dict = dict()
@@ -83,57 +82,52 @@ def strcut(some_str, max_size=120):
 def run_annotation(request_body_dict, input_metaphors, language, task, logger, with_pdf_content, last_step=3, kb=None):
     start_time = time.time()
     input_str = generate_text_input(input_metaphors, language)
-    global lang_to_parser
+
     # Parser pipeline
     parser_proc = ""
-    if language in lang_to_parser:
-            parser_proc = lang_to_parser[language]
-    else:
-        if language == "FA":
-            if last_step == 1:
-                parser_proc = FARSI_PIPELINE
-            else:
-                parser_proc = FARSI_PIPELINE + " | python " + PARSER2HENRY + " --nonmerge sameid freqpred"
-            if kb is None:
-                KBPATH = FA_KBPATH
-            else:
-                KBPATH = kb
-            
-        elif language == "ES":
-        
-            if last_step == 1:
-                parser_proc = SPANISH_PIPELINE
-            else:
-                parser_proc = SPANISH_PIPELINE + " | python " + PARSER2HENRY + " --nonmerge sameid freqpred"
-            if kb is None:
-                KBPATH = ES_KBPATH
-            else:
-                KBPATH = kb
+    if language == "FA":
+        if last_step == 1:
+            parser_proc = FARSI_PIPELINE
+        else:
+            parser_proc = FARSI_PIPELINE + " | python " + PARSER2HENRY + " --nonmerge sameid freqpred"
+        if kb is None:
+            KBPATH = FA_KBPATH
+        else:
+            KBPATH = kb
 
-        elif language == "RU":
-            if last_step == 1:
-                parser_proc = RUSSIAN_PIPELINE
-            else:
-                parser_proc = RUSSIAN_PIPELINE + " | python " + PARSER2HENRY + " --nonmerge sameid freqpred"
-            if kb is None:
-                KBPATH = RU_KBPATH
-            else:
-                KBPATH = kb
+    elif language == "ES":
+        if last_step == 1:
+            parser_proc = SPANISH_PIPELINE
+        else:
+            parser_proc = SPANISH_PIPELINE + " | python " + PARSER2HENRY + " --nonmerge sameid freqpred"
+        if kb is None:
+            KBPATH = ES_KBPATH
+        else:
+            KBPATH = kb
 
-        elif language == "EN":
-            tokenizer = BOXER_DIR + "/bin/tokkie --stdin"
-            candcParser = BOXER_DIR + "/bin/candc --models " + BOXER_DIR + "/models/boxer --candc-printer boxer"
-            boxer = BOXER_DIR + "/bin/boxer --semantics tacitus --resolve true --stdin"
-            b2h = "python " + BOXER2HENRY + " --nonmerge sameid freqpred"
-            if last_step == 1:
-                parser_proc = tokenizer + " | " + candcParser + " | " + boxer
-            else:
-                parser_proc = tokenizer + " | " + candcParser + " | " + boxer + " | " + b2h
-            if kb is None:
-                KBPATH = EN_KBPATH
-            else:
-                KBPATH = kb
-        lang_to_parser[language] = parser_proc
+    elif language == "RU":
+        if last_step == 1:
+            parser_proc = RUSSIAN_PIPELINE
+        else:
+            parser_proc = RUSSIAN_PIPELINE + " | python " + PARSER2HENRY + " --nonmerge sameid freqpred"
+        if kb is None:
+            KBPATH = RU_KBPATH
+        else:
+            KBPATH = kb
+
+    elif language == "EN":
+        tokenizer = BOXER_DIR + "/bin/tokkie --stdin"
+        candcParser = BOXER_DIR + "/bin/candc --models " + BOXER_DIR + "/models/boxer --candc-printer boxer"
+        boxer = BOXER_DIR + "/bin/boxer --semantics tacitus --resolve true --stdin"
+        b2h = "python " + BOXER2HENRY + " --nonmerge sameid freqpred"
+        if last_step == 1:
+            parser_proc = tokenizer + " | " + candcParser + " | " + boxer
+        else:
+            parser_proc = tokenizer + " | " + candcParser + " | " + boxer + " | " + b2h
+        if kb is None:
+            KBPATH = EN_KBPATH
+        else:
+            KBPATH = kb
 
     logger.info("Running parsing command: '%s'." % parser_proc)
     logger.info("Input str: %r" % strcut(input_str))
