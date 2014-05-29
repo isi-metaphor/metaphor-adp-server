@@ -97,8 +97,9 @@ def deploy():
         run("git pull")
 
         print(green("Uploading bashrc"))
-        generateBashConfig("fab/bashrc.sh2")
-        fabric.contrib.files.upload_template("fab/bashrc.sh2",
+        bashrcFile="fab/bashrc.sh"
+        generateBashConfig(bashrcFile)
+        fabric.contrib.files.upload_template(bashrcFile,
                                              "{path}/bashrc.sh".format(**config),
                                              context=context,
                                              use_jinja=True)
