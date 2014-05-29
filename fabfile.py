@@ -169,8 +169,8 @@ def generateBashConfig(file):
 
     fo.write("export CPLUS_INCLUDE_PATH=/usr/include/python2.7/:${GUROBI_HOME}/include\n")
     fo.write("export PATH=${PATH}:/usr/sbin:/sbin:/usr/bin:${GUROBI_HOME}/bin:${JAVA_HOME}/bin\n")
-    fo.write("export LD_LIBRARY_PATH=:${GUROBI_HOME}/lib/:${LD_LIBRARY_PATH}")
-    fo.write("export LIBRARY_PATH=${GUROBI_HOME}/lib")
+    fo.write("export LD_LIBRARY_PATH=:${GUROBI_HOME}/lib/:${LD_LIBRARY_PATH}\n")
+    fo.write("export LIBRARY_PATH=${GUROBI_HOME}/lib\n")
     fo.close()
 
 
