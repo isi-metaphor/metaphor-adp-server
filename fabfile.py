@@ -19,7 +19,7 @@ from fabric.colors import green, red
 
 def dev():
     env.config = {
-        "repository":   "https://github.com/zaycev/lcc-service.git",
+        "repository":   "https://github.com/isi-metaphor/lcc-service.git",
         "branch":       "dev",
         "context":       json.load(open("fab/config.dev.json", "r")),
     }
@@ -29,8 +29,8 @@ def dev():
 
 def prod():
     env.config = {
-        "repository":   "https://github.com/zaycev/lcc-service.git",
-        "branch":       "prod",
+        "repository":   "https://github.com/isi-metaphor/lcc-service.git",
+        "branch":       "master",
         "context":      json.load(open("fab/config.prod.json", "r")),
     }
     env.config["path"] = env.config["context"]["ROOT"]
@@ -46,8 +46,8 @@ def run_local():
 
 def server():
     env.host_string = "colo-vm19.isi.edu"
-    env.user = "vzaytsev"
-    env.key_filename = "~/.ssh/id_dsa"
+    env.user = "morbini"
+    env.key_filename = "~/.ssh/id_rsa"
     env.local = False
 
 
@@ -97,11 +97,12 @@ def deploy():
         run("git pull")
 
         print(green("Uploading bashrc"))
-        fabric.contrib.files.upload_template("fab/bashrc.sh",
+        generateBashConfig("fab/bashrc.sh2")
+        fabric.contrib.files.upload_template("fab/bashrc.sh2",
                                              "{path}/bashrc.sh".format(**config),
                                              context=context,
                                              use_jinja=True)
-        run("sudo cp -f {path}/bashrc.sh /root/metaphor.sh".format(**config))
+        run("cp -f {path}/bashrc.sh ~/metaphor.sh".format(**config))
 
         print(green("Uploading setting.py"))
         fabric.contrib.files.upload_template("fab/settings.py",
@@ -150,10 +151,30 @@ def test_client():
 def devdeploy():
     dev()
     server()
+    #init()
     deploy()
+
+def generateBashConfig(file):
+    fo = open(file, "wb")
+    fo.write("export METAPHOR_DIR="+env.config["context"]["PIPELINE_CONFIG"]["METAPHOR_DIR"]+"\n");
+    fo.write("export PYTHONPATH=$PYTHONPATH:$METAPHOR_DIR/pipelines/common:$METAPHOR_DIR/pipelines/Russian:$METAPHOR_DIR/pipelines/English:$METAPHOR_DIR/pipelines/Farsi:$METAPHOR_DIR/pipelines/Spanish\n\n")
+
+    fo.write("export HENRY_DIR="+env.config["context"]["PIPELINE_CONFIG"]["HENRY_DIR"]+"\n")
+    fo.write("export BOXER_DIR="+env.config["context"]["PIPELINE_CONFIG"]["BOXER_DIR"]+"\n")
+    fo.write("export TMP_DIR="+env.config["context"]["PIPELINE_CONFIG"]["TMP_DIR"]+"\n\n")
+
+    fo.write("export GUROBI_HOME="+env.config["context"]["PIPELINE_CONFIG"]["GUROBI_HOME"]+"\n")
+    fo.write("export GRB_LICENSE_FILE="+env.config["context"]["PIPELINE_CONFIG"]["GRB_LICENSE_FILE"]+"\n\n")
+
+    fo.write("export CPLUS_INCLUDE_PATH=/usr/include/python2.7/:${GUROBI_HOME}/include\n")
+    fo.write("export PATH=${PATH}:/usr/sbin:/sbin:/usr/bin:${GUROBI_HOME}/bin:${JAVA_HOME}/bin\n")
+    fo.write("export LD_LIBRARY_PATH=:${GUROBI_HOME}/lib/:${LD_LIBRARY_PATH}")
+    fo.write("export LIBRARY_PATH=${GUROBI_HOME}/lib")
+    fo.close()
 
 
 def proddeploy():
     prod()
     server()
+    #init()
     deploy()
