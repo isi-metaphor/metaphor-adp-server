@@ -162,17 +162,32 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
                                 
 	parser_output_inter, parser_stderr_inter = parser_pipeline.communicate(input=tokenizer_output)"""
 	task.log_error("Parser Running: %r " % getParse())
+	
 	if not getParse():
-		child = pexpect.spawn(parser_proc)
-		child.sendline(tokenizer_output)
-	        child.expect ("\n?ccg\(.*'+\)*\)\)\.\r\n", timeout=10)
-		parser_output_inter = child.after
+		child = pexpect.spawn(parser_proc,timeout=10)
 		setParse(True)
-	else:
-		child.sendline(tokenizer_output)
-		child.expect("\n?ccg\(.*'+\)*\)\)\.\r\n", timeout=10)
-		parser_output_inter = child.after
-		parser_output_inter = re.sub("ccg\(\d+", "ccg(1", parser_output_inter)
+
+	child.sendline(tokenizer_output)
+	reattempts = 0
+	parser_output_inter = ""
+	while reattempts < 2:
+		index = child.expect (["\n?ccg\(.*'+\)*\)\)\.\r\n", pexpect.TIMEOUT, pexpect.EOF])
+		logger.info("reattempts: %r\n" % str(reattempts))
+		if index == 0:
+			parser_output_inter = child.after
+			reattempts = 2
+		elif reattempts == 0:
+			reattempts += 1
+			child.terminate()
+			child = pexpect.spawn(parser_proc,timeout=10)
+			child.sendline(tokenizer_output)
+		else:
+			logger.info("Parser not wroking\n")
+			task.log_error("\nParser not working\n")
+			reattempts = 2
+			child.terminate()
+			setParse(False)
+	parser_output_inter = re.sub("ccg\(\d+", "ccg(1", parser_output_inter)
 	
         logger.info("Parser output:\n%r" % parser_output_inter)
 	task.log_error("Parser output:\n%r" % parser_output_inter)
