@@ -13,6 +13,11 @@ import traceback
 from lccsrv.paths import *
 from legacy.extractor import *
 from subprocess import Popen, PIPE
+from manage import getParse, setParse
+import pexpect
+import re
+
+child = ""
 
 ENV = os.environ
 
@@ -82,7 +87,7 @@ def strcut(some_str, max_size=120):
 def run_annotation(request_body_dict, input_metaphors, language, task, logger, with_pdf_content, last_step=3, kb=None):
     start_time = time.time()
     input_str = generate_text_input(input_metaphors, language)
-
+    global child
     # Parser pipeline
     parser_proc = ""
     if language == "FA":
@@ -120,35 +125,89 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
         candcParser = BOXER_DIR + "/bin/candc --models " + BOXER_DIR + "/models/boxer --candc-printer boxer"
         boxer = BOXER_DIR + "/bin/boxer --semantics tacitus --resolve true --stdin"
         b2h = "python " + BOXER2HENRY + " --nonmerge sameid freqpred"
-        if last_step == 1:
-            parser_proc = tokenizer + " | " + candcParser + " | " + boxer
-        else:
-            parser_proc = tokenizer + " | " + candcParser + " | " + boxer + " | " + b2h
+##        if last_step == 1:
+##            parser_proc = tokenizer + " | " + candcParser + " | " + boxer
+##        else:
+##            parser_proc = tokenizer + " | " + candcParser + " | " + boxer + " | " + b2h
+        
         if kb is None:
             KBPATH = EN_KBPATH
         else:
             KBPATH = kb
-
-    logger.info("Running parsing command: '%s'." % parser_proc)
-    logger.info("Input str: %r" % strcut(input_str))
-
-    parser_pipeline = Popen(parser_proc,
+        tokenizer_proc = tokenizer
+        logger.info("Running tokenizing command: '%s'." % tokenizer_proc)
+        logger.info("Input str: %r" % strcut(input_str))
+        tokenizer_pipeline = Popen(tokenizer_proc,
+                                    env=ENV,
+                                    shell=True,
+                                    stdin=PIPE,
+                                    stdout=PIPE,
+                                    stderr=None,
+                                    close_fds=True)
+        tokenizer_output, tokenizer_stderr = tokenizer_pipeline.communicate(input=input_str)
+	logger.info("Tokenizer Output:\n%r" % tokenizer_output)
+	task.log_error("Tokenizer Output:\n%r" % tokenizer_output)
+        #parser_proc = candcParser + " | " + boxer
+	parser_proc = candcParser
+        logger.info("Running parsing command: '%s'." % parser_proc)
+        logger.info("Input str: %r" % strcut(tokenizer_output))
+        start_time = time.time()
+        """parser_pipeline = Popen(parser_proc,
+                                env=ENV,
+                                shell=True,
+                                stdin=PIPE,
+                                stdout=PIPE,
+                                stderr=None,
+                                close_fds=True)
+                                
+	parser_output_inter, parser_stderr_inter = parser_pipeline.communicate(input=tokenizer_output)"""
+	task.log_error("Parser Running: %r " % getParse())
+	if not getParse():
+		child = pexpect.spawn(parser_proc)
+		child.sendline(tokenizer_output)
+	        child.expect ("\n?ccg\(.*'+\)*\)\)\.\r\n", timeout=10)
+		parser_output_inter = child.after
+		setParse(True)
+	else:
+		child.sendline(tokenizer_output)
+		child.expect("\n?ccg\(.*'+\)*\)\)\.\r\n", timeout=10)
+		parser_output_inter = child.after
+		parser_output_inter = re.sub("ccg\(\d+", "ccg(1", parser_output_inter)
+	
+        logger.info("Parser output:\n%r" % parser_output_inter)
+	task.log_error("Parser output:\n%r" % parser_output_inter)
+        # Parser processing time in seconds
+        parser_time = (time.time() - start_time) * 0.001
+        logger.info("Command finished. Processing time: %r." % parser_time)
+	boxer_proc = boxer
+	logger.info("Running Boxer command: '%s'." % boxer_proc)
+	logger.info("Input str: %r" % strcut(parser_output_inter)) 	
+	parser_output_append = ":- op(601, xfx, (/)).\n:- op(601, xfx, (\)).\n:- multifile ccg/2, id/2.\n:- discontiguous ccg/2, id/2.\n"
+	parser_output_append += parser_output_inter
+	boxer_pipeline = Popen(boxer_proc,
+        		       env=ENV,
+	                       shell=True,
+                               stdin=PIPE,
+                               stdout=PIPE,
+                               stderr=None,
+                               close_fds=True)
+	boxer_output, boxer_error = boxer_pipeline.communicate(input=parser_output_append)
+	logger.info("Boxer output:\n%r" % boxer_output)
+	task.log_error("Boxer output:\n%r" % boxer_output)
+        b2h_proc = b2h
+        logger.info("Running boxer-2-henry command: '%s'." % b2h_proc)
+        logger.info("Input str: %r" % strcut(boxer_output))
+        b2h_pipeline = Popen(b2h_proc,
                             env=ENV,
                             shell=True,
                             stdin=PIPE,
                             stdout=PIPE,
                             stderr=None,
                             close_fds=True)
-    parser_output, parser_stderr = parser_pipeline.communicate(input=input_str)
-    task.log_error("Parser output:\n%r" % parser_output)
-
-    # Parser processing time in seconds
-    parser_time = (time.time() - start_time) * 0.001
-    logger.info("Command finished. Processing time: %r." % parser_time)
-
-    logger.info("Parser output:\n%s\n" % parser_output)
-    task.log_error("Parser output: \n%r" % parser_output)
-    task.parse_out = parser_output
+        parser_output, parser_stderr = b2h_pipeline.communicate(input=boxer_output)
+	logger.info("B2H output:\n%s\n" % parser_output)
+    	task.log_error("B2H output: \n%r" % parser_output)
+    	task.parse_out = parser_output
 
 
     if last_step == 1:
@@ -209,6 +268,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
     if with_pdf_content:
         logger.info("Generating proofgraphs.")
         unique_id = get_unique_id()
+	logger.info("unique id: %s\n" % unique_id) 
         proofgraphs = generate_graph(input_metaphors, henry_output, unique_id)
         task.dot_out = proofgraphs
 
@@ -290,3 +350,4 @@ def get_unique_id():
     current_time = int(time.time())
     unique_id = str(current_time)[5:]
     return unique_id
+

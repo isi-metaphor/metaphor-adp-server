@@ -11,6 +11,16 @@
 import os
 import sys
 
+ParserRunning = False
+
+
+def getParse():
+	return ParserRunning
+
+def setParse(value):
+	global ParserRunning
+	ParserRunning = value
+
 if __name__ == "__main__":
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "lcc_service.settings")
 
