@@ -12,6 +12,13 @@ import os
 import sys
 
 ParserRunning = False
+BoxerLock = True
+
+def getBoxerLock():
+	return BoxerLock
+
+def setBoxerLock(val):
+	BoxerLock = val
 
 
 def getParse():
