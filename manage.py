@@ -13,7 +13,11 @@ import sys
 
 ParserRunning = False
 BoxerLock = True
-
+FarsiParserRunning = False
+def getFAchild():
+	return FAchild
+def setFAchild(child):
+	FAchild = child
 def getBoxerLock():
 	return BoxerLock
 
@@ -27,6 +31,12 @@ def getParse():
 def setParse(value):
 	global ParserRunning
 	ParserRunning = value
+def getFarsiParse():
+	return FarsiParserRunning
+
+def setFarsiParse(value):
+	global FarsiParserRunning
+	FarsiParserRunning = value
 
 if __name__ == "__main__":
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "lcc_service.settings")
