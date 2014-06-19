@@ -13,14 +13,9 @@ import traceback
 from lccsrv.paths import *
 from legacy.extractor import *
 from subprocess import Popen, PIPE
-from manage import getParse, setParse, getBoxerLock, setBoxerLock, getFarsiParse, setFarsiParse, getRuParse, setRuParse, getEsParse, setEsParse
+from manage import getParserStatus, setParserStatus, getParserLock, setParserLock
 import pexpect
 import re
-
-FAchild = ""
-ENchild = ""
-ESchild = ""
-RUchild = ""
 
 ENV = os.environ
 
@@ -86,247 +81,158 @@ def strcut(some_str, max_size=120):
         return some_str
     return "<NONE>"
 
+def FAexpect():
+    child['FA'].expect("1.*\r\n\r\n")
+    index = child['FA'].expect(["1.*\r\n\r\n1.*\r\n\r\n", pexpect.TIMEOUT, pexpect.EOF])
+    return index
+
+def ESexpect():
+    index = child['ES'].expect(["1.*\r\n\r\n1.*\r\n\r\n", pexpect.TIMEOUT, pexpect.EOF])
+    return index
+
+def RUexpect():
+    child['RU'].expect("1.*\r\n\r\n")
+    index = child['RU'].expect(["1.*\r\n\r\n1.*\r\n\r\n1.*\r\n\r\n", pexpect.TIMEOUT, pexpect.EOF])
+    return index
+
+def ENexpect():
+    index = child['EN'].expect (["\n?ccg\(.*'+\)*\)\)\.\r\n", pexpect.TIMEOUT, pexpect.EOF])
+    return index
+
+child = {'FA':"",'ES':"",'RU':"",'EN':""}
+expectChild = {'FA': FAexpect, 'ES': ESexpect, 'RU': RUexpect, 'EN': ENexpect}
+
 def run_annotation(request_body_dict, input_metaphors, language, task, logger, with_pdf_content, last_step=3, kb=None):
     start_time = time.time()
     input_str = generate_text_input(input_metaphors, language)
-    global FAchild
-    global ENchild
-    global ESchild
-    global RUchild
-    # Parser pipeline
+    tokenizer_proc = ""
     parser_proc = ""
+    createLF_proc = ""
+    parser_output_append = ""
+    b2h_proc = ""
+    
+    global child
+    
+    # Parser pipeline
+    
     if language == "FA":
         tokenizer_proc = FARSI_PIPELINE
-	MALT_PARSER_DIR = os.path.join(METAPHOR_DIR, "external-tools/malt-1.5") 
-	parser_proc = "java -cp " + MALT_PARSER_DIR + "/dist/malt/malt.jar:" + MALT_PARSER_DIR + " maltParserWrap"
-        boxer_proc = os.path.join(METAPHOR_DIR, "pipelines/Farsi/createLF")
+        MALT_PARSER_DIR = os.path.join(METAPHOR_DIR, "external-tools/malt-1.5") 
+        parser_proc = "java -cp " + MALT_PARSER_DIR + "/dist/malt/malt.jar:" + MALT_PARSER_DIR + " maltParserWrap"
+        createLF_proc = os.path.join(METAPHOR_DIR, "pipelines/Farsi/createLF")
+        parser_output_append = ""
         b2h_proc = "python " + PARSER2HENRY + " --nonmerge sameid freqpred"	
         if kb is None:
             KBPATH = FA_KBPATH
         else:
             KBPATH = kb
-        logger.info("Running tokenizing command: '%s'." % tokenizer_proc)
-        logger.info("Input str: %r" % strcut(input_str))
-
-        tokenizer_pipeline = Popen(tokenizer_proc,
-                                   env=ENV,
-                                   shell=True,
-                                   stdin=PIPE,
-                                   stdout=PIPE,
-                                   stderr=None,
-                                   close_fds=True)      
-        tokenizer_output, tokenizer_stderr = tokenizer_pipeline.communicate(input=input_str)
-        logger.info("Tokenizer Output:\n%r" % tokenizer_output)
-        task.log_error("Tokenizer Output:\n%r" % tokenizer_output)
-
-        logger.info("Running parsing command: '%s'." % parser_proc)
-        logger.info("Input str: %r" % tokenizer_output)
-        logger.info("Parser Running: " + str(getFarsiParse()))
-        if not getFarsiParse():
-	    FAchild = pexpect.spawn('/bin/bash', ['-c',parser_proc], timeout=30)
-            setFarsiParse(True)
-        FAchild.send(tokenizer_output)
-        FAchild.expect("1.*\r\n\r\n")
-        FAchild.expect("1.*\r\n\r\n1.*\r\n\r\n")
-        parser_output_inter = FAchild.after
-        logger.info("Parser Output:\n%r" % parser_output_inter)
-        task.log_error("Parser Output:\n%r" % parser_output_inter)
-
-        logger.info("Running createLF command: '%s'." % boxer_proc)
-        logger.info("Input str: %r" % parser_output_inter)
-
-        createLF_pipeline = Popen(boxer_proc,
-                                 env=ENV,
-                                 shell=True,
-                                 stdin=PIPE,
-                                 stdout=PIPE,
-                                 stderr=None,
-                                 close_fds=True)
-        boxer_output, boxer_stderr = createLF_pipeline.communicate(input=parser_output_inter)
-        logger.info("createLF Output:\n%r" % boxer_output)
-        task.log_error("createLF Output:\n%r" % boxer_output)
-	
+        
     elif language == "ES":
-        #if last_step == 1:
-            #parser_proc = SPANISH_PIPELINE
-        #else:
-            #parser_proc = SPANISH_PIPELINE + " | python " + PARSER2HENRY + " --nonmerge sameid freqpred"
-	tokenizer_proc = SPANISH_PIPELINE 
-	parser_proc =  METAPHOR_DIR + "/pipelines/Spanish/parse" 
-	createLF_proc =  METAPHOR_DIR + "/pipelines/Spanish/create_LF"
-	b2h_proc = "python " + PARSER2HENRY + " --nonmerge sameid freqpred"
+        tokenizer_proc = SPANISH_PIPELINE 
+        MALT_PARSER_DIR = os.path.join(METAPHOR_DIR, "external-tools/maltparser-1.7.2") 
+        parser_proc = "java -cp " + MALT_PARSER_DIR + "/maltparser-1.7.2.jar:" + MALT_PARSER_DIR + " maltParserWrap_ES" 
+        createLF_proc =  METAPHOR_DIR + "/pipelines/Spanish/create_LF"
+        parser_output_append = ""
+        b2h_proc = "python " + PARSER2HENRY + " --nonmerge sameid freqpred"
         if kb is None:
             KBPATH = ES_KBPATH
         else:
             KBPATH = kb
-	tokenizer_pipeline = Popen(tokenizer_proc,
-                                    env=ENV,
-                                    shell=True,
-                                    stdin=PIPE,
-                                    stdout=PIPE,
-                                    stderr=None,
-                                    close_fds=True)
-        tokenizer_output, tokenizer_stderr = tokenizer_pipeline.communicate(input=input_str)
-	logger.info("Tokenizer Output:\n%r" % tokenizer_output)
-        task.log_error("Tokenizer Output:\n%r" % tokenizer_output)
-	"""
-	parser_pipeline = Popen(parser_proc,
-                                    env=ENV,
-                                    shell=True,
-                                    stdin=PIPE,
-                                    stdout=PIPE,
-                                    stderr=None,
-                                    close_fds=True)
-        parser_output_inter, parser_stderr_inter = parser_pipeline.communicate(input=(tokenizer_output + "\n"))
-	"""
-	logger.info("Parser Running: " + str(getEsParse()))
-	if not getEsParse():
-		ESchild = pexpect.spawn('/bin/bash', ['-c',parser_proc], timeout=30)
-        	setEsParse(True)
-        ESchild.send(tokenizer_output)
-        #ESchild.expect("1.*\r\n\r\n")
-        ESchild.expect("1.*\r\n\r\n1.*\r\n\r\n")
-        parser_output_inter = ESchild.after
-
-        logger.info("Parser Output:\n%r" % parser_output_inter)
-        task.log_error("Parser Output:\n%r" % parser_output_inter)
-	createLF_pipeline = Popen(createLF_proc,
-                                    env=ENV,
-                                    shell=True,
-                                    stdin=PIPE,
-                                    stdout=PIPE,
-                                    stderr=None,
-                                    close_fds=True)
-        boxer_output, boxer_stderr = createLF_pipeline.communicate(input=parser_output_inter)
-        logger.info("CreateLF Output:\n%r" % boxer_output)
-        task.log_error("CreateLF Output:\n%r" % boxer_output)
-
+        
     elif language == "RU":
         tokenizer_proc = RUSSIAN_PIPELINE
-	MALT_PARSER_DIR = os.path.join(METAPHOR_DIR, "external-tools/malt-1.5")
-	RU_PARSER_DIR = os.path.join(METAPHOR_DIR, "external-tools/malt-ru")
+        MALT_PARSER_DIR = os.path.join(METAPHOR_DIR, "external-tools/malt-1.5")
+        RU_PARSER_DIR = os.path.join(METAPHOR_DIR, "external-tools/malt-ru")
         parser_proc = "java -cp " + MALT_PARSER_DIR + "/dist/malt/malt.jar:" + RU_PARSER_DIR + " maltParserWrap_RU"
-	boxer_proc = os.path.join(METAPHOR_DIR, "pipelines/Russian/create_LF")
-	b2h_proc = "python " + PARSER2HENRY + " --nonmerge sameid freqpred"
-	if kb is None:
-            KBPATH = RU_KBPATH
+        createLF_proc = os.path.join(METAPHOR_DIR, "pipelines/Russian/create_LF")
+        parser_output_append = ""
+        b2h_proc = "python " + PARSER2HENRY + " --nonmerge sameid freqpred"
+        if kb is None:
+                KBPATH = RU_KBPATH
         else:
-            KBPATH = kb
-	logger.info("Running tokenizing command: '%s'." % tokenizer_proc)
-        logger.info("Input str: %r" % strcut(input_str))
-
-	tokenizer_pipeline = Popen(tokenizer_proc,
-                                    env=ENV,
-                                    shell=True,
-                                    stdin=PIPE,
-                                    stdout=PIPE,
-                                    stderr=None,
-                                    close_fds=True)
-	tokenizer_output, tokenizer_stderr = tokenizer_pipeline.communicate(input=input_str)
-	logger.info("Tokenizer Output:\n%r" % tokenizer_output)
-        task.log_error("Tokenizer Output:\n%r" % tokenizer_output)
-	logger.info("Parser Running: " + str(getRuParse()))
-	if not getRuParse():
-	    RUchild = pexpect.spawn('/bin/bash', ['-c',parser_proc], timeout=30)
-	    setRuParse(True)
-			
-	RUchild.send(tokenizer_output)
-	RUchild.expect("1.*\r\n\r\n")
-	RUchild.expect("1.*\r\n\r\n1.*\r\n\r\n1.*\r\n\r\n")
-	parser_output_inter = RUchild.after
-	
-	logger.info("Parser Output:\n%r" % parser_output_inter)
-        task.log_error("Parser Output:\n%r" % parser_output_inter)
-	createLF_pipeline = Popen(boxer_proc,
-                                    env=ENV,
-                                    shell=True,
-                                    stdin=PIPE,
-                                    stdout=PIPE,
-                                    stderr=None,
-                                    close_fds=True)
-        boxer_output, boxer_stderr = createLF_pipeline.communicate(input=parser_output_inter)
-	logger.info("createLF Output:\n%r" % boxer_output)
-        task.log_error("createLF Output:\n%r" % boxer_output)
+                KBPATH = kb
+        
     elif language == "EN":
-        tokenizer = BOXER_DIR + "/bin/tokkie --stdin"
-        candcParser = BOXER_DIR + "/bin/candc --models " + BOXER_DIR + "/models/boxer --candc-printer boxer"
-        boxer = BOXER_DIR + "/bin/boxer --semantics tacitus --resolve true --stdin"
+        tokenizer_proc = BOXER_DIR + "/bin/tokkie --stdin"
+        parser_proc = BOXER_DIR + "/bin/candc --models " + BOXER_DIR + "/models/boxer --candc-printer boxer"
+        createLF_proc = BOXER_DIR + "/bin/boxer --semantics tacitus --resolve true --stdin"
+        parser_output_append = ":- op(601, xfx, (/)).\n:- op(601, xfx, (\)).\n:- multifile ccg/2, id/2.\n:- discontiguous ccg/2, id/2.\n"
         b2h_proc = "python " + BOXER2HENRY + " --nonmerge sameid freqpred"
         if kb is None:
             KBPATH = EN_KBPATH
         else:
             KBPATH = kb
-        tokenizer_proc = tokenizer
-        logger.info("Running tokenizing command: '%s'." % tokenizer_proc)
-        logger.info("Input str: %r" % strcut(input_str))
-        tokenizer_pipeline = Popen(tokenizer_proc,
-                                    env=ENV,
-                                    shell=True,
-                                    stdin=PIPE,
-                                    stdout=PIPE,
-                                    stderr=None,
-                                    close_fds=True)
-        tokenizer_output, tokenizer_stderr = tokenizer_pipeline.communicate(input=input_str)
-        logger.info("Tokenizer Output:\n%r" % tokenizer_output)
-        task.log_error("Tokenizer Output:\n%r" % tokenizer_output)
-        parser_proc = candcParser
-        logger.info("Running parsing command: '%s'." % parser_proc)
-        logger.info("Input str: %r" % strcut(tokenizer_output))
-        task.log_error("Parser Running: %r " % getParse())
-	
-        if not getParse():
-            ENchild = pexpect.spawn(parser_proc,timeout=30)
-            setParse(True)
-        while True:
-            if getBoxerLock():
-                setBoxerLock(False)
-                ENchild.sendline(tokenizer_output)
-                reattempts = 0
-                parser_output_inter = ""
-                while reattempts < 2:
-                    index = ENchild.expect (["\n?ccg\(.*'+\)*\)\)\.\r\n", pexpect.TIMEOUT, pexpect.EOF])
-                    logger.info("reattempts: %r\n" % str(reattempts))
-                    if index == 0:
-                        parser_output_inter = ENchild.after
-                        reattempts = 2
-                    elif reattempts == 0:
-                        reattempts += 1
-                        ENchild.terminate()
-                        ENchild = pexpect.spawn(parser_proc,timeout=30)
-                        ENchild.sendline(tokenizer_output)
-                    else:
-                        logger.info("Parser not wroking\n")
-                        task.log_error("\nParser not working\n")
-                        reattempts = 2
-                        ENchild.terminate()
-                        setParse(False)
-                setBoxerLock(True)
-                break
-        parser_output_inter = re.sub("ccg\(\d+", "ccg(1", parser_output_inter)
-	
-        logger.info("Parser output:\n%r" % parser_output_inter)
-        task.log_error("Parser output:\n%r" % parser_output_inter)
-        boxer_proc = boxer
-        logger.info("Running Boxer command: '%s'." % boxer_proc)
-        logger.info("Input str: %r" % strcut(parser_output_inter)) 	
-        parser_output_append = ":- op(601, xfx, (/)).\n:- op(601, xfx, (\)).\n:- multifile ccg/2, id/2.\n:- discontiguous ccg/2, id/2.\n"
-        parser_output_append += parser_output_inter
-        boxer_pipeline = Popen(boxer_proc,
-                           env=ENV,
-                               shell=True,
-                                   stdin=PIPE,
-                                   stdout=PIPE,
-                                   stderr=None,
-                                   close_fds=True)
-        boxer_output, boxer_error = boxer_pipeline.communicate(input=parser_output_append)
-        logger.info("Boxer output:\n%r" % boxer_output)
-        task.log_error("Boxer output:\n%r" % boxer_output)
         
-    
+    logger.info("Running tokenizing command: '%s'." % tokenizer_proc)
+    logger.info("Input str: %r" % strcut(input_str))
+    tokenizer_pipeline = Popen(tokenizer_proc,
+                                env=ENV,
+                                shell=True,
+                                stdin=PIPE,
+                                stdout=PIPE,
+                                stderr=None,
+                                close_fds=True)
+    tokenizer_output, tokenizer_stderr = tokenizer_pipeline.communicate(input=input_str)
+    if language == "EN":
+        tokenizer_output += "\n"
+    logger.info("Tokenizer Output:\n%r" % tokenizer_output)
+    task.log_error("Tokenizer Output:\n%r" % tokenizer_output)
+        
+    logger.info("Running parsing command: '%s'." % parser_proc)
+    logger.info("Input str: %r" % tokenizer_output)
+    logger.info(language + " Parser Running: " + str(getParserStatus(language)))
+    if not getParserStatus(language):
+        child[language] = pexpect.spawn('/bin/bash', ['-c',parser_proc], timeout=30)
+        setParserStatus(language, True)
+    while True:
+        if getParserLock(language):
+            setParserLock(language, False)
+            child[language].send(tokenizer_output)
+            reattempts = 0
+            parser_output_inter = ""
+            while reattempts < 2:
+                index = expectChild[language]()
+                logger.info("reattempts: %r\n" % str(reattempts))
+                if index == 0:
+                    parser_output_inter = child[language].after
+                    reattempts = 2
+                elif reattempts == 0:
+                    reattempts += 1
+                    child[language].terminate()
+                    child[language] = pexpect.spawn('/bin/bash', ['-c',parser_proc], timeout=30)
+                    child[language].send(tokenizer_output)
+                else:
+                    logger.info("Parser not wroking\n")
+                    task.log_error("\nParser not working\n")
+                    reattempts = 2
+                    child[language].terminate()
+                    setParserStatus(language, False)
+            setParserLock(language, True)
+            break
+    if language == "EN":
+        parser_output_inter = re.sub("ccg\(\d+", "ccg(1", parser_output_inter)
+    logger.info("Parser output:\n%r" % parser_output_inter)
+    task.log_error("Parser output:\n%r" % parser_output_inter)
+       
+    logger.info("Running createLF command: '%s'." % createLF_proc)
+    logger.info("Input str: %r" % strcut(parser_output_inter))
+    parser_output_append += parser_output_inter
+    createLF_pipeline = Popen(createLF_proc,
+                            env=ENV,
+                            shell=True,
+                            stdin=PIPE,
+                            stdout=PIPE,
+                            stderr=None,
+                            close_fds=True)
+    createLF_output, createLF_stderr = createLF_pipeline.communicate(input=parser_output_append)
+    logger.info("createLF output:\n%r" % createLF_output)
+    task.log_error("createLF output:\n%r" % createLF_output)
+        
     if last_step == 1:
-       	return boxer_output
+       	return createLF_output
+    
     logger.info("Running boxer-2-henry command: '%s'." % b2h_proc)
-    logger.info("Input str: %r" % strcut(boxer_output))
+    logger.info("Input str: %r" % strcut(createLF_output))
     b2h_pipeline = Popen(b2h_proc,
                          env=ENV,
                          shell=True,
@@ -334,7 +240,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
                          stdout=PIPE,
                          stderr=None,
                          close_fds=True)
-    parser_output, parser_stderr = b2h_pipeline.communicate(input=boxer_output)
+    parser_output, parser_stderr = b2h_pipeline.communicate(input=createLF_output)
     logger.info("B2H output:\n%s\n" % parser_output)
     task.log_error("B2H output: \n%r" % parser_output)
     task.parse_out = parser_output
@@ -399,7 +305,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
     if with_pdf_content:
         logger.info("Generating proofgraphs.")
         unique_id = get_unique_id()
-	logger.info("unique id: %s\n" % unique_id) 
+        logger.info("unique id: %s\n" % unique_id) 
         proofgraphs = generate_graph(input_metaphors, henry_output, unique_id)
         task.dot_out = proofgraphs
 
@@ -481,6 +387,7 @@ def get_unique_id():
     current_time = int(time.time())
     unique_id = str(current_time)[5:]
     return unique_id
+
 
 
 

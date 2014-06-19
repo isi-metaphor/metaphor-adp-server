@@ -11,41 +11,22 @@
 import os
 import sys
 
-ParserRunning = False
-BoxerLock = True
-FarsiParserRunning = False
-RuParserRunning = False
-EsParserRunning = False
+ParserRunning = {'FA':False, 'ES':False, 'RU':False, 'EN':False}
+ParserLock = {'FA':True, 'ES':True, 'RU':True, 'EN':True}
 
-def getEsParse():
-        return EsParserRunning
-def setEsParse(value):
-        global EsParserRunning
-        EsParserRunning = value
-def getRuParse():
-	return RuParserRunning
-def setRuParse(value):
-	global RuParserRunning
-	RuParserRunning = value
-def getBoxerLock():
-	return BoxerLock
+def getParserStatus(language):
+    return ParserRunning[language]
 
-def setBoxerLock(val):
-	BoxerLock = val
+def setParserStatus(language, value):
+    global ParserRunning
+    ParserRunning[language] = value
 
+def getParserLock(language):
+    return ParserLock[language]
 
-def getParse():
-	return ParserRunning
-
-def setParse(value):
-	global ParserRunning
-	ParserRunning = value
-def getFarsiParse():
-	return FarsiParserRunning
-
-def setFarsiParse(value):
-	global FarsiParserRunning
-	FarsiParserRunning = value
+def setParserLock(language, value):
+    global ParserLock
+    ParserLock[language] = value
 
 if __name__ == "__main__":
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "lcc_service.settings")
@@ -53,3 +34,4 @@ if __name__ == "__main__":
     from django.core.management import execute_from_command_line
 
     execute_from_command_line(sys.argv)
+
