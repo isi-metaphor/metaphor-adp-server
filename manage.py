@@ -14,10 +14,19 @@ import sys
 ParserRunning = False
 BoxerLock = True
 FarsiParserRunning = False
-def getFAchild():
-	return FAchild
-def setFAchild(child):
-	FAchild = child
+RuParserRunning = False
+EsParserRunning = False
+
+def getEsParse():
+        return EsParserRunning
+def setEsParse(value):
+        global EsParserRunning
+        EsParserRunning = value
+def getRuParse():
+	return RuParserRunning
+def setRuParse(value):
+	global RuParserRunning
+	RuParserRunning = value
 def getBoxerLock():
 	return BoxerLock
 
