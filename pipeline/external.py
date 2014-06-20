@@ -118,7 +118,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
     if language == "FA":
         tokenizer_proc = FARSI_PIPELINE
         MALT_PARSER_DIR = os.path.join(METAPHOR_DIR, "external-tools/malt-1.5") 
-        parser_proc = "java -cp " + MALT_PARSER_DIR + "/dist/malt/malt.jar:" + MALT_PARSER_DIR + " maltParserWrap"
+        parser_proc = "java -cp " + MALT_PARSER_DIR + "/dist/malt/malt.jar:" + MALT_PARSER_DIR + " maltParserWrap_FA"
         createLF_proc = os.path.join(METAPHOR_DIR, "pipelines/Farsi/createLF")
         parser_output_append = ""
         b2h_proc = "python " + PARSER2HENRY + " --nonmerge sameid freqpred"	
