@@ -46,8 +46,8 @@ def run_local():
 
 def server():
     env.host_string = "colo-vm19.isi.edu"
-    env.user = "morbini"
-    env.key_filename = "~/.ssh/id_rsa"
+    env.user = "metaphor"
+    env.key_filename = "~/.ssh/id_dsa"
     env.local = False
 
 
