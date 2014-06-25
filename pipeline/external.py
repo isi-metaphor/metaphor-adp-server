@@ -13,7 +13,7 @@ import traceback
 from lccsrv.paths import *
 from legacy.extractor import *
 from subprocess import Popen, PIPE
-from manage import getParserStatus, setParserStatus, getParserLock, setParserLock
+from manage import getParserStatus, setParserStatus, getParserLock, setParserLock, getParserFlag, setParserFlag
 import pexpect
 import re
 
@@ -88,6 +88,8 @@ def FAexpect():
 
 def ESexpect():
     index = child['ES'].expect(["1.*\r\n\r\n1.*\r\n\r\n", pexpect.TIMEOUT, pexpect.EOF])
+
+    #index = child['ES'].expect(["0.*\r\n\r\n0.*\r\n\r\n", pexpect.TIMEOUT, pexpect.EOF])
     return index
 
 def RUexpect():
@@ -207,6 +209,12 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
                     reattempts = 2
                     child[language].terminate()
                     setParserStatus(language, False)
+	    logger.info("Parser Flag : " +str(getParserFlag()))
+	    if not getParserFlag():
+		logger.info("\nTerminating Parser Process\n")
+		child[language].terminate()
+		child[language] = ""
+		setParserStatus(language, False)
             setParserLock(language, True)
             break
     if language == "EN":
