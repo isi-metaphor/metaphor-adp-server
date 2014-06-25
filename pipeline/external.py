@@ -13,7 +13,7 @@ import traceback
 from lccsrv.paths import *
 from legacy.extractor import *
 from subprocess import Popen, PIPE
-from manage import getParserStatus, setParserStatus, getParserLock, setParserLock
+from manage import getParserStatus, setParserStatus, getParserLock, setParserLock, getParserFlag, setParserFlag
 import pexpect
 import re
 
@@ -88,6 +88,8 @@ def FAexpect():
 
 def ESexpect():
     index = child['ES'].expect(["1.*\r\n\r\n1.*\r\n\r\n", pexpect.TIMEOUT, pexpect.EOF])
+
+    #index = child['ES'].expect(["0.*\r\n\r\n0.*\r\n\r\n", pexpect.TIMEOUT, pexpect.EOF])
     return index
 
 def RUexpect():
@@ -207,6 +209,12 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
                     reattempts = 2
                     child[language].terminate()
                     setParserStatus(language, False)
+	    logger.info("Parser Flag : " +str(getParserFlag()))
+	    if not getParserFlag():
+		logger.info("\nTerminating Parser Process\n")
+		child[language].terminate()
+		child[language] = ""
+		setParserStatus(language, False)
             setParserLock(language, True)
             break
     if language == "EN":
@@ -319,6 +327,9 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
             sID = str(annotation["sentenceId"])
             if sID in hkeys:
                 CM_output = extract_CM_mapping(sID, hypotheses[sID], parses[sID], DESCRIPTION, annotation)
+                msg="Sentence #%s has interpretation #%s" % (sID,CM_output['isiAbductiveExplanation'])
+                logger.info(msg)
+                task.log_error(msg)
                 try:
                     for annot_property in CM_output.keys():
                         if CM_output.get(annot_property):
@@ -340,8 +351,78 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
                 task.log_error(error_msg)
                 task.log_error("Failed annotation: %s" % str(annotation))
                 task.task_error_count += 1
+    task.log_error("Parser output: \n%r" % parser_output)
 
-    request_body_dict["kb"] = KBPATH
+    answer=dict()
+    count=0
+    for annotation in input_annotations:
+        if u"sentenceId" in annotation:
+            sID = str(annotation["sentenceId"])
+            if sID in hkeys:
+                count=count+1
+                exp = str(annotation["isiAbductiveExplanation"])
+                lines=exp.split('\n');
+                start=False
+                for line in lines:
+                    if line == "%%BEGIN_CM_LIST":
+                        start=True
+                    elif line == "%%END_CM_LIST":
+                        start=False
+                    elif start:
+                        r=line.split(',')
+                        if len(r) == 6:
+                            key=",".join(r[0:5])
+                            value=float(r[5])
+                            if key in answer:
+                                answer[key]=answer[key]+value
+                            else:
+                                answer[key]=value
+    msg="number of sentences: %d" % count
+    logger.info(msg)
+    task.log_error(msg)
+    msg="raw cumulative result: %r" % answer
+    logger.info(msg)
+    task.log_error(msg)
+    for key in answer:
+        answer[key]=answer[key]/count
+    best=-1
+    bestkey=''
+    if answer:
+        for key in answer:
+            if answer[key]>=best:
+                best=answer[key]
+                bestkey=key
+        msg="best: %s,%s" % (bestkey,best)
+        logger.info(msg)
+        task.log_error(msg)
+        for annotation in input_annotations:
+            if u"isiAbductiveExplanation" in annotation:
+                exp = str(annotation["isiAbductiveExplanation"])
+                start=-1
+                end=-1
+                lines=exp.split('\n');
+                for idx, line in enumerate(lines):
+                    if line == "%%BEGIN_CM_LIST":
+                        start=idx
+                    elif line == "%%END_CM_LIST":
+                        end=idx
+                        break
+                if start>=0 and end>=0:
+                    exp="\n".join(lines[0:start+1]+[bestkey+","+`best`]+[lines[end]])
+                else:
+                    exp=exp+"\n"+"%%BEGIN_CM_LIST"+"\n"+bestkey+","+`best`+"\n"+"%%END_CM_LIST"
+                msg="changing interpretation from:\n%s\n to:\n%s" % (annotation["isiAbductiveExplanation"],exp)
+                logger.info(msg)
+                task.log_error(msg)
+                annotation["isiAbductiveExplanation"]=exp
+
+    #request_body_dict["kb"] = KBPATH
+    if "kb" in request_body_dict:
+        del request_body_dict["kb"];
+    if "step" in request_body_dict:
+        del request_body_dict["step"];
+    if "enableDebug" in request_body_dict:
+        del request_body_dict["enableDebug"];
     result = json.dumps(request_body_dict, encoding="utf-8", indent=4)
 
     logger.info("Processed: %d." % processed)

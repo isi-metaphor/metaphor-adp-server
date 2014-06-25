@@ -13,6 +13,17 @@ import sys
 
 ParserRunning = {'FA':False, 'ES':False, 'RU':False, 'EN':False}
 ParserLock = {'FA':True, 'ES':True, 'RU':True, 'EN':True}
+ParserFlag =True 
+
+def getParserFlag():
+    global ParserFlag
+    #print "Value of ParserFlag is " + str(ParserFlag)
+    return ParserFlag
+
+def setParserFlag(value):
+    global ParserFlag
+    ParserFlag = value
+    #print "Parser Flag value set to " + str(value)
 
 def getParserStatus(language):
     return ParserRunning[language]
@@ -28,10 +39,18 @@ def setParserLock(language, value):
     global ParserLock
     ParserLock[language] = value
 
-if __name__ == "__main__":
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "lcc_service.settings")
-
+def main():
+    #global ParserFlag
+    #print "main"
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "lcc-dev.settings")
     from django.core.management import execute_from_command_line
-
+    #ParserFlag = True
+    #setParserFlag(True)
     execute_from_command_line(sys.argv)
 
+if __name__ == "__main__":
+    #global ParserFlag
+    #setParserFlag(True) 
+    #print "__name__=__main__"
+    main()
+	
