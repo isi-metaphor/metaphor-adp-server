@@ -88,8 +88,8 @@ def FAexpect():
 
 def ESexpect():
     index = child['ES'].expect(["1.*\r\n\r\n1.*\r\n\r\n", pexpect.TIMEOUT, pexpect.EOF])
-
-    #index = child['ES'].expect(["0.*\r\n\r\n0.*\r\n\r\n", pexpect.TIMEOUT, pexpect.EOF])
+   
+    index = child['ES'].expect(["1.*\r\n\r\n1.*\r\n\r\n2.*\r\n\r\n", pexpect.TIMEOUT, pexpect.EOF])
     return index
 
 def RUexpect():
@@ -119,7 +119,8 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
     
     if language == "FA":
         tokenizer_proc = FARSI_PIPELINE
-        MALT_PARSER_DIR = os.path.join(METAPHOR_DIR, "external-tools/malt-1.5") 
+        MALT_PARSER_DIR = os.path.join(METAPHOR_DIR, "external-tools/malt-1.5")
+	MALT_PARSER_DIR_NEW = os.path.join(METAPHOR_DIR, "external-tools/maltparser-1.7.2") 
         parser_proc = "java -cp " + MALT_PARSER_DIR + "/dist/malt/malt.jar:" + MALT_PARSER_DIR + " maltParserWrap_FA"
         createLF_proc = os.path.join(METAPHOR_DIR, "pipelines/Farsi/createLF")
         parser_output_append = ""
