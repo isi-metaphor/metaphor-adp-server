@@ -1,0 +1,12 @@
+{
+  "step": 3,
+  "kb": "KBs/Farsi/Farsi_compiled_KB.da",
+  "language": "FA",
+  "enableDebug": false,
+  "metaphorAnnotationRecords": [
+    {
+      "sentenceId": 1,
+      "linguisticMetaphor": "از نگاه دینی نیز صرف نظر از نوشته های عمومی، با نگاهی دقیقابعادفقركاویده نشده است."
+    }
+  ]
+}

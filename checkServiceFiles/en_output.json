@@ -1,0 +1,26 @@
+INFO:root:Sending JSON to port 8082 on 0.0.0.0...
+{
+   "metaphorAnnotationRecords": [
+      {
+         "targetConceptDomain": "ECONOMIC_INEQUALITY", 
+         "annotationMappings": [
+            {
+               "targetInLm": true, 
+               "source": "cure", 
+               "explanation": "", 
+               "target": "poverty", 
+               "sourceInLm": true
+            }
+         ], 
+         "targetFrame": "POVERTY", 
+         "linguisticMetaphor": "we should cure poverty", 
+         "targetConceptSubDomain": "POVERTY", 
+         "sentenceId": 1, 
+         "sourceConceptSubDomain": "CURE", 
+         "isiDescription": "Abductive engine output; targetFrame: Is currently equal to targetConceptSubDomain;targetConceptDomain: Target concept domain defined by abduction; targetConceptSubDomain: Target concept subdomain defined by abduction ; sourceFrame: Source frame proposed by abduction ; sourceConceptSubDomain: Source subdomain proposed by abduction ; targetFrameElementSentence: List of words denoting the target found by abduction; sourceFrameElementSentence: List of words denoting the source found by abduction; annotationMappings: Target-Source mapping structures. isiAbductiveExplanation: Target-Source mapping (metaphor interpretation) as logical form found by abduction.", 
+         "sourceFrame": "DISEASE", 
+         "isiAbductiveExplanation": "poverty-nn(e5,x2) ^ cure-vb(x1,x0,x2,u4) ^ person(e3,x0) ^ TS#POVERTY(x2) ^ T#ECONOMIC-INEQUALITY(_0) ^ S#DISEASE(x1) ^ SS#DISEASE%CURE(x1,x1) ^ R#CURE-AGENT(x0,x1) ^ I#DISEASE(_1)\n%%BEGIN_CM_LIST\nECONOMIC_INEQUALITY,POVERTY,POVERTY,DISEASE,CURE,0.85\n%%END_CM_LIST"
+      }
+   ], 
+   "language": "EN"
+}
