@@ -82,19 +82,19 @@ def strcut(some_str, max_size=120):
     return "<NONE>"
 
 def FAexpect():
-    child['FA'].expect("1.*\r\n\r\n")
+    child['FA'].expect(".*\r\n\r\n.*\r\n\r\n")
     index = child['FA'].expect(["1.*\r\n\r\n1.*\r\n\r\n", pexpect.TIMEOUT, pexpect.EOF])
     return index
 
 def ESexpect():
-    index = child['ES'].expect(["1.*\r\n\r\n1.*\r\n\r\n", pexpect.TIMEOUT, pexpect.EOF])
+    index = child['ES'].expect([".*\r\n\r\n.*\r\n\r\n.*\r\n\r\n", pexpect.TIMEOUT, pexpect.EOF])
 
-    #index = child['ES'].expect(["0.*\r\n\r\n0.*\r\n\r\n", pexpect.TIMEOUT, pexpect.EOF])
+    index = child['ES'].expect([".*\r\n\r\n.*\r\n\r\n.*\r\n\r\n", pexpect.TIMEOUT, pexpect.EOF])
     return index
 
 def RUexpect():
-    child['RU'].expect("1.*\r\n\r\n")
-    index = child['RU'].expect(["1.*\r\n\r\n1.*\r\n\r\n1.*\r\n\r\n", pexpect.TIMEOUT, pexpect.EOF])
+    child['RU'].expect(".*\r\n\r\n.*\r\n\r\n.*\r\n\r\n")
+    index = child['RU'].expect([".*\r\n\r\n.*\r\n\r\n.*\r\n\r\n", pexpect.TIMEOUT, pexpect.EOF])
     return index
 
 def ENexpect():
@@ -167,6 +167,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
         
     logger.info("Running tokenizing command: '%s'." % tokenizer_proc)
     logger.info("Input str: %r" % strcut(input_str))
+    task.log_error("Input str: %r" % input_str)
     tokenizer_pipeline = Popen(tokenizer_proc,
                                 env=ENV,
                                 shell=True,
