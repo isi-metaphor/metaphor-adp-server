@@ -165,6 +165,12 @@ class Annotator(object):
             error_msg = "Found 0 metaphors for annotation. Task id=#%d."
             return self.task_error(error_msg, 6)
 
+        # 7 Get henry max depth
+        depth = request_document.get("depth",'3')
+        log_msg = "Selected HENRY max depth is '%r'" % depth
+        self.logger.info(log_msg)
+        self.task.log_error(log_msg)
+
         result = adb.run_annotation(request_document,
                                     metaphors,
                                     language,
@@ -172,7 +178,8 @@ class Annotator(object):
                                     self.logger,
                                     with_pdf_content=debug_option,
                                     last_step=last_step,
-                                    kb=selected_kb)
+                                    kb=selected_kb
+                                    depth=depth)
         if inputHandleAndName is not None:
             os.unlink(inputHandleAndName[1])
         if outputHandleAndName is not None:
