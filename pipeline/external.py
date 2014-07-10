@@ -88,8 +88,9 @@ def FAexpect():
 
 def ESexpect():
     index = child['ES'].expect([".*\r\n\r\n.*\r\n\r\n.*\r\n\r\n", pexpect.TIMEOUT, pexpect.EOF])
-
-    index = child['ES'].expect([".*\r\n\r\n.*\r\n\r\n.*\r\n\r\n", pexpect.TIMEOUT, pexpect.EOF])
+    index = child['ES'].expect(["END\r\n", pexpect.TIMEOUT, pexpect.EOF])
+    #index = child['ES'].expect([".*\r\n\r\n.*\r\n\r\n.*\r\n\r\n", pexpect.TIMEOUT, pexpect.EOF])
+    index = child['ES'].expect([".*\r\n\r\n.*\r\n\r\n.*\r\n\r\nEND", pexpect.TIMEOUT, pexpect.EOF])
     return index
 
 def RUexpect():
@@ -104,7 +105,7 @@ def ENexpect():
 child = {'FA':"",'ES':"",'RU':"",'EN':""}
 expectChild = {'FA': FAexpect, 'ES': ESexpect, 'RU': RUexpect, 'EN': ENexpect}
 
-def run_annotation(request_body_dict, input_metaphors, language, task, logger, with_pdf_content, last_step=3, kb=None):
+def run_annotation(request_body_dict, input_metaphors, language, task, logger, with_pdf_content, last_step=3, kb=None,depth='3'):
     start_time = time.time()
     input_str = generate_text_input(input_metaphors, language)
     tokenizer_proc = ""
@@ -133,6 +134,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
         tokenizer_proc = SPANISH_PIPELINE 
         MALT_PARSER_DIR = os.path.join(METAPHOR_DIR, "external-tools/maltparser-1.7.2") 
         parser_proc = "java -cp " + MALT_PARSER_DIR + "/maltparser-1.7.2.jar:" + MALT_PARSER_DIR + " maltParserWrap_ES" 
+	#parser_proc = METAPHOR_DIR + "/pipelines/Spanish/parse"
         createLF_proc =  METAPHOR_DIR + "/pipelines/Spanish/create_LF"
         parser_output_append = ""
         b2h_proc = "python " + PARSER2HENRY + " --nonmerge sameid freqpred"
@@ -159,7 +161,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
         parser_proc = BOXER_DIR + "/bin/candc --models " + BOXER_DIR + "/models/boxer --candc-printer boxer"
         createLF_proc = BOXER_DIR + "/bin/boxer --semantics tacitus --resolve true --stdin"
         parser_output_append = ":- op(601, xfx, (/)).\n:- op(601, xfx, (\)).\n:- multifile ccg/2, id/2.\n:- discontiguous ccg/2, id/2.\n"
-        b2h_proc = "python " + BOXER2HENRY + " --nonmerge sameid freqpred"
+        b2h_proc = "python " + BOXER2HENRY + " --nonmerge samename freqpred"
         if kb is None:
             KBPATH = EN_KBPATH
         else:
@@ -198,6 +200,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
                 logger.info("reattempts: %r\n" % str(reattempts))
                 if index == 0:
                     parser_output_inter = child[language].after
+		    parser_output_inter = parser_output_inter.replace("END","")
                     reattempts = 2
                 elif reattempts == 0:
                     reattempts += 1
@@ -220,6 +223,8 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
             break
     if language == "EN":
         parser_output_inter = re.sub("ccg\(\d+", "ccg(1", parser_output_inter)
+    if language == "ES":
+	parser_output_inter = parser_output_inter.replace("ROOT", "sentence")
     logger.info("Parser output:\n%r" % parser_output_inter)
     task.log_error("Parser output:\n%r" % parser_output_inter)
        
@@ -279,11 +284,11 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
     # Henry processing
     if kbcompiled:
         henry_proc = HENRY_DIR + "/bin/henry -m infer -e " + HENRY_DIR +        \
-                     "/models/h93.py -d 3 -t 4 -O proofgraph,statistics -T " +  \
+                     "/models/h93.py -d "+depth+" -t 4 -O proofgraph,statistics -T " +  \
                      time_unit_henry + " -b " + KBPATH
     else:
         henry_proc = HENRY_DIR + "/bin/henry -m infer -e " + HENRY_DIR +        \
-                     "/models/h93.py -d 3 -t 4 -O proofgraph,statistics -T " +  \
+                     "/models/h93.py -d "+depth+" -t 4 -O proofgraph,statistics -T " +  \
                      time_unit_henry
 
     logger.info("Running Henry command: '%s'." % henry_proc)
