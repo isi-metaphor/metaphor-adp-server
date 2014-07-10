@@ -1,6 +1,11 @@
-lz4
+lz4 (python module; use easy_install)
 uwsgi
 jinja2
 fabric
 django
 gitpython
+pypy
+java (?)
+nginx
+aptitude
+simplejson (python mod)

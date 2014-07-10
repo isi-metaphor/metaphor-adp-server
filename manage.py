@@ -40,7 +40,7 @@ def setParserLock(language, value):
     ParserLock[language] = value
 
 if __name__ == "__main__":
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "lcc-dev.settings")
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "lccsrv.settings")
     from django.core.management import execute_from_command_line
     execute_from_command_line(sys.argv)
 

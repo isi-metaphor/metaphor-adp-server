@@ -178,7 +178,7 @@ class Annotator(object):
                                     self.logger,
                                     with_pdf_content=debug_option,
                                     last_step=last_step,
-                                    kb=selected_kb
+                                    kb=selected_kb,
                                     depth=depth)
         if inputHandleAndName is not None:
             os.unlink(inputHandleAndName[1])
