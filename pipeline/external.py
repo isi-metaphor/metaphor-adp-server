@@ -82,8 +82,9 @@ def strcut(some_str, max_size=120):
     return "<NONE>"
 
 def FAexpect():
-    child['FA'].expect(".*\r\n\r\n.*\r\n\r\n")
-    index = child['FA'].expect(["1.*\r\n\r\n1.*\r\n\r\n", pexpect.TIMEOUT, pexpect.EOF])
+    index = child['FA'].expect([".*\r\n\r\n.*\r\n\r\n", pexpect.TIMEOUT, pexpect.EOF])
+    index = child['FA'].expect(["END\r\n", pexpect.TIMEOUT, pexpect.EOF])
+    index = child['FA'].expect([".*\r\n\r\n.*\r\n\r\nEND", pexpect.TIMEOUT, pexpect.EOF])
     return index
 
 def ESexpect():
@@ -94,8 +95,9 @@ def ESexpect():
     return index
 
 def RUexpect():
-    child['RU'].expect(".*\r\n\r\n.*\r\n\r\n.*\r\n\r\n")
     index = child['RU'].expect([".*\r\n\r\n.*\r\n\r\n.*\r\n\r\n", pexpect.TIMEOUT, pexpect.EOF])
+    index = child['RU'].expect(["END\r\n", pexpect.TIMEOUT, pexpect.EOF])
+    index = child['RU'].expect([".*\r\n\r\n.*\r\n\r\n.*\r\n\r\nEND", pexpect.TIMEOUT, pexpect.EOF])
     return index
 
 def ENexpect():
