@@ -19,20 +19,18 @@ DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 
-ADMINS = (
-    ("Jon May", "metaphor@jonmay.net"),
-)
+ADMINS = ()
 
 
 MANAGERS = ADMINS
 DATABASES = {
     "default": {
         "ENGINE":   "django.db.backends.sqlite3",
-        "NAME":     "/home/jonmay/lcc/lcc-service.prod.db",
+        "NAME":     "local.db",
     }
 }
 
-TIME_ZONE = "America/Los_Angeles"
+TIME_ZONE = "America/Chicago"
 LANGUAGE_CODE = "en-us"
 
 SITE_ID = 1
@@ -74,10 +72,7 @@ MIDDLEWARE_CLASSES = (
 ROOT_URLCONF = "lccsrv.urls"
 WSGI_APPLICATION = "lccsrv.wsgi.application"
 
-TEMPLATE_DIRS = (
-    project_dir("templates"),
-)
-
+TEMPLATE_DIRS = (project_dir("templates"),)
 
 INSTALLED_APPS = (
     "django.contrib.auth",
@@ -109,24 +104,24 @@ LOGGING = {
 
         "pipeline-file": {
             "class": "logging.handlers.RotatingFileHandler",
-            "filename": "/home/jonmay/lcc/logs/app.pipeline.log",
+            "filename": "logs/pipeline.log",
             "formatter": "verbose",
-            "backupCount": 32,
-            "maxBytes": 1024 * 1024 * 128,
+            "backupCount": 3,
+            "maxBytes": 1024 * 1024 * 16,
         },
         "django-file": {
             "class": "logging.handlers.RotatingFileHandler",
-            "filename": "/home/jonmay/lcc/logs/app.django.log",
+            "filename": "logs/django.log",
             "formatter": "verbose",
-            "backupCount": 32,
-            "maxBytes": 1024 * 1024 * 128,
+            "backupCount": 3,
+            "maxBytes": 1024 * 1024 * 16,
         },
         "requests-file": {
             "class": "logging.handlers.RotatingFileHandler",
-            "filename": "/home/jonmay/lcc/logs/app.requests.log",
+            "filename": "logs/requests.log",
             "formatter": "verbose",
-            "backupCount": 32,
-            "maxBytes": 1024 * 1024 * 128,
+            "backupCount": 3,
+            "maxBytes": 1024 * 1024 * 16,
         },
 
         "mail_admins": {
@@ -155,6 +150,5 @@ LOGGING = {
             "propagate": True,
             "level": "DEBUG",
         },
-
     }
 }

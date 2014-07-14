@@ -45,8 +45,8 @@ def run_local():
 
 
 def server():
-    env.host_string = "jonmay-metaphor"
-    env.user = "jonmay"
+    env.host_string = "colo-vm19.isi.edu"
+    env.user = "metaphor"
     env.key_filename = "~/.ssh/id_dsa"
     env.local = False
 
@@ -177,11 +177,5 @@ def generateBashConfig(file):
 def proddeploy():
     prod()
     server()
-    init()
-    deploy()
-
-def prodlocaldeploy():
-    prod()
-    run_local()
-    init()
+    #init()
     deploy()

@@ -14,37 +14,34 @@ import logging
 logger = logging.getLogger("pipeline")
 
 
-METAPHOR_DIR        =  "/mnt/metaphor"
-HENRY_DIR           =  "/mnt/deploy/henry-n700"
-BOXER_DIR           =  "/mnt/deploy/boxer"
-TMP_DIR             =  "/home/jonmay/lcc/tmp"
-GUROBI_HOME         =  "/mnt/deploy/gurobi511/linux64/"
-GRB_LICENSE_FILE    =  "/mnt/deploy/gurobi.lic"
-CPLUS_INCLUDE_PATH  =  "/usr/include/python2.7/:/mnt/deploy/gurobi511/linux64/include"
-PATH                =  ".:${TEAM_LOCAL}/bin:${TEAM_PUBLIC}/bin:${PATH}:/usr/sbin:/sbin:/usr/bin:${GUROBI_HOME}/bin"
-LD_LIBRARY_PATH     =  ":${GUROBI_HOME}/lib/:${LD_LIBRARY_PATH}"
-LIBRARY_PATH        =  "${GUROBI_HOME}/lib"
-UPLOADS_DIR         =  "/mnt/deploy/kbs"
+METAPHOR_DIR        =  "{{PIPELINE_CONFIG.METAPHOR_DIR}}"
+HENRY_DIR           =  "{{PIPELINE_CONFIG.HENRY_DIR}}"
+BOXER_DIR           =  "{{PIPELINE_CONFIG.BOXER_DIR}}"
+TMP_DIR             =  "{{PIPELINE_CONFIG.TMP_DIR}}"
+GUROBI_HOME         =  "{{PIPELINE_CONFIG.GUROBI_HOME}}"
+GRB_LICENSE_FILE    =  "{{PIPELINE_CONFIG.GRB_LICENSE_FILE}}"
+CPLUS_INCLUDE_PATH  =  "{{PIPELINE_CONFIG.CPLUS_INCLUDE_PATH}}"
+PATH                =  "{{PIPELINE_CONFIG.PATH}}"
+LD_LIBRARY_PATH     =  "{{PIPELINE_CONFIG.LD_LIBRARY_PATH}}"
+LIBRARY_PATH        =  "{{PIPELINE_CONFIG.LIBRARY_PATH}}"
 
 FARSI_PIPELINE      =  os.path.join(METAPHOR_DIR, "pipelines/Farsi/LF_Pipeline")
 SPANISH_PIPELINE    =  os.path.join(METAPHOR_DIR, "pipelines/Spanish/run_spanish.sh")
 RUSSIAN_PIPELINE    =  os.path.join(METAPHOR_DIR, "pipelines/Russian/run_russian.sh")
 
-BOXER2HENRY         =  os.path.join(METAPHOR_DIR, "pipelines/English/Boxer2Henry.py")
-PARSER2HENRY        =  os.path.join(METAPHOR_DIR, "pipelines/common/IntParser2Henry.py")
+BOXER2HENRY         =   os.path.join(METAPHOR_DIR, "pipelines/English/Boxer2Henry.py")
+PARSER2HENRY        =   os.path.join(METAPHOR_DIR, "pipelines/common/IntParser2Henry.py")
 
-KBS_DIR             =  os.path.join(METAPHOR_DIR, "KBs")
+EN_KBPATH           =   os.path.join(METAPHOR_DIR, "KBs/English/English_compiled_KB.da")
+ES_KBPATH           =   os.path.join(METAPHOR_DIR, "KBs/Spanish/Spanish_compiled_KB.da")
+RU_KBPATH           =   os.path.join(METAPHOR_DIR, "KBs/Russian/Russian_compiled_KB.da")
+FA_KBPATH           =   os.path.join(METAPHOR_DIR, "KBs/Farsi/Farsi_compiled_KB.da")
 
-EN_KBPATH           =  os.path.join(KBS_DIR, "English/English_compiled_KB.da")
-ES_KBPATH           =  os.path.join(KBS_DIR, "Spanish/Spanish_compiled_KB.da")
-RU_KBPATH           =  os.path.join(KBS_DIR, "Russian/Russian_compiled_KB.da")
-FA_KBPATH           =  os.path.join(KBS_DIR, "Farsi/Farsi_compiled_KB.da")
-
-CODE_RU             =  os.path.join(METAPHOR_DIR, "pipelines/Russian/")
-CODE_EN             =  os.path.join(METAPHOR_DIR, "pipelines/English/")
-CODE_ES             =  os.path.join(METAPHOR_DIR, "pipelines/Spanish/")
-CODE_FA             =  os.path.join(METAPHOR_DIR, "pipelines/Farsi/")
-CODE_COMMON         =  os.path.join(METAPHOR_DIR, "pipelines/common/")
+CODE_RU             =   os.path.join(METAPHOR_DIR, "pipelines/Russian/")
+CODE_EN             =   os.path.join(METAPHOR_DIR, "pipelines/English/")
+CODE_ES             =   os.path.join(METAPHOR_DIR, "pipelines/Spanish/")
+CODE_FA             =   os.path.join(METAPHOR_DIR, "pipelines/Farsi/")
+CODE_COMMON         =   os.path.join(METAPHOR_DIR, "pipelines/common/")
 
 
 sys.path.extend([CODE_RU, CODE_EN, CODE_ES, CODE_FA, CODE_COMMON])
