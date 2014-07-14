@@ -1,0 +1,12 @@
+{
+  "step": 3,
+  "kb": "KBs/Russian/Russian_compiled_KB.da",
+  "language": "RU",
+  "enableDebug": false,
+  "metaphorAnnotationRecords": [
+    {
+      "sentenceId": 1,
+      "linguisticMetaphor": "Победитьбедность без опоры на рациональные методы вряд ли удастся."
+    }
+  ]
+}

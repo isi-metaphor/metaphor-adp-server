@@ -1,0 +1,26 @@
+INFO:root:Sending JSON to port 8082 on 0.0.0.0...
+{
+   "metaphorAnnotationRecords": [
+      {
+         "targetConceptDomain": "ECONOMIC_INEQUALITY", 
+         "annotationMappings": [
+            {
+               "targetInLm": true, 
+               "source": "caer", 
+               "explanation": "", 
+               "target": "pobreza", 
+               "sourceInLm": true
+            }
+         ], 
+         "targetFrame": "POVERTY", 
+         "linguisticMetaphor": "La iniciativa de reforma hacendaria del presidente Enrique Pe\u00f1a Nieto no lastima la clase media, sino que salva a millones de caer en las filas de la pobreza, defendi\u00f3 este lunes la secretaria de Desarrollo Social (Sedesol), Rosario Robles Berlanga.", 
+         "targetConceptSubDomain": "POVERTY", 
+         "sentenceId": 1, 
+         "sourceConceptSubDomain": "ENTRANCE", 
+         "isiDescription": "Abductive engine output; targetFrame: Is currently equal to targetConceptSubDomain;targetConceptDomain: Target concept domain defined by abduction; targetConceptSubDomain: Target concept subdomain defined by abduction ; sourceFrame: Source frame proposed by abduction ; sourceConceptSubDomain: Source subdomain proposed by abduction ; targetFrameElementSentence: List of words denoting the target found by abduction; sourceFrameElementSentence: List of words denoting the source found by abduction; annotationMappings: Target-Source mapping structures. isiAbductiveExplanation: Target-Source mapping (metaphor interpretation) as logical form found by abduction.", 
+         "sourceFrame": "ABYSS", 
+         "isiAbductiveExplanation": "iniciativa-nn(e1,x1) ^ de-in(e2,u1,e4) ^ reforma-nn(e3,x2) ^ hacendaria-adj(e4,u3) ^ del-in(e5,e2,x5) ^ presidente-nn(e6,x3) ^ enrique-nn(e7,x4) ^ pe\u00f1a-nn(e8,x5) ^ nieto-nn(e9,x6) ^ not(e10,e10) ^ lastimar-vb(e11,u7,u8,u9) ^ clase-nn(e12,x7) ^ sino-in(e14,u11,u12) ^ salvar-vb(e15,u13,u18,u15) ^ card(e17,u18,millones) ^ a-in(e16,u16,u17) ^ de-in(e18,e16,u20) ^ caer-vb(e19,u21,x8,u23) ^ en-in(e20,e18,u25) ^ fila-nn(e21,x8) ^ de-in(e22,u26,u27) ^ pobreza-nn(e23,x9) ^ defender-vb(e24,u28,u29,u30) ^ thing(e34,x34) ^ lunes-nn(e25,x10) ^ secretario-nn(e26,x11) ^ de-in(e27,u31,u32) ^ desarrollo-nn(e28,x12) ^ social-nn(e29,x13) ^ sedesol-nn(e30,x14) ^ rosario-nn(e31,x15) ^ robles-nn(e32,x16) ^ berlanga-nn(e33,x17) ^ !=(e2,e18,e22,e27) ^ S#PHYSICAL_HARM(e11) ^ SS#PHYSICAL_HARM%TYPE(e11,e11) ^ R#HARM-VICTIM(u8,e11) ^ R#HARM-AGENT(u7,e11) ^ TS#WEALTH_AND_SOCIAL-CLASS(x7) ^ T#ECONOMIC_INEQUALITY(_0) ^ S#ABYSS(e19) ^ SS#ABYSS%ENTRANCE(e19,e19) ^ R#ABYSS-THEME(u21,e19) ^ TS#POVERTY(x9) ^ T#ECONOMIC_INEQUALITY(_1) ^ I#PHYSICAL_HARM(e11) ^ M#CAUSE-HARM(e11) ^ M#CAUSING-THING-H(u7,e11) ^ M#HARM-VICTIM(u8,e11) ^ I#ABYSS(e19) ^ I#ABYSS%ENTRANCE(e19,e19) ^ R#POOR(u20,x9) ^ R#POOR(u27,x9) ^ M#CAUSE-HARM(e11) ^ =(u27,u20) ^ =(_0,_1) ^ =(x9,e16,u26) ^ =(e19,e18)\n%%BEGIN_CM_LIST\nECONOMIC_INEQUALITY,POVERTY,POVERTY,ABYSS,ENTRANCE,0.85\n%%END_CM_LIST"
+      }
+   ], 
+   "language": "ES"
+}
