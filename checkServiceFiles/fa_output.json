@@ -1,0 +1,26 @@
+INFO:root:Sending JSON to port 8082 on 0.0.0.0...
+{
+   "metaphorAnnotationRecords": [
+      {
+         "targetConceptDomain": "ECONOMIC_INEQUALITY", 
+         "annotationMappings": [
+            {
+               "targetInLm": false, 
+               "source": "", 
+               "explanation": "", 
+               "target": "", 
+               "sourceInLm": false
+            }
+         ], 
+         "targetFrame": "POVERTY", 
+         "linguisticMetaphor": "\u0627\u0632 \u0646\u06af\u0627\u0647 \u062f\u06cc\u0646\u06cc \u0646\u06cc\u0632 \u0635\u0631\u0641 \u0646\u0638\u0631 \u0627\u0632 \u0646\u0648\u0634\u062a\u0647 \u0647\u0627\u06cc \u0639\u0645\u0648\u0645\u06cc\u060c \u0628\u0627 \u0646\u06af\u0627\u0647\u06cc \u062f\u0642\u06cc\u0642\u0627\u0628\u0639\u0627\u062f\u0641\u0642\u0631\u0643\u0627\u0648\u06cc\u062f\u0647 \u0646\u0634\u062f\u0647 \u0627\u0633\u062a.", 
+         "targetConceptSubDomain": "POVERTY", 
+         "sentenceId": 1, 
+         "sourceConceptSubDomain": "TYPE", 
+         "isiDescription": "Abductive engine output; targetFrame: Is currently equal to targetConceptSubDomain;targetConceptDomain: Target concept domain defined by abduction; targetConceptSubDomain: Target concept subdomain defined by abduction ; sourceFrame: Source frame proposed by abduction ; sourceConceptSubDomain: Source subdomain proposed by abduction ; targetFrameElementSentence: List of words denoting the target found by abduction; sourceFrameElementSentence: List of words denoting the source found by abduction; annotationMappings: Target-Source mapping structures. isiAbductiveExplanation: Target-Source mapping (metaphor interpretation) as logical form found by abduction.", 
+         "sourceFrame": "STRUGGLE", 
+         "isiAbductiveExplanation": "\u0627\u0632-in(e0,e13,x0) ^ \u0646\u06af\u0627\u0647-nn(e1,x0) ^ \u062f\u06cc\u0646-adj(e2,x0) ^ \u0646\u06cc\u0632-rb(e3,u3) ^ \u0635\u0631\u0641-nn(e4,x1) ^ \u0646\u0638\u0631-nn(e5,x2) ^ \u0627\u0632-in(e6,x2,x3) ^ \u0646\u0648\u0634\u062a\u0647-nn(e7,x3) ^ \u0639\u0645\u0648\u0645\u06cc-adj(e8,x3) ^ \u0628\u0627-in(e10,e13,x4) ^ \u0646\u06af\u0627\u0647-nn(e11,x4) ^ \u062f\u0642\u06cc\u0642\u0627\u0628\u0639\u0627\u062f\u0641\u0642\u0631\u06a9\u0627\u0648\u06cc\u062f\u0647-adj(e12,x4) ^ \u0634\u062f#\u0634\u0648-vb(e13,x1,u12,u13) ^ nn(e16,x1,x2) ^ not(e17,e13) ^ !=(e0,e6) ^ =(x4,x0) ^ =(e11,e1)\n%%BEGIN_CM_LIST\nECONOMIC_INEQUALITY,POVERTY,POVERTY,STRUGGLE,TYPE,0.001\n%%END_CM_LIST"
+      }
+   ], 
+   "language": "FA"
+}
