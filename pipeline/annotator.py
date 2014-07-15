@@ -9,7 +9,8 @@
 import os
 import simplejson as json
 import pipeline.external as adb
-
+import subprocess
+import tempfile
 from lccsrv import paths
 from pipeline.models import TASK_STATUS
 
@@ -68,6 +69,24 @@ class Annotator(object):
                 selected_kb = os.path.join(paths.METAPHOR_DIR, selected_kb)
             else:
                 selected_kb = os.path.join(paths.UPLOADS_DIR, selected_kb)
+            log_msg = "Selected KB full path is '%r'" % selected_kb
+            self.logger.info(log_msg)
+            self.task.log_error(log_msg)
+        # 2.2.1 Get kb content if supplied
+        kb_content = request_document.get("kb_content", None)
+        inputHandleAndName=None
+        outputHandleAndName=None
+        if kb_content is not None:
+            log_msg = "KB content is NON NULL. overwriting selected_kb"
+            self.logger.info(log_msg)
+            self.task.log_error(log_msg)
+            inputHandleAndName=tempfile.mkstemp(dir=paths.UPLOADS_DIR)
+            outputHandleAndName=tempfile.mkstemp(dir=paths.UPLOADS_DIR)
+            f = os.fdopen(inputHandleAndName[0], "w")
+            f.write(kb_content)
+            f.close()
+            subprocess.check_call([paths.HENRY_DIR+"/bin/henry", "-m", "compile_kb",inputHandleAndName[1],"-o",outputHandleAndName[1]])
+            selected_kb = outputHandleAndName[1]
             log_msg = "Selected KB full path is '%r'" % selected_kb
             self.logger.info(log_msg)
             self.task.log_error(log_msg)
@@ -146,6 +165,12 @@ class Annotator(object):
             error_msg = "Found 0 metaphors for annotation. Task id=#%d."
             return self.task_error(error_msg, 6)
 
+        # 7 Get henry max depth
+        depth = request_document.get("depth",'3')
+        log_msg = "Selected HENRY max depth is '%r'" % depth
+        self.logger.info(log_msg)
+        self.task.log_error(log_msg)
+
         result = adb.run_annotation(request_document,
                                     metaphors,
                                     language,
@@ -153,8 +178,13 @@ class Annotator(object):
                                     self.logger,
                                     with_pdf_content=debug_option,
                                     last_step=last_step,
-                                    kb=selected_kb)
-
+                                    kb=selected_kb,
+                                    depth=depth)
+        if inputHandleAndName is not None:
+            os.unlink(inputHandleAndName[1])
+        if outputHandleAndName is not None:
+            os.unlink(outputHandleAndName[1])
+            
         self.task.response_body = result
         self.task.task_status = TASK_STATUS.PROCESSED
 

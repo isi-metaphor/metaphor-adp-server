@@ -39,18 +39,9 @@ def setParserLock(language, value):
     global ParserLock
     ParserLock[language] = value
 
-def main():
-    #global ParserFlag
-    #print "main"
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "lcc-dev.settings")
+if __name__ == "__main__":
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "lccsrv.settings")
     from django.core.management import execute_from_command_line
-    #ParserFlag = True
-    #setParserFlag(True)
     execute_from_command_line(sys.argv)
 
-if __name__ == "__main__":
-    #global ParserFlag
-    #setParserFlag(True) 
-    #print "__name__=__main__"
-    main()
 	
