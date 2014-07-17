@@ -167,7 +167,13 @@ class Annotator(object):
 
         # 7 Get henry max depth
         depth = request_document.get("depth",'3')
-        log_msg = "Selected HENRY max depth is '%r'" % depth
+        log_msg = "Selected HENRY max depth is '%s'" % depth
+        self.logger.info(log_msg)
+        self.task.log_error(log_msg)
+        
+        # 8 generate graph (even if no debug option)
+        dograph = request_document.get("dograph",False) or debug_option
+        log_msg = "dograph is '%s' '%s" % dograph debug_option
         self.logger.info(log_msg)
         self.task.log_error(log_msg)
 
@@ -176,7 +182,7 @@ class Annotator(object):
                                     language,
                                     self.task,
                                     self.logger,
-                                    with_pdf_content=debug_option,
+                                    with_pdf_content=dograph,
                                     last_step=last_step,
                                     kb=selected_kb,
                                     depth=depth)
