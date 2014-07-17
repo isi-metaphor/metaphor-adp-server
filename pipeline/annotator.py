@@ -173,7 +173,7 @@ class Annotator(object):
         
         # 8 generate graph (even if no debug option)
         dograph = request_document.get("dograph",False) or debug_option
-        log_msg = "dograph is '%s' '%s" % dograph debug_option
+        log_msg = "dograph is {0} {1}".format(dograph ,debug_option)
         self.logger.info(log_msg)
         self.task.log_error(log_msg)
 
