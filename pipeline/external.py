@@ -11,11 +11,11 @@ import simplejson as json
 import traceback
 
 from lccsrv.paths import *
-from legacy.extractor import *
 from subprocess import Popen, PIPE
 from manage import getParserStatus, setParserStatus, getParserLock, setParserLock, getParserFlag, setParserFlag
 import pexpect
 import re
+import imp
 
 ENV = os.environ
 
@@ -107,7 +107,13 @@ def ENexpect():
 child = {'FA':"",'ES':"",'RU':"",'EN':""}
 expectChild = {'FA': FAexpect, 'ES': ESexpect, 'RU': RUexpect, 'EN': ENexpect}
 
-def run_annotation(request_body_dict, input_metaphors, language, task, logger, with_pdf_content, last_step=3, kb=None,depth='3'):
+def run_annotation(request_body_dict, input_metaphors, language, task, logger, with_pdf_content, last_step=3, kb=None,depth='3',extractor=None):
+    extractor_module=None
+    # load up the extractor code to use for extracting the metaphor
+    if extractor:
+        module_desc=imp.find_module(extractor,["legacy"])
+        extractor_module=imp.load_module(extractor,*module_desc)
+
     start_time = time.time()
     input_str = generate_text_input(input_metaphors, language)
     tokenizer_proc = ""
@@ -115,29 +121,29 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
     createLF_proc = ""
     parser_output_append = ""
     b2h_proc = ""
-    
+
     global child
-    
+
     # Parser pipeline
-    
+
     if language == "FA":
         tokenizer_proc = FARSI_PIPELINE
         MALT_PARSER_DIR = os.path.join(METAPHOR_DIR, "external-tools/malt-1.5")
-	MALT_PARSER_DIR_NEW = os.path.join(METAPHOR_DIR, "external-tools/maltparser-1.7.2") 
+        MALT_PARSER_DIR_NEW = os.path.join(METAPHOR_DIR, "external-tools/maltparser-1.7.2")
         parser_proc = "java -cp " + MALT_PARSER_DIR + "/dist/malt/malt.jar:" + MALT_PARSER_DIR + " maltParserWrap_FA"
         createLF_proc = os.path.join(METAPHOR_DIR, "pipelines/Farsi/createLF")
         parser_output_append = ""
-        b2h_proc = "python " + PARSER2HENRY + " --nonmerge sameid freqpred"	
+        b2h_proc = "python " + PARSER2HENRY + " --nonmerge sameid freqpred"
         if kb is None:
             KBPATH = FA_KBPATH
         else:
             KBPATH = kb
-        
+
     elif language == "ES":
-        tokenizer_proc = SPANISH_PIPELINE 
-        MALT_PARSER_DIR = os.path.join(METAPHOR_DIR, "external-tools/maltparser-1.7.2") 
-        parser_proc = "java -cp " + MALT_PARSER_DIR + "/maltparser-1.7.2.jar:" + MALT_PARSER_DIR + " maltParserWrap_ES" 
-	#parser_proc = METAPHOR_DIR + "/pipelines/Spanish/parse"
+        tokenizer_proc = SPANISH_PIPELINE
+        MALT_PARSER_DIR = os.path.join(METAPHOR_DIR, "external-tools/maltparser-1.7.2")
+        parser_proc = "java -cp " + MALT_PARSER_DIR + "/maltparser-1.7.2.jar:" + MALT_PARSER_DIR + " maltParserWrap_ES"
+        #parser_proc = METAPHOR_DIR + "/pipelines/Spanish/parse"
         createLF_proc =  METAPHOR_DIR + "/pipelines/Spanish/create_LF"
         parser_output_append = ""
         b2h_proc = "python " + PARSER2HENRY + " --nonmerge sameid freqpred"
@@ -145,20 +151,20 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
             KBPATH = ES_KBPATH
         else:
             KBPATH = kb
-        
+
     elif language == "RU":
         tokenizer_proc = RUSSIAN_PIPELINE
         MALT_PARSER_DIR = os.path.join(METAPHOR_DIR, "external-tools/malt-1.5")
         RU_PARSER_DIR = os.path.join(METAPHOR_DIR, "external-tools/malt-ru")
         parser_proc = "java -cp " + MALT_PARSER_DIR + "/dist/malt/malt.jar:" + RU_PARSER_DIR + " maltParserWrap_RU"
-	createLF_proc = os.path.join(METAPHOR_DIR, "pipelines/Russian/create_LF")
+        createLF_proc = os.path.join(METAPHOR_DIR, "pipelines/Russian/create_LF")
         parser_output_append = ""
         b2h_proc = "python " + PARSER2HENRY + " --nonmerge sameid freqpred"
         if kb is None:
                 KBPATH = RU_KBPATH
         else:
                 KBPATH = kb
-        
+
     elif language == "EN":
         tokenizer_proc = BOXER_DIR + "/bin/tokkie --stdin"
         parser_proc = BOXER_DIR + "/bin/candc --models " + BOXER_DIR + "/models/boxer --candc-printer boxer"
@@ -169,7 +175,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
             KBPATH = EN_KBPATH
         else:
             KBPATH = kb
-        
+
     logger.info("Running tokenizing command: '%s'." % tokenizer_proc)
     logger.info("Input str: %r" % strcut(input_str))
     task.log_error("Input str: %r" % input_str)
@@ -185,7 +191,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
         tokenizer_output += "\n"
     logger.info("Tokenizer Output:\n%r" % tokenizer_output)
     task.log_error("Tokenizer Output:\n%r" % tokenizer_output)
-        
+
     logger.info("Running parsing command: '%s'." % parser_proc)
     logger.info("Input str: %r" % tokenizer_output)
     logger.info(language + " Parser Running: " + str(getParserStatus(language)))
@@ -203,7 +209,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
                 logger.info("reattempts: %r\n" % str(reattempts))
                 if index == 0:
                     parser_output_inter = child[language].after
-		    parser_output_inter = parser_output_inter.replace("END","")
+                    parser_output_inter = parser_output_inter.replace("END","")
                     reattempts = 2
                 elif reattempts == 0:
                     reattempts += 1
@@ -216,21 +222,21 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
                     reattempts = 2
                     child[language].terminate()
                     setParserStatus(language, False)
-	    logger.info("Parser Flag : " +str(getParserFlag()))
-	    if not getParserFlag():
-		logger.info("\nTerminating Parser Process\n")
-		child[language].terminate()
-		child[language] = ""
-		setParserStatus(language, False)
+            logger.info("Parser Flag : " +str(getParserFlag()))
+            if not getParserFlag():
+                logger.info("\nTerminating Parser Process\n")
+                child[language].terminate()
+                child[language] = ""
+                setParserStatus(language, False)
             setParserLock(language, True)
             break
     if language == "EN":
         parser_output_inter = re.sub("ccg\(\d+", "ccg(1", parser_output_inter)
     if language == "ES":
-	parser_output_inter = parser_output_inter.replace("ROOT", "sentence")
+        parser_output_inter = parser_output_inter.replace("ROOT", "sentence")
     logger.info("Parser output:\n%r" % parser_output_inter)
     task.log_error("Parser output:\n%r" % parser_output_inter)
-       
+
     logger.info("Running createLF command: '%s'." % createLF_proc)
     logger.info("Input str: %r" % strcut(parser_output_inter))
     parser_output_append += parser_output_inter
@@ -244,10 +250,10 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
     createLF_output, createLF_stderr = createLF_pipeline.communicate(input=parser_output_append)
     logger.info("createLF output:\n%r" % createLF_output)
     task.log_error("createLF output:\n%r" % createLF_output)
-        
+
     if last_step == 1:
-       	return createLF_output
-    
+        return createLF_output
+
     logger.info("Running boxer-2-henry command: '%s'." % b2h_proc)
     logger.info("Input str: %r" % strcut(createLF_output))
     b2h_pipeline = Popen(b2h_proc,
@@ -262,11 +268,11 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
     task.log_error("B2H output: \n%r" % parser_output)
     task.parse_out = parser_output
 
-    
+
     # Parser processing time in seconds
     parser_time = (time.time() - start_time) * 0.001
     logger.info("Command finished. Processing time: %r." % parser_time)
-    
+
     parses = extract_parses(parser_output)
     logger.info("Parses:\n%r\n" % strcut(parses))
     task.log_error("Parses:\n%r" % parses)
@@ -322,7 +328,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
     if with_pdf_content:
         logger.info("Generating proofgraphs.")
         unique_id = get_unique_id()
-        logger.info("unique id: %s\n" % unique_id) 
+        logger.info("unique id: %s\n" % unique_id)
         proofgraphs = generate_graph(input_metaphors, henry_output, unique_id)
         task.dot_out = proofgraphs
 
@@ -335,7 +341,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
         if u"sentenceId" in annotation:
             sID = str(annotation["sentenceId"])
             if sID in hkeys:
-                CM_output = extract_CM_mapping(sID, hypotheses[sID], parses[sID], DESCRIPTION, annotation)
+                CM_output = extractor_module.extract_CM_mapping(sID, hypotheses[sID], parses[sID], DESCRIPTION, annotation)
                 msg="Sentence #%s has interpretation #%s" % (sID,CM_output['isiAbductiveExplanation'])
                 logger.info(msg)
                 task.log_error(msg)
@@ -477,7 +483,3 @@ def get_unique_id():
     current_time = int(time.time())
     unique_id = str(current_time)[5:]
     return unique_id
-
-
-
-
