@@ -11,11 +11,11 @@ import simplejson as json
 import traceback
 
 from lccsrv.paths import *
+from legacy.extractor import *
 from subprocess import Popen, PIPE
 from manage import getParserStatus, setParserStatus, getParserLock, setParserLock, getParserFlag, setParserFlag
 import pexpect
 import re
-import imp
 
 ENV = os.environ
 
@@ -446,7 +446,6 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
     logger.info("Result size: %d." % len(result))
 
     return result
-
 
 
 def generate_graph(input_dict, henry_output, unique_id):
