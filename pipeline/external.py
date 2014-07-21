@@ -115,7 +115,8 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
         extractor_module=imp.load_module(extractor,*module_desc)
 
     start_time = time.time()
-    input_str = generate_text_input(input_metaphors, language)
+    #input_str = generate_text_input(input_metaphors, language)
+    input_metaphors_count = len(input_metaphors.keys())
     tokenizer_proc = ""
     parser_proc = ""
     createLF_proc = ""
@@ -127,133 +128,139 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
     # Parser pipeline
 
     if language == "FA":
-        tokenizer_proc = FARSI_PIPELINE
-        MALT_PARSER_DIR = os.path.join(METAPHOR_DIR, "external-tools/malt-1.5")
-        MALT_PARSER_DIR_NEW = os.path.join(METAPHOR_DIR, "external-tools/maltparser-1.7.2")
-        parser_proc = "java -cp " + MALT_PARSER_DIR + "/dist/malt/malt.jar:" + MALT_PARSER_DIR + " maltParserWrap_FA"
-        createLF_proc = os.path.join(METAPHOR_DIR, "pipelines/Farsi/createLF")
-        parser_output_append = ""
-        b2h_proc = "python " + PARSER2HENRY + " --nonmerge sameid freqpred"
-        if kb is None:
-            KBPATH = FA_KBPATH
-        else:
-            KBPATH = kb
-
-    elif language == "ES":
-        tokenizer_proc = SPANISH_PIPELINE
-        MALT_PARSER_DIR = os.path.join(METAPHOR_DIR, "external-tools/maltparser-1.7.2")
-        parser_proc = "java -cp " + MALT_PARSER_DIR + "/maltparser-1.7.2.jar:" + MALT_PARSER_DIR + " maltParserWrap_ES"
-        #parser_proc = METAPHOR_DIR + "/pipelines/Spanish/parse"
-        createLF_proc =  METAPHOR_DIR + "/pipelines/Spanish/create_LF"
-        parser_output_append = ""
-        b2h_proc = "python " + PARSER2HENRY + " --nonmerge sameid freqpred"
-        if kb is None:
-            KBPATH = ES_KBPATH
-        else:
-            KBPATH = kb
-
-    elif language == "RU":
-        tokenizer_proc = RUSSIAN_PIPELINE
-        MALT_PARSER_DIR = os.path.join(METAPHOR_DIR, "external-tools/malt-1.5")
-        RU_PARSER_DIR = os.path.join(METAPHOR_DIR, "external-tools/malt-ru")
-        parser_proc = "java -cp " + MALT_PARSER_DIR + "/dist/malt/malt.jar:" + RU_PARSER_DIR + " maltParserWrap_RU"
-        createLF_proc = os.path.join(METAPHOR_DIR, "pipelines/Russian/create_LF")
-        parser_output_append = ""
-        b2h_proc = "python " + PARSER2HENRY + " --nonmerge sameid freqpred"
-        if kb is None:
-                KBPATH = RU_KBPATH
-        else:
-                KBPATH = kb
-
-    elif language == "EN":
-        tokenizer_proc = BOXER_DIR + "/bin/tokkie --stdin"
-        parser_proc = BOXER_DIR + "/bin/candc --models " + BOXER_DIR + "/models/boxer --candc-printer boxer"
-        createLF_proc = BOXER_DIR + "/bin/boxer --semantics tacitus --resolve true --stdin"
-        parser_output_append = ":- op(601, xfx, (/)).\n:- op(601, xfx, (\)).\n:- multifile ccg/2, id/2.\n:- discontiguous ccg/2, id/2.\n"
-        b2h_proc = "python " + BOXER2HENRY + " --nonmerge samename freqpred"
-        if kb is None:
-            KBPATH = EN_KBPATH
-        else:
-            KBPATH = kb
-
-    logger.info("Running tokenizing command: '%s'." % tokenizer_proc)
-    logger.info("Input str: %r" % strcut(input_str))
-    task.log_error("Input str: %r" % input_str)
-    tokenizer_pipeline = Popen(tokenizer_proc,
-                                env=ENV,
-                                shell=True,
-                                stdin=PIPE,
-                                stdout=PIPE,
-                                stderr=None,
-                                close_fds=True)
-    tokenizer_output, tokenizer_stderr = tokenizer_pipeline.communicate(input=input_str)
-    if language == "EN":
-        tokenizer_output += "\n"
-    logger.info("Tokenizer Output:\n%r" % tokenizer_output)
-    task.log_error("Tokenizer Output:\n%r" % tokenizer_output)
-
-    logger.info("Running parsing command: '%s'." % parser_proc)
-    logger.info("Input str: %r" % tokenizer_output)
-    logger.info(language + " Parser Running: " + str(getParserStatus(language)))
-    if not getParserStatus(language):
-        child[language] = pexpect.spawn('/bin/bash', ['-c',parser_proc], timeout=30)
-        setParserStatus(language, True)
-    while True:
-        if getParserLock(language):
-            setParserLock(language, False)
-            child[language].send(tokenizer_output)
-            reattempts = 0
-            parser_output_inter = ""
-            while reattempts < 2:
-                index = expectChild[language]()
-                logger.info("reattempts: %r\n" % str(reattempts))
-                if index == 0:
-                    parser_output_inter = child[language].after
-                    parser_output_inter = parser_output_inter.replace("END","")
-                    reattempts = 2
-                elif reattempts == 0:
-                    reattempts += 1
-                    child[language].terminate()
-                    child[language] = pexpect.spawn('/bin/bash', ['-c',parser_proc], timeout=30)
-                    child[language].send(tokenizer_output)
-                else:
-                    logger.info("Parser not wroking\n")
-                    task.log_error("\nParser not working\n")
-                    reattempts = 2
-                    child[language].terminate()
-                    setParserStatus(language, False)
-            logger.info("Parser Flag : " +str(getParserFlag()))
-            if not getParserFlag():
-                logger.info("\nTerminating Parser Process\n")
-                child[language].terminate()
-                child[language] = ""
-                setParserStatus(language, False)
-            setParserLock(language, True)
-            break
-    if language == "EN":
-        parser_output_inter = re.sub("ccg\(\d+", "ccg(1", parser_output_inter)
-    if language == "ES":
-        parser_output_inter = parser_output_inter.replace("ROOT", "sentence")
-    logger.info("Parser output:\n%r" % parser_output_inter)
-    task.log_error("Parser output:\n%r" % parser_output_inter)
-
-    logger.info("Running createLF command: '%s'." % createLF_proc)
-    logger.info("Input str: %r" % strcut(parser_output_inter))
-    parser_output_append += parser_output_inter
-    createLF_pipeline = Popen(createLF_proc,
-                            env=ENV,
-                            shell=True,
-                            stdin=PIPE,
-                            stdout=PIPE,
-                            stderr=None,
-                            close_fds=True)
-    createLF_output, createLF_stderr = createLF_pipeline.communicate(input=parser_output_append)
-    logger.info("createLF output:\n%r" % createLF_output)
-    task.log_error("createLF output:\n%r" % createLF_output)
-
-    if last_step == 1:
-        return createLF_output
-
+		tokenizer_proc = os.path.join(METAPHOR_DIR, "pipelines/Farsi/pre-parser")
+		MALT_PARSER_DIR = os.path.join(METAPHOR_DIR, "external-tools/malt-1.5")
+		parser_proc = "java -cp " + MALT_PARSER_DIR + "/dist/malt/malt.jar:" + MALT_PARSER_DIR + " maltParserWrap_FA"
+		createLF_proc = os.path.join(METAPHOR_DIR, "pipelines/Farsi/createLF")
+		parser_output_append = ""
+		b2h_proc = "python " + PARSER2HENRY + " --nonmerge sameid freqpred"	
+		if kb is None:
+			KBPATH = FA_KBPATH
+		else:
+			KBPATH = kb
+		
+	elif language == "ES":
+		tokenizer_proc = SPANISH_PIPELINE 
+		MALT_PARSER_DIR = os.path.join(METAPHOR_DIR, "external-tools/maltparser-1.7.2") 
+		parser_proc = "java -cp " + MALT_PARSER_DIR + "/maltparser-1.7.2.jar:" + MALT_PARSER_DIR + " maltParserWrap_ES" 
+		createLF_proc =  METAPHOR_DIR + "/pipelines/Spanish/create_LF"
+		parser_output_append = ""
+		b2h_proc = "python " + PARSER2HENRY + " --nonmerge sameid freqpred"
+		if kb is None:
+			KBPATH = ES_KBPATH
+		else:
+			KBPATH = kb
+		
+	elif language == "RU":
+		tokenizer_proc = os.path.join(METAPHOR_DIR, "pipelines/Russian/pre-parser")
+		MALT_PARSER_DIR = os.path.join(METAPHOR_DIR, "external-tools/malt-1.5")
+		RU_PARSER_DIR = os.path.join(METAPHOR_DIR, "external-tools/malt-ru")
+		parser_proc = "java -cp " + MALT_PARSER_DIR + "/dist/malt/malt.jar:" + RU_PARSER_DIR + " maltParserWrap_RU"
+		createLF_proc = os.path.join(METAPHOR_DIR, "pipelines/Russian/create_LF")
+		parser_output_append = ""
+		b2h_proc = "python " + PARSER2HENRY + " --nonmerge sameid freqpred"
+		if kb is None:
+				KBPATH = RU_KBPATH
+		else:
+				KBPATH = kb
+		
+	elif language == "EN":
+		tokenizer_proc = BOXER_DIR + "/bin/tokkie --stdin"
+		parser_proc = BOXER_DIR + "/bin/candc --models " + BOXER_DIR + "/models/boxer --candc-printer boxer"
+		createLF_proc = BOXER_DIR + "/bin/boxer --semantics tacitus --resolve true --stdin"
+		parser_output_append = ":- op(601, xfx, (/)).\n:- op(601, xfx, (\)).\n:- multifile ccg/2, id/2.\n:- discontiguous ccg/2, id/2.\n"
+		b2h_proc = "python " + BOXER2HENRY + " --nonmerge samename freqpred"
+		if kb is None:
+			KBPATH = EN_KBPATH
+		else:
+			KBPATH = kb
+	while True:
+		if getParserLock(language):
+			setParserLock(language, False)
+			for key in input_metaphors.keys():
+				metaphor_count += 1
+				input_str = "<META>" + str(key) + "\n\n" + input_metaphors[key] + "\n\n"
+				logger.info("Processing metaphor " + str(metaphor_count))
+				logger.info("Running tokenizing command: '%s'." % tokenizer_proc)
+				logger.info("Input str: %r" % strcut(input_str))
+				task.log_error("Input str: %r" % input_str)
+				tokenizer_pipeline = Popen(tokenizer_proc,
+											env=ENV,
+											shell=True,
+											stdin=PIPE,
+											stdout=PIPE,
+											stderr=None,
+											close_fds=True)
+				tokenizer_output, tokenizer_stderr = tokenizer_pipeline.communicate(input=input_str)
+				logger.info("Tokenizer Output:\n%r" % tokenizer_output)
+				task.log_error("Tokenizer Output:\n%r" % tokenizer_output)
+					
+				logger.info("Running parsing command: '%s'." % parser_proc)
+				logger.info("Input str: %r" % tokenizer_output)
+				logger.info(language + " Parser Running: " + str(getParserStatus(language)))
+				if not getParserStatus(language):
+					child[language] = pexpect.spawn('/bin/bash', ['-c',parser_proc], timeout=30)
+					setParserStatus(language, True)
+					
+				child[language].send(tokenizer_output)
+				reattempts = 0
+				while reattempts < 2:
+					logger.info("reattempts: %r\n" % str(reattempts))
+					index = expectChild[language]()
+					if index == 0:
+						parser_output_inter = child[language].after
+						parser_output_inter = parser_output_append + parser_output_inter
+						if language == "EN":
+							parser_output_inter += "\r\nid(" + str(key) + ",[1]).\r\n\r\n"
+						else:	
+							parser_output_inter = parser_output_inter.replace("END","")
+						reattempts = 2
+					elif reattempts == 0:
+						reattempts += 1
+						child[language].terminate()
+						child[language] = pexpect.spawn('/bin/bash', ['-c',parser_proc], timeout=30)
+						child[language].send(tokenizer_output)
+					else:
+						logger.info("Parser not working\n")
+						task.log_error("\nParser not working\n")
+						reattempts = 2
+						child[language].terminate()
+						setParserStatus(language, False)
+				logger.info("Parser Flag : " +str(getParserFlag()))
+				if not getParserFlag():
+					logger.info("\nTerminating Parser Process\n")
+					child[language].terminate()
+					child[language] = ""
+					setParserStatus(language, False)
+			
+				if language == "EN":
+					parser_output_inter = re.sub("ccg\(\d+", "ccg(1", parser_output_inter)
+				if language == "ES":
+					parser_output_inter = parser_output_inter.replace("ROOT", "sentence")
+			
+				logger.info("Parser output:\n%r" % parser_output_inter)
+				task.log_error("Parser output:\n%r" % parser_output_inter)
+				   
+				logger.info("Running createLF command: '%s'." % createLF_proc)
+				logger.info("Input str: %r" % strcut(parser_output_inter))
+				
+				createLF_pipeline = Popen(createLF_proc,
+										env=ENV,
+										shell=True,
+										stdin=PIPE,
+										stdout=PIPE,
+										stderr=None,
+										close_fds=True)
+				createLF_output_temp, createLF_stderr_temp = createLF_pipeline.communicate(input=parser_output_inter)
+				logger.info("createLF output:\n%r" % createLF_output_temp)
+				task.log_error("createLF output:\n%r" % createLF_output_temp)
+				createLF_output += createLF_output_temp
+			setParserLock(language, True)
+			break
+			
+	if last_step == 1:
+		return createLF_output
+    
     logger.info("Running boxer-2-henry command: '%s'." % b2h_proc)
     logger.info("Input str: %r" % strcut(createLF_output))
     b2h_pipeline = Popen(b2h_proc,
