@@ -11,11 +11,11 @@ import simplejson as json
 import traceback
 
 from lccsrv.paths import *
+from legacy.extractor import *
 from subprocess import Popen, PIPE
 from manage import getParserStatus, setParserStatus, getParserLock, setParserLock, getParserFlag, setParserFlag
 import pexpect
 import re
-import imp
 
 ENV = os.environ
 input_metaphors_count = 0
@@ -454,6 +454,8 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
 
 	return result
 
+
+
 def generate_graph(input_dict, henry_output, unique_id):
 
 	# create proofgraphs directory if it doesn't exist
@@ -488,5 +490,7 @@ def get_unique_id():
 	current_time = int(time.time())
 	unique_id = str(current_time)[5:]
 	return unique_id
+
+
 
 
