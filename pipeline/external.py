@@ -16,6 +16,7 @@ from subprocess import Popen, PIPE
 from manage import getParserStatus, setParserStatus, getParserLock, setParserLock, getParserFlag, setParserFlag
 import pexpect
 import re
+import imp
 
 ENV = os.environ
 input_metaphors_count = 0
@@ -110,8 +111,12 @@ def ENexpect():
 
 child = {'FA':"",'ES':"",'RU':"",'EN':""}
 expectChild = {'FA': FAexpect, 'ES': ESexpect, 'RU': RUexpect, 'EN': ENexpect}
-
-def run_annotation(request_body_dict, input_metaphors, language, task, logger, with_pdf_content, last_step=3, kb=None,depth='3'):
+def run_annotation(request_body_dict, input_metaphors, language, task, logger, with_pdf_content, last_step=3, kb=None,depth='3',extractor=None):
+        extractor_module=None
+    # load up the extractor code to use for extracting the metaphor
+        if extractor:
+     		module_desc=imp.find_module(extractor,["legacy"])
+ 	    	extractor_module=imp.load_module(extractor,*module_desc)
 	global child
 	start_time = time.time()
 	#input_str = generate_text_input(input_metaphors, language)
@@ -348,7 +353,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
 		if u"sentenceId" in annotation:
 			sID = str(annotation["sentenceId"])
 			if sID in hkeys:
-				CM_output = extract_CM_mapping(sID, hypotheses[sID], parses[sID], DESCRIPTION, annotation)
+				CM_output = extractor_module.extract_CM_mapping(sID, hypotheses[sID], parses[sID], DESCRIPTION, annotation)
 				msg="Sentence #%s has interpretation #%s" % (sID,CM_output['isiAbductiveExplanation'])
 				logger.info(msg)
 				task.log_error(msg)
