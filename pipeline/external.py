@@ -174,7 +174,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
 		parser_proc = BOXER_DIR + "/bin/candc --models " + BOXER_DIR + "/models/boxer --candc-printer boxer"
 		createLF_proc = BOXER_DIR + "/bin/boxer --semantics tacitus --resolve true --stdin"
 		parser_output_append = ":- op(601, xfx, (/)).\n:- op(601, xfx, (\)).\n:- multifile ccg/2, id/2.\n:- discontiguous ccg/2, id/2.\n"
-		b2h_proc = "python " + BOXER2HENRY + " --nonmerge samename freqpred"
+		b2h_proc = "python " + BOXER2HENRY + " --nonmerge sameid freqpred"
 		if kb is None:
 			KBPATH = EN_KBPATH
 		else:
