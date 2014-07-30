@@ -157,7 +157,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
 			KBPATH = kb
 		
 	elif language == "RU":
-		tokenizer_proc = os.path.join(METAPHOR_DIR, "pipelines/Russian/run_russian")
+		tokenizer_proc = os.path.join(METAPHOR_DIR, "pipelines/Russian/run_russian.sh")
 		MALT_PARSER_DIR = os.path.join(METAPHOR_DIR, "external-tools/malt-1.5")
 		RU_PARSER_DIR = os.path.join(METAPHOR_DIR, "external-tools/malt-ru")
 		parser_proc = "java -cp " + MALT_PARSER_DIR + "/dist/malt/malt.jar:" + RU_PARSER_DIR + " maltParserWrap_RU"
