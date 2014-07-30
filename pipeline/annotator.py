@@ -167,27 +167,49 @@ class Annotator(object):
 
         # 7 Get henry max depth
         depth = request_document.get("depth",'3')
-        log_msg = "Selected HENRY max depth is '%r'" % depth
+        log_msg = "Selected HENRY max depth is '%s'" % depth
         self.logger.info(log_msg)
         self.task.log_error(log_msg)
 
+        # 8 generate graph (even if no debug option)
+        dograph = request_document.get("dograph",False) or debug_option
+        log_msg = "dograph is {0} {1}".format(dograph ,debug_option)
+        self.logger.info(log_msg)
+        self.task.log_error(log_msg)
+
+        # 9 select which extractor code to run
+        extractor = request_document.get("extractor","extractor-no-span-june-2014-eval")
+        log_msg = "using this extractor code: legacy/{0}.py".format(extractor)
+        self.logger.info(log_msg)
+        self.task.log_error(log_msg)
+
+	# 10 include parser and henry processing times
+	request_document["parser_time"] = request_document.get("parser_time", False)
+	request_document["henry_time"] = request_document.get("henry_time", False)
+	log_msg = "get parser time: " + str(request_document["parser_time"])
+	self.logger.info(log_msg)
+	self.task.log_error(log_msg)
+	log_msg = "get henry time: " + str(request_document["henry_time"])
+	self.logger.info(log_msg)
+	self.task.log_error(log_msg)
+	# 11 used to indicate whether to use the input metaphor or just the parser output
+	request_document["parser_output"] = request_document.get("parser_output", "")
         result = adb.run_annotation(request_document,
                                     metaphors,
                                     language,
                                     self.task,
                                     self.logger,
-                                    with_pdf_content=debug_option,
+                                    with_pdf_content=dograph,
                                     last_step=last_step,
                                     kb=selected_kb,
-                                    depth=depth)
+                                    depth=depth,
+                                    extractor=extractor)
         if inputHandleAndName is not None:
             os.unlink(inputHandleAndName[1])
         if outputHandleAndName is not None:
             os.unlink(outputHandleAndName[1])
-            
+
         self.task.response_body = result
         self.task.task_status = TASK_STATUS.PROCESSED
 
         return debug_option
-
-
