@@ -1,25 +1,11 @@
-INFO:root:Sending JSON to port 8082 on 0.0.0.0...
+INFO:root:Sending JSON to port 8083 on 0.0.0.0...
 {
    "metaphorAnnotationRecords": [
       {
-         "targetConceptDomain": "ECONOMIC_INEQUALITY", 
-         "annotationMappings": [
-            {
-               "targetInLm": false, 
-               "source": "\u043e\u043f\u043e\u0440\u0430", 
-               "explanation": "", 
-               "target": "", 
-               "sourceInLm": true
-            }
-         ], 
-         "targetFrame": "POVERTY", 
          "linguisticMetaphor": "\u041f\u043e\u0431\u0435\u0434\u0438\u0442\u044c\u0431\u0435\u0434\u043d\u043e\u0441\u0442\u044c \u0431\u0435\u0437 \u043e\u043f\u043e\u0440\u044b \u043d\u0430 \u0440\u0430\u0446\u0438\u043e\u043d\u0430\u043b\u044c\u043d\u044b\u0435 \u043c\u0435\u0442\u043e\u0434\u044b \u0432\u0440\u044f\u0434 \u043b\u0438 \u0443\u0434\u0430\u0441\u0442\u0441\u044f.", 
-         "targetConceptSubDomain": "POVERTY", 
          "sentenceId": 1, 
-         "sourceConceptSubDomain": "SUPPORT", 
          "isiDescription": "Abductive engine output; targetFrame: Is currently equal to targetConceptSubDomain;targetConceptDomain: Target concept domain defined by abduction; targetConceptSubDomain: Target concept subdomain defined by abduction ; sourceFrame: Source frame proposed by abduction ; sourceConceptSubDomain: Source subdomain proposed by abduction ; targetFrameElementSentence: List of words denoting the target found by abduction; sourceFrameElementSentence: List of words denoting the source found by abduction; annotationMappings: Target-Source mapping structures. isiAbductiveExplanation: Target-Source mapping (metaphor interpretation) as logical form found by abduction.", 
-         "sourceFrame": "BUILDING", 
-         "isiAbductiveExplanation": "\u0431\u0435\u0437-in(e1,x1,x2) ^ \u043e\u043f\u043e\u0440\u0430-nn(e2,x3) ^ \u043d\u0430-in(e3,x1,x4) ^ \u0440\u0430\u0446\u0438\u043e\u043d\u0430\u043b\u044c\u043d\u044b\u0439-adj(e4,x5) ^ \u043c\u0435\u0442\u043e\u0434-nn(e5,x5) ^ \u0432\u0440\u044f\u0434-rb(e6,e8) ^ \u043b\u0438-par(e7,x6) ^ \u0443\u0434\u0430\u0442\u044c\u0441\u044f-vb(e8,u1,u2,u3) ^ typelt(e9,x5,s1) ^ future(e10,e8) ^ !=(e1,e2,e3,e4,e5,e6,e7,e8) ^ S#BUILDING(e2) ^ SS#SUPPORT(x3,e2) ^ I#BUILDING(e2)\n%%BEGIN_CM_LIST\nECONOMIC_INEQUALITY,POVERTY,POVERTY,BUILDING,SUPPORT,0.001\n%%END_CM_LIST"
+         "isiAbductiveExplanation": "\u043f\u043e\u0431\u0435\u0434\u0438\u0442\u044c\u0431\u0435\u0434\u043d\u043e\u0441\u0442\u044c-nn(e1,x1) ^ \u0431\u0435\u0437-in(e2,x1,x2) ^ \u043e\u043f\u043e\u0440\u0430-nn(e3,x2) ^ \u043d\u0430-in(e4,x1,x3) ^ \u0440\u0430\u0446\u0438\u043e\u043d\u0430\u043b\u044c\u043d\u044b\u0439-adj(e5,x3) ^ \u043c\u0435\u0442\u043e\u0434-nn(e6,x3) ^ \u0432\u0440\u044f\u0434-rb(e7,e8) ^ \u0443\u0434\u0430\u0442\u044c\u0441\u044f-vb(e8,x1,e7,u1) ^ typelt(e9,x3,s1) ^ future(e10,e8) ^ S#BUILDING(x2) ^ S#MACHINE(e4)\n%%BEGIN_CM_LIST\n%%END_CM_LIST"
       }
    ], 
    "language": "RU"

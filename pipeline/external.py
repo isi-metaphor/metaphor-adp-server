@@ -182,7 +182,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
 	
 	parser_start_time = time.time()
 	while True:
-		if request_body_dict["parser_output"] != "":
+		if "parser_output" in request_body_dict and request_body_dict["parser_output"] != "":
 			createLF_output = request_body_dict["parser_output"]
 			break
 		if getParserLock(language):
@@ -280,8 +280,9 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
 	task.log_error("createLF output:\n%r" % createLF_output_temp)
 	if last_step == 1:
 		return createLF_output
-	request_body_dict["parser_output"] = createLF_output
-	if request_body_dict["parser_time"] == True:
+	if "parser_output" in request_body_dict:
+		request_body_dict["parser_output"] = createLF_output
+	if "parser_time" in request_body_dict:
 		request_body_dict["parser_time"] = str((parser_end_time-parser_start_time))
 	logger.info("Running boxer-2-henry command: '%s'." % b2h_proc)
 	logger.info("Input str: %r" % createLF_output)
@@ -346,7 +347,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
 	logger.info("Hypotheses output:\n%s\n" % strcut(hypotheses))
 	task.log_error("Hypotheses: \n%r" % hypotheses)
 	henry_end_time = time.time()
-	if request_body_dict["henry_time"] == True:
+	if "henry_time" in request_body_dict:
 		request_body_dict["henry_time"] = str((henry_end_time - henry_start_time)) 
 	if last_step == 2:
 		return json.dumps(henry_output, encoding="utf-8", indent=4)

@@ -184,16 +184,16 @@ class Annotator(object):
         self.task.log_error(log_msg)
 
 	# 10 include parser and henry processing times
-	request_document["parser_time"] = request_document.get("parser_time", False)
-	request_document["henry_time"] = request_document.get("henry_time", False)
-	log_msg = "get parser time: " + str(request_document["parser_time"])
-	self.logger.info(log_msg)
-	self.task.log_error(log_msg)
-	log_msg = "get henry time: " + str(request_document["henry_time"])
-	self.logger.info(log_msg)
-	self.task.log_error(log_msg)
+	parser_time = request_document.get("parser_time", "Absent")
+	if parser_time != "Absent":
+		request_document["parser_time"] = ""
+	henry_time = request_document.get("henry_time", "Absent")
+	if henry_time != "Absent":
+		request_document["henry_time"] = ""
 	# 11 used to indicate whether to use the input metaphor or just the parser output
-	request_document["parser_output"] = request_document.get("parser_output", "")
+	parser_output = request_document.get("parser_output", "Absent")
+	if parser_output != "Absent":
+		request_document["parser_output"] = parser_output 
         result = adb.run_annotation(request_document,
                                     metaphors,
                                     language,
