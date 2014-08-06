@@ -4,6 +4,8 @@
 
 while [ 1 == 1 ]
 do
+	sleep 1s
+	continue
 	python manage.py runserver 0.0.0.0:8083 --settings=lccsrv.settings
 	SUBJECT="Dev-Parser-Alive Server Error"
 	EMAIL1="amiakshp@usc.edu"

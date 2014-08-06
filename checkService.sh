@@ -1,4 +1,4 @@
-# !/bin/bash
+#!/bin/bash
 
 port=$1
 yest_date=`date "+%s"`
@@ -6,6 +6,7 @@ EMAIL1="amiakshp@usc.edu"
 EMAIL2="morbini@ict.usc.edu"
 SUBJECT="Dev Parser Alive Service Error"
 outputFile="/tmp/outputCheckDevParserAlive.json"
+echo $port
 
 while [ 1 == 1 ]
 do
