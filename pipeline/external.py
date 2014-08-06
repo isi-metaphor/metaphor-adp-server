@@ -133,7 +133,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
 	# Parser pipeline
 	
 	if language == "FA":
-		tokenizer_proc = os.path.join(METAPHOR_DIR, "pipelines/Farsi/LF_Pipeline")
+		tokenizer_proc = os.path.join(METAPHOR_DIR, "pipelines/Farsi/pre-parser")
 		MALT_PARSER_DIR = os.path.join(METAPHOR_DIR, "external-tools/malt-1.5")
 		parser_proc = "java -cp " + MALT_PARSER_DIR + "/dist/malt/malt.jar:" + MALT_PARSER_DIR + " maltParserWrap_FA"
 		createLF_proc = os.path.join(METAPHOR_DIR, "pipelines/Farsi/createLF")
@@ -146,7 +146,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
 		
 	elif language == "ES":
 		tokenizer_proc = SPANISH_PIPELINE 
-		MALT_PARSER_DIR = os.path.join(METAPHOR_DIR, "external-tools/maltparser-1.7.2") 
+		MALT_PARSER_DIR = os.path.join(METAPHOR_DIR, "external-tools/maltparser-1.7.2")
 		parser_proc = "java -cp " + MALT_PARSER_DIR + "/maltparser-1.7.2.jar:" + MALT_PARSER_DIR + " maltParserWrap_ES" 
 		createLF_proc =  METAPHOR_DIR + "/pipelines/Spanish/create_LF"
 		parser_output_append = ""
@@ -157,7 +157,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
 			KBPATH = kb
 		
 	elif language == "RU":
-		tokenizer_proc = os.path.join(METAPHOR_DIR, "pipelines/Russian/run_russian.sh")
+		tokenizer_proc = os.path.join(METAPHOR_DIR, "pipelines/Russian/pre-parser")
 		MALT_PARSER_DIR = os.path.join(METAPHOR_DIR, "external-tools/malt-1.5")
 		RU_PARSER_DIR = os.path.join(METAPHOR_DIR, "external-tools/malt-ru")
 		parser_proc = "java -cp " + MALT_PARSER_DIR + "/dist/malt/malt.jar:" + RU_PARSER_DIR + " maltParserWrap_RU"
@@ -183,7 +183,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
 	parser_start_time = time.time()
 	while True:
 		if "parser_output" in request_body_dict and request_body_dict["parser_output"] != "":
-			createLF_output = request_body_dict["parser_output"]
+			createLF_output = request_body_dict["parser_output"].encode("UTF-8")
 			break
 		if getParserLock(language):
 			setParserLock(language, False)
@@ -276,8 +276,8 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
 			break
 				
 	parser_end_time = time.time()
-	logger.info("createLF output:\n%r" % strcut(createLF_output_temp))
-	task.log_error("createLF output:\n%r" % createLF_output_temp)
+	logger.info("createLF output:\n%r" % createLF_output)
+	task.log_error("createLF output:\n%r" % createLF_output)
 	if last_step == 1:
 		return createLF_output
 	if "parser_output" in request_body_dict:
