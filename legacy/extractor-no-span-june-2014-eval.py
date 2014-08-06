@@ -77,7 +77,7 @@ def createDStruc(superD,subD):
 			if subD:
 				for subd in subD:
 					for subArgs in subD[subd]:
-						if len(subArgs)>0:# and superArgs[0]==subArgs[1]:
+						if len(subArgs)>1 and superArgs[0]==subArgs[1]:
 							outputstrucs[superd][superArgs[0]].append((subd,subArgs[0]))
 			else:
 				outputstrucs[superd][superArgs[0]].append(('',superArgs[0]))
