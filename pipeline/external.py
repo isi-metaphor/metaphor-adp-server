@@ -11,7 +11,6 @@ import simplejson as json
 import traceback
 
 from lccsrv.paths import *
-from legacy.extractor import *
 from subprocess import Popen, PIPE
 from manage import getParserStatus, setParserStatus, getParserLock, setParserLock, getParserFlag, setParserFlag
 import pexpect
