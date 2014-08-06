@@ -16,6 +16,9 @@ from manage import getParserStatus, setParserStatus, getParserLock, setParserLoc
 import pexpect
 import re
 import imp
+from collections import defaultdict
+import sexp
+from sets import Set
 
 ENV = os.environ
 input_metaphors_count = 0
@@ -108,9 +111,91 @@ def ENexpect():
 	return index
 	#return 0
 
+metaPattern=re.compile("^<META>[\s]*[0-9]+$")
+def getWpos(tokenizer_output,language):
+	word2ids=defaultdict(list)
+	if language=="ES" or language=="FA" or language=="RU":
+		for line in tokenizer_output.splitlines():
+			line=line.strip()
+			if line:
+				words=line.split()
+				if words and len(words)>1:
+					word2ids[words[1]].append(int(words[0]))
+	elif language=="EN":
+		for line in tokenizer_output.splitlines():
+			line=line.strip()
+			if line and not metaPattern.match(line):
+				words=line.split()
+				for i in xrange(len(words)):
+					word2ids[words[i]].append(i+1)
+	return word2ids
+
+def name(o):
+	if type(o)==tuple:
+		return o[0]
+	else:
+		return str(o)
+
+def removeThousands(pid):
+	if pid and type(pid)==int:
+		while pid>999:
+			pid=pid-1000
+	return pid
+
+def printLiteral(l):
+	ret=""
+	t=type(l)
+	if t==list:
+		ret="("+" ".join(map(lambda x: printLiteral(x),l))+")"
+	elif t==tuple:
+		ret=name(l)
+        else:
+		ret=str(l)
+	return ret
+
+idPattern=re.compile("^.*\[([^\]]+)\].*$")
+def filterParserOutput(parses,word2ids,sources,targets):
+	filtered={}
+	if sources and targets and parses and word2ids:
+		for key in parses:
+			toKeep=Set()
+			if key in sources and key in targets and key in word2ids:
+				wids=word2ids[key]
+				for w in sources[key].strip().split():
+					if w in wids:
+						toKeep.update(wids[w])
+				for w in targets[key].strip().split():
+					if w in wids:
+						toKeep.update(wids[w])
+			if toKeep:
+				filtered[key]="(O (name "+str(key)+") (^ "
+				p=sexp.parse(parses[key])
+				o=p[0]
+				for p in o[2]:
+					pid=name(p[-1])
+					result=idPattern.match(pid)
+					try:
+						pid=int(result.group(1)) if result else None
+					except ValueError:
+						pid=None
+					pid=removeThousands(pid)
+					if not pid or pid in toKeep:
+						filtered[key]+=printLiteral(p)+" "
+				filtered[key]+="))"
+	parser_output=""
+	if parses:
+		for key in parses:
+			if key in filtered:
+				parser_output+=filtered[key]+"\n"
+			else:
+				parser_output+=parses[key]+"\n"
+	return parser_output
+
 child = {'FA':"",'ES':"",'RU':"",'EN':""}
 expectChild = {'FA': FAexpect, 'ES': ESexpect, 'RU': RUexpect, 'EN': ENexpect}
-def run_annotation(request_body_dict, input_metaphors, language, task, logger, with_pdf_content, last_step=3, kb=None,depth='3', extractor=None):
+def run_annotation(request_body_dict, input_metaphors, language, task, logger, with_pdf_content, last_step=3, kb=None,depth='3', extractor=None,
+		   sources=None,targets=None):
+	word2ids=defaultdict(list)
         extractor_module=None
     # load up the extractor code to use for extracting the metaphor
         if extractor:
@@ -145,7 +230,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
 		
 	elif language == "ES":
 		tokenizer_proc = SPANISH_PIPELINE 
-		MALT_PARSER_DIR = os.path.join(METAPHOR_DIR, "external-tools/maltparser-1.7.2")
+		MALT_PARSER_DIR = os.path.join(METAPHOR_DIR, "external-tools/maltparser-1.7.2") 
 		parser_proc = "java -cp " + MALT_PARSER_DIR + "/maltparser-1.7.2.jar:" + MALT_PARSER_DIR + " maltParserWrap_ES" 
 		createLF_proc =  METAPHOR_DIR + "/pipelines/Spanish/create_LF"
 		parser_output_append = ""
@@ -182,7 +267,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
 	parser_start_time = time.time()
 	while True:
 		if "parser_output" in request_body_dict and request_body_dict["parser_output"] != "":
-			createLF_output = request_body_dict["parser_output"].encode("UTF-8")
+			createLF_output = request_body_dict["parser_output"].encode("utf-8")
 			break
 		if getParserLock(language):
 			setParserLock(language, False)
@@ -191,7 +276,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
 				input_str = "<META>" + str(key) + "\n\n" + input_metaphors[key] + "\n\n"
 				logger.info("Processing metaphor " + str(metaphor_count))
 				logger.info("Running tokenizing command: '%s'." % tokenizer_proc)
-				logger.info("Input str: %r" % strcut(input_str))
+				logger.info("Input str: %r" % input_str))
 				task.log_error("Input str: %r" % input_str)
 				tokenizer_pipeline = Popen(tokenizer_proc,
 							env=ENV,
@@ -209,6 +294,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
 					tokenizer_output = lines + "\n"
 				logger.info("Tokenizer Output:\n%r" % tokenizer_output)
 				task.log_error("Tokenizer Output:\n%r" % tokenizer_output)
+				word2ids[key]=getWpos(tokenizer_output,language)
 					
 				logger.info("Running parsing command: '%s'." % parser_proc)
 				logger.info("Input str: %r" % tokenizer_output)
@@ -296,7 +382,6 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
 	logger.info("B2H output:\n%s\n" % parser_output)
 	task.log_error("B2H output: \n%r" % parser_output)
 	task.parse_out = parser_output
-
 	
 	# Parser processing time in seconds
 	parser_time = (time.time() - start_time) * 0.001
@@ -304,8 +389,17 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
 	henry_start_time = time.time()
 
 	parses = extract_parses(parser_output)
-	logger.info("Parses:\n%r\n" % strcut(parses))
+	logger.info("Parses:\n%r\n" % parses)
 	task.log_error("Parses:\n%r" % parses)
+
+	msg="initial parser output: \n"+str(parses)+"\n sources: "+str(sources)+"\n targets: "+str(targets)+"\n word2ids: "+str(word2ids)
+	logger.info(msg)
+	task.log_error(msg)
+	parser_output=filterParserOutput(parses,word2ids,sources,targets)
+	msg="final parser output: \n"+parser_output
+	logger.info(msg)
+	task.log_error(msg)
+	
 
 	# time to generate final output in seconds
 	generate_output_time = 2
@@ -343,7 +437,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
 	logger.info("Henry output:\n%s\n" % str(henry_output))
 	task.log_error("Henry output: \n%r" % henry_output)
 	task.henry_out = henry_output
-	logger.info("Hypotheses output:\n%s\n" % strcut(hypotheses))
+	logger.info("Hypotheses output:\n%s\n" % hypotheses)
 	task.log_error("Hypotheses: \n%r" % hypotheses)
 	henry_end_time = time.time()
 	if "henry_time" in request_body_dict:

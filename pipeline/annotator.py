@@ -31,6 +31,17 @@ class Annotator(object):
             self.task.task_error_count += 1
         return self.task
 
+    def normalize(self,string,language):
+        if language == "EN":
+            # Replacing single quote, double quote (start/end), dash
+            ascii_metaphor = string.replace(u"\u2019", u"\u0027")\
+                .replace(u"\u201c", u"\u0022")\
+                .replace(u"\u201d", u"\u0022")\
+                .replace(u"\u2014", u"\u002d")
+            return ascii_metaphor
+        else:
+            return string
+
     def annotate(self):
 
         # 1.
@@ -38,6 +49,8 @@ class Annotator(object):
         self.logger.info(log_msg)
         self.task.log_error(log_msg)
         metaphors = {}
+        sourcePhrases={}
+        targetPhrases={}
         request_document_body = self.task.request_body
 
 
@@ -131,22 +144,11 @@ class Annotator(object):
                 self.task_error(error_msg, error_code=None, count_error=True)
                 annotation_id_index += 1
                 annotation_id = annotation_id_index
-
+                
             # 5.2
             try:
                 metaphor = annotation["linguisticMetaphor"]
-                if language == "EN":
-                    # Replacing single quote, double quote (start/end), dash
-                    ascii_metaphor = metaphor.replace(u"\u2019", u"\u0027")\
-                                             .replace(u"\u201c", u"\u0022")\
-                                             .replace(u"\u201d", u"\u0022")\
-                                             .replace(u"\u2014", u"\u002d")
-
-                    metaphors[str(annotation_id)] = ascii_metaphor.encode("utf-8")
-
-                else:
-
-                    metaphors[str(annotation_id)] = metaphor.encode("utf-8")
+                metaphors[str(annotation_id)]=self.normalize(metaphor,language).encode("utf-8")
 
             except KeyError:
                 error_msg = "Ann #%d. No metaphor available (skip it). Task=%d" % (
@@ -154,6 +156,15 @@ class Annotator(object):
                     self.task.id,
                 )
                 self.task_error(error_msg, error_code=None, count_error=True)
+            if "annotationMappings" in annotation:
+                ams=annotation["annotationMappings"]
+                am=None
+                if ams and len(ams)>0:
+                    am=ams[0]
+                if am and "source" in am:
+                    sourcePhrases[str(annotation_id)]=self.normalize(am["source"],language).encode("utf-8")
+                if am and "target" in am:
+                    targetPhrases[str(annotation_id)]=self.normalize(am["target"],language).encode("utf-8")
 
         self.logger.info("Task %d language=%s" % (self.task.id, language))
         self.task.language = language
@@ -203,7 +214,9 @@ class Annotator(object):
                                     last_step=last_step,
                                     kb=selected_kb,
                                     depth=depth,
-                                    extractor=extractor)
+                                    extractor=extractor,
+                                    sources=sourcePhrases,
+                                    targets=targetPhrases)
         if inputHandleAndName is not None:
             os.unlink(inputHandleAndName[1])
         if outputHandleAndName is not None:
