@@ -47,7 +47,7 @@ headers = {
     "Content-type": "application/json"
 }
 
-conn = httplib.HTTPConnection(options.hostname, options.port)
+conn = httplib.HTTPConnection(options.hostname, options.port,timeout=60)
 conn.request("POST", "/annotateDocument", json_string, headers)
 
 # Process the response

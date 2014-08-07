@@ -405,7 +405,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
 	generate_output_time = 2
 	
 	# time left for Henry in seconds
-	time_all_henry = 600 - parser_time - generate_output_time
+	time_all_henry = 122 - generate_output_time
 
 	if with_pdf_content:
 		# time for graph generation subtracted from Henry time in seconds
@@ -413,7 +413,8 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
 
 	# time for one interpretation in Henry in seconds
 	time_unit_henry = str(int(time_all_henry / len(input_metaphors)))
-
+	if time_unit_henry < 20:
+		time_unit_henry = 20
 	# Henry processing
 	if kbcompiled:
 		henry_proc = HENRY_DIR + "/bin/henry -m infer -e " + HENRY_DIR +        \

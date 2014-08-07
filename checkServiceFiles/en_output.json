@@ -1,4 +1,3 @@
-INFO:root:Sending JSON to port 8083 on 0.0.0.0...
 {
    "metaphorAnnotationRecords": [
       {
@@ -6,9 +5,10 @@ INFO:root:Sending JSON to port 8083 on 0.0.0.0...
          "linguisticMetaphor": "we should cure poverty", 
          "targetConceptSubDomain": "POVERTY", 
          "targetConceptDomain": "POVERTY", 
+         "sourceConceptSubDomain": "CURE", 
          "isiDescription": "Abductive engine output; targetFrame: Is currently equal to targetConceptSubDomain;targetConceptDomain: Target concept domain defined by abduction; targetConceptSubDomain: Target concept subdomain defined by abduction ; sourceFrame: Source frame proposed by abduction ; sourceConceptSubDomain: Source subdomain proposed by abduction ; targetFrameElementSentence: List of words denoting the target found by abduction; sourceFrameElementSentence: List of words denoting the source found by abduction; annotationMappings: Target-Source mapping structures. isiAbductiveExplanation: Target-Source mapping (metaphor interpretation) as logical form found by abduction.", 
          "sourceFrame": "DISEASE", 
-         "isiAbductiveExplanation": "poverty-nn(e5,x2) ^ cure-vb(x1,x0,x2,u4) ^ person(e3,x0) ^ T#POVERTY(e5) ^ TS#POVERTY(e5) ^ S#DISEASE(x2)\n%%BEGIN_CM_LIST\nPOVERTY,POVERTY,POVERTY,DISEASE,DISEASE,0.85\n%%END_CM_LIST"
+         "isiAbductiveExplanation": "poverty-nn(e5,x2) ^ cure-vb(x1,x0,x2,u4) ^ person(e3,x0) ^ TS#POVERTY(x2) ^ T#ECONOMIC-INEQUALITY(_0) ^ S#DISEASE(x1) ^ SS#DISEASE%CURE(x1,x1) ^ R#CURE-AGENT(x0,x1) ^ I#DISEASE(_2) ^ I#DISEASE%CURE(x1,x1) ^ M#CAUSE-NOT-EXIST(_3) ^ M#CAUSING-THING_E(x0,_3) ^ M#CAUSE-NOT-EXIST(_4) ^ M#CAUSING-THING_E(x1,_4) ^ =(x1,x0) ^ =(_4,_3)\n%%BEGIN_CM_LIST\nPOVERTY,POVERTY,POVERTY,DISEASE,DISEASE,0.85\n%%END_CM_LIST"
       }
    ], 
    "language": "EN"
