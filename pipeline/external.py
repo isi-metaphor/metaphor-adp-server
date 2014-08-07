@@ -158,29 +158,41 @@ def filterParserOutput(parses,word2ids,sources,targets):
 	filtered={}
 	if sources and targets and parses and word2ids:
 		for key in parses:
+			allfound=False
 			toKeep=Set()
 			if key in sources and key in targets and key in word2ids:
+				allfound=True
 				wids=word2ids[key]
 				for w in sources[key].strip().split():
 					if w in wids:
 						toKeep.update(wids[w])
+					else:
+						allfound=False
+						break
 				for w in targets[key].strip().split():
 					if w in wids:
 						toKeep.update(wids[w])
-			if toKeep:
+					else:
+						allfound=False
+						break
+			if allfound and toKeep:
 				filtered[key]="(O (name "+str(key)+") (^ "
 				p=sexp.parse(parses[key])
 				o=p[0]
 				for p in o[2]:
 					pid=name(p[-1])
-					result=idPattern.match(pid)
-					try:
-						pid=int(result.group(1)) if result else None
-					except ValueError:
-						pid=None
-					pid=removeThousands(pid)
-					if not pid or pid in toKeep:
-						filtered[key]+=printLiteral(p)+" "
+					#print("pid: "+pid)
+					if not pid=='^':
+						result=idPattern.match(pid)
+						try:
+							pid=int(result.group(1)) if result else None
+						except ValueError:
+							pid=None
+						pid=removeThousands(pid)
+						#print("pid number: "+str(pid))
+						if not pid or pid in toKeep:
+							filtered[key]+=printLiteral(p)+" "
+					#print("filtered[key]: "+filtered[key])
 				filtered[key]+="))"
 	parser_output=""
 	if parses:
