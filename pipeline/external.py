@@ -276,7 +276,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
 				input_str = "<META>" + str(key) + "\n\n" + input_metaphors[key] + "\n\n"
 				logger.info("Processing metaphor " + str(metaphor_count))
 				logger.info("Running tokenizing command: '%s'." % tokenizer_proc)
-				logger.info("Input str: %r" % input_str))
+				logger.info("Input str: %r" % input_str)
 				task.log_error("Input str: %r" % input_str)
 				tokenizer_pipeline = Popen(tokenizer_proc,
 							env=ENV,
