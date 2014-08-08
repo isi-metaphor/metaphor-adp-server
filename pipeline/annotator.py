@@ -13,7 +13,7 @@ import subprocess
 import tempfile
 from lccsrv import paths
 from pipeline.models import TASK_STATUS
-
+import regex
 
 class Annotator(object):
 
@@ -30,6 +30,9 @@ class Annotator(object):
         if count_error:
             self.task.task_error_count += 1
         return self.task
+
+    def removePunctuation(self,string):
+        return regex.sub(ur"\p{P}+", "", string)
 
     def normalize(self,string,language):
         if language == "EN":
@@ -162,9 +165,9 @@ class Annotator(object):
                 if ams and len(ams)>0:
                     am=ams[0]
                 if am and "source" in am:
-                    sourcePhrases[str(annotation_id)]=self.normalize(am["source"],language).encode("utf-8")
+                    sourcePhrases[str(annotation_id)]=self.normalize(self.removePunctuation(am["source"]),language).encode("utf-8")
                 if am and "target" in am:
-                    targetPhrases[str(annotation_id)]=self.normalize(am["target"],language).encode("utf-8")
+                    targetPhrases[str(annotation_id)]=self.normalize(self.removePunctuation(am["target"]),language).encode("utf-8")
 
         self.logger.info("Task %d language=%s" % (self.task.id, language))
         self.task.language = language
