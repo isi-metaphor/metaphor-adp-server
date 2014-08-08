@@ -182,7 +182,7 @@ def filterParserOutput(parses,word2ids,sources,targets):
 									keepThisOne=True
 									break
 						if keepThisOne:
-							filtered[key]+=sexpdata.dumps(p)+" "
+							filtered[key]+=sexpdata.dumps(p).replace(": [",":[").encode("utf-8")
 					#print("filtered[key]: "+filtered[key])
 				filtered[key]+="))"
 	parser_output=""
