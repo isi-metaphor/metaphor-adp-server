@@ -17,7 +17,7 @@ import pexpect
 import re
 import imp
 from collections import defaultdict
-import sexp
+import sexpdata
 from sets import Set
 
 ENV = os.environ
@@ -130,28 +130,11 @@ def getWpos(tokenizer_output,language):
 					word2ids[words[i]].append(i+1)
 	return word2ids
 
-def name(o):
-	if type(o)==tuple:
-		return o[0]
-	else:
-		return str(o)
-
 def removeThousands(pid):
 	if pid and type(pid)==int:
 		while pid>999:
 			pid=pid-1000
 	return pid
-
-def printLiteral(l):
-	ret=""
-	t=type(l)
-	if t==list:
-		ret="("+" ".join(map(lambda x: printLiteral(x),l))+")"
-	elif t==tuple:
-		ret=name(l)
-        else:
-		ret=str(l)
-	return ret
 
 idPattern=re.compile("^.*\[([^\]]+)\].*$")
 def filterParserOutput(parses,word2ids,sources,targets):
@@ -177,21 +160,29 @@ def filterParserOutput(parses,word2ids,sources,targets):
 						break
 			if allfound and toKeep:
 				filtered[key]="(O (name "+str(key)+") (^ "
-				p=sexp.parse(parses[key])
-				o=p[0]
+				o=sexpdata.loads(parses[key])
 				for p in o[2]:
-					pid=name(p[-1])
-					#print("pid: "+pid)
-					if not pid=='^':
-						result=idPattern.match(pid)
-						try:
-							pid=int(result.group(1)) if result else None
-						except ValueError:
-							pid=None
-						pid=removeThousands(pid)
-						#print("pid number: "+str(pid))
-						if not pid or pid in toKeep:
-							filtered[key]+=printLiteral(p)+" "
+					if type(p)==list:
+						#print("p: "+str(p))
+						pidstring=sexpdata.dumps(p[-1])
+						#print("pidstring: "+pidstring)
+						result=idPattern.match(pidstring)
+						keepThisOne=True
+						if result:
+							keepThisOne=False
+							pids=result.group(1).split(",")
+							for pid in pids:
+								try:
+									pid=int(result.group(1)) if result else None
+									pid=removeThousands(pid)
+								except ValueError:
+									pid=None
+								#print("pid number: "+str(pid))
+								if not pid or pid in toKeep:
+									keepThisOne=True
+									break
+						if keepThisOne:
+							filtered[key]+=sexpdata.dumps(p)+" "
 					#print("filtered[key]: "+filtered[key])
 				filtered[key]+="))"
 	parser_output=""
