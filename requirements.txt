@@ -9,3 +9,5 @@ java (?)
 nginx
 aptitude
 simplejson (python mod)
+sexpdata
+regex
