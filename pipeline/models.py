@@ -22,7 +22,53 @@ class TASK_STATUS:
     PREPROCESSED      = 1
     PROCESSED         = 2
 
+class LogsDisplay(models.Model):
+    class Meta:
+	db_table = "light_t_tasks"
+    id                  = models.IntegerField(primary_key=True)
+    request_addr        = models.CharField(null=True, blank=True, max_length=16)
+    request_time        = models.DateTimeField(auto_now_add=True, null=False)
+    request_lang        = models.CharField(max_length=32, null=True)
+    response_time       = models.DateTimeField(null=True)
+    response_status     = models.IntegerField(null=False, default=500)
 
+    task_status         = models.SmallIntegerField(null=False, default=TASK_STATUS.DOCUMENT_RECEIVED)
+    task_error_count    = models.IntegerField(default=0, null=False)
+    task_error_code     = models.IntegerField(null=False, default=0)
+    
+    def status_str(self):
+        if self.task_status == TASK_STATUS.DOCUMENT_RECEIVED:
+            return "RECEIVED"
+        if self.task_status == TASK_STATUS.PREPROCESSED:
+            return "PREPROCESSED"
+        if self.task_status == TASK_STATUS.PROCESSED:
+            return "PROCESSED"
+        return "UNKNOWN"
+    def error_code_str(self):
+        if self.task_error_code == 0:
+            return "OK"
+        if self.task_error_code == 1:
+            return "SERVER_ERR"
+        if self.task_error_code == 3:
+            return "NO_LANG_ERR"
+        if self.task_error_code == 4:
+            return "NO_ANNO_ERR"
+        if self.task_error_code == 6:
+            return "NO_META_ERR"
+        return "UNKNOWN"
+
+    def fill_table(self, task):
+	self.id = task.id
+	self.request_addr = task.request_addr
+	self.request_time = task.request_time
+	self.request_lang = task.request_lang
+	self.response_time = task.response_time
+	self.response_status = task.response_status
+	self.task_status = task.task_status
+	self.task_error_count = task.task_error_count
+	self.error_code = task.task_error_code
+	self.save()
+    
 class AnnotationTask(models.Model):
 
     class Meta:
@@ -128,7 +174,8 @@ class AnnotationTask(models.Model):
 
     @henry_out.setter
     def henry_out(self, value):
-        self.henry_out_blob = lz4.compressHC(value)
+	self.henry_out_blob = lz4.compressHC(value)
+	
 
     @property
     def parse_out(self):

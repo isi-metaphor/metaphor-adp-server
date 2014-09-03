@@ -33,7 +33,7 @@ from django.views.decorators.csrf import csrf_exempt
 from lccsrv import paths
 from lccsrv import settings
 
-from pipeline.models import AnnotationTask
+from pipeline.models import AnnotationTask, LogsDisplay
 from pipeline.annotator import Annotator
 
 
@@ -87,7 +87,7 @@ def app_logs(request):
 
     page_size = 30
     page_num = request.GET.get("page", "1")
-    items = AnnotationTask.objects.order_by("-request_time")
+    items = LogsDisplay.objects.order_by("-request_time")
     pages = Paginator(items, page_size)
 
     try:
@@ -199,6 +199,9 @@ def run_pipeline(request):
 
         try:
             response = task.to_response(save=True, enable_debug=debug_option)
+	    logsDisplay = LogsDisplay()
+	    logsDisplay.fill_table(task)
+	    
             return response
         except Exception:
             msg="Error 2 while saving failed task. Traceback: %s" % traceback.format_exc()
