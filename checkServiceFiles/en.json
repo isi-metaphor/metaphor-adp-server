@@ -1,0 +1,12 @@
+{
+  "step": 3,
+  "kb": "KBs/English/English_compiled_KB.da",
+  "language": "EN",
+  "enableDebug": false,
+  "metaphorAnnotationRecords": [
+    {
+      "sentenceId": 1,
+      "linguisticMetaphor": "we should cure poverty"
+    }
+  ]
+}

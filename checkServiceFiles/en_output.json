@@ -1,0 +1,11 @@
+{
+   "metaphorAnnotationRecords": [
+      {
+         "linguisticMetaphor": "we should cure poverty", 
+         "sentenceId": 1, 
+         "isiDescription": "Abductive engine output; targetFrame: Is currently equal to targetConceptSubDomain;targetConceptDomain: Target concept domain defined by abduction; targetConceptSubDomain: Target concept subdomain defined by abduction ; sourceFrame: Source frame proposed by abduction ; sourceConceptSubDomain: Source subdomain proposed by abduction ; targetFrameElementSentence: List of words denoting the target found by abduction; sourceFrameElementSentence: List of words denoting the source found by abduction; annotationMappings: Target-Source mapping structures. isiAbductiveExplanation: Target-Source mapping (metaphor interpretation) as logical form found by abduction.", 
+         "isiAbductiveExplanation": "poverty-nn(e5,x2) ^ cure-vb(x1,x0,x2,u4) ^ person(e3,x0) ^ TS#POVERTY(e5)\n%%BEGIN_CM_LIST\n%%END_CM_LIST"
+      }
+   ], 
+   "language": "EN"
+}

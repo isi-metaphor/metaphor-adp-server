@@ -78,6 +78,42 @@ def strcut(some_str, max_size=120):
         return some_str
     return "<NONE>"
 
+def getARFieldForId(jsonRequest,id,source):
+    #print(json.dumps(jsonRequest, encoding="utf-8", indent=4))
+    if jsonRequest and "metaphorAnnotationRecords" in jsonRequest:
+        sentences=jsonRequest["metaphorAnnotationRecords"]
+        for sentence in sentences:
+            if sentence and (("sentenceId" in sentence and str(sentence["sentenceId"]) == str(id)) or
+                             ("id" in sentence and str(sentence["id"]) == str(id))):
+                if sentence and 'annotationMappings' in sentence and len(sentence['annotationMappings'])>0:
+                    sta=sentence["annotationMappings"][0]
+                    if sta and source in sta:
+                        return sta[source]
+    return None
+def getLMforId(jsonRequest,id):
+    #print(json.dumps(jsonRequest, encoding="utf-8", indent=4))
+    if jsonRequest and "metaphorAnnotationRecords" in jsonRequest:
+        sentences=jsonRequest["metaphorAnnotationRecords"]
+        for sentence in sentences:
+            if sentence and (("sentenceId" in sentence and str(sentence["sentenceId"]) == str(id)) or
+                             ("id" in sentence and str(sentence["id"]) == str(id))):
+                if sentence and "linguisticMetaphor" in sentence:
+                    return sentence["linguisticMetaphor"]
+    return None
+
+def useSpan(parses,jsonRequest):
+    c=""
+    for id in parses:
+        source=getARFieldForId(jsonRequest,id,"source")
+        target=getARFieldForId(jsonRequest,id,"target")
+        lm=getLMforId(jsonRequest,id)
+        print("##########################22222222222222")
+        print(id)
+        print(source)
+        print(target)
+        c=c+parses[id]
+        c=c+"\n"
+    return c
 
 def run_annotation(request_body_dict, input_metaphors, language, task, logger, with_pdf_content, last_step=3, kb=None):
     start_time = time.time()
@@ -182,6 +218,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
                      time_unit_henry
 
     logger.info("Running Henry command: '%s'." % henry_proc)
+    #parser_output=useSpan(parses,request_body_dict)
     henry_pipeline = Popen(henry_proc,
                            env=ENV,
                            shell=True,
@@ -222,6 +259,9 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
             sID = str(annotation["sentenceId"])
             if sID in hkeys:
                 CM_output = extract_CM_mapping(sID, hypotheses[sID], parses[sID], DESCRIPTION, annotation)
+                msg="Sentence #%s has interpretation #%s" % (sID,CM_output['isiAbductiveExplanation'])
+                logger.info(msg)
+                task.log_error(msg)
                 try:
                     for annot_property in CM_output.keys():
                         if CM_output.get(annot_property):
@@ -243,8 +283,80 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
                 task.log_error(error_msg)
                 task.log_error("Failed annotation: %s" % str(annotation))
                 task.task_error_count += 1
+    task.log_error("Parser output: \n%r" % parser_output)
 
-    request_body_dict["kb"] = KBPATH
+    answer=dict()
+    count=0
+    for annotation in input_annotations:
+        if u"sentenceId" in annotation:
+            sID = str(annotation["sentenceId"])
+            if sID in hkeys:
+                count=count+1
+                exp = str(annotation["isiAbductiveExplanation"])
+                lines=exp.split('\n');
+                start=False
+                for line in lines:
+                    if line == "%%BEGIN_CM_LIST":
+                        start=True
+                    elif line == "%%END_CM_LIST":
+                        start=False
+                    elif start:
+                        r=line.split(',')
+                        if len(r) == 6:
+                            key=",".join(r[0:5])
+                            value=float(r[5])
+                            if key in answer:
+                                answer[key]=answer[key]+value
+                            else:
+                                answer[key]=value
+    msg="number of sentences: %d" % count
+    logger.info(msg)
+    task.log_error(msg)
+    msg="raw cumulative result: %r" % answer
+    logger.info(msg)
+    task.log_error(msg)
+    for key in answer:
+        answer[key]=answer[key]/count
+    best=-1
+    bestkey=''
+    if answer:
+        for key in answer:
+            if answer[key]>=best:
+                best=answer[key]
+                bestkey=key
+        msg="best: %s,%s" % (bestkey,best)
+        logger.info(msg)
+        task.log_error(msg)
+        for annotation in input_annotations:
+            if u"isiAbductiveExplanation" in annotation:
+                exp = str(annotation["isiAbductiveExplanation"])
+                start=-1
+                end=-1
+                lines=exp.split('\n');
+                for idx, line in enumerate(lines):
+                    if line == "%%BEGIN_CM_LIST":
+                        start=idx
+                    elif line == "%%END_CM_LIST":
+                        end=idx
+                        break
+                if start>=0 and end>=0:
+                    exp="\n".join(lines[0:start+1]+[bestkey+","+`best`]+[lines[end]])
+                else:
+                    exp=exp+"\n"+"%%BEGIN_CM_LIST"+"\n"+bestkey+","+`best`+"\n"+"%%END_CM_LIST"
+                msg="changing interpretation from:\n%s\n to:\n%s" % (annotation["isiAbductiveExplanation"],exp)
+                logger.info(msg)
+                task.log_error(msg)
+                annotation["isiAbductiveExplanation"]=exp
+
+    #request_body_dict["kb"] = KBPATH
+    if "kb" in request_body_dict:
+        del request_body_dict["kb"];
+    if "step" in request_body_dict:
+        del request_body_dict["step"];
+    if "task_id" in request_body_dict:
+        request_body_dict["task_id"]=task.id
+    if "enableDebug" in request_body_dict:
+        del request_body_dict["enableDebug"];
     result = json.dumps(request_body_dict, encoding="utf-8", indent=4)
 
     logger.info("Processed: %d." % processed)

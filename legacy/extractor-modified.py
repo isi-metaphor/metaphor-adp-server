@@ -77,7 +77,7 @@ def createDStruc(superD,subD):
 			if subD:
 				for subd in subD:
 					for subArgs in subD[subd]:
-						if len(subArgs)>1 and superArgs[0]==subArgs[1]:
+						if len(subArgs)>0: # and superArgs[0]==subArgs[1]:
 							outputstrucs[superd][superArgs[0]].append((subd,subArgs[0]))
 			else:
 				outputstrucs[superd][superArgs[0]].append(('',superArgs[0]))
@@ -240,13 +240,13 @@ def extract_CM_mapping(sid,inputString,parse,DESCRIPTION,LCCannotation):
 					otherArgs[a]|=uargs
 					
 
-	#print json.dumps(targets, ensure_ascii=False)
-	#print json.dumps(subtargets, ensure_ascii=False)
-	#print json.dumps(sources, ensure_ascii=False)
-	#print json.dumps(subsources, ensure_ascii=False)
-	#print json.dumps(word_props, ensure_ascii=False)
-	#print json.dumps(mappings, ensure_ascii=False)
-	#print(json.dumps(equalities, ensure_ascii=False))
+	#print("DOMAINS: "+json.dumps(targets, ensure_ascii=False))
+	#print("TARGETS: "+json.dumps(subtargets, ensure_ascii=False))
+	#print("SOURCES: "+json.dumps(sources, ensure_ascii=False))
+	#print("SUBSOURCES: "+json.dumps(subsources, ensure_ascii=False))
+	#print("WORDs AND ARGS: "+json.dumps(word_props, ensure_ascii=False))
+	#print("MAPPINGS: "+json.dumps(mappings, ensure_ascii=False))
+	#print("EQs: "+json.dumps(equalities, ensure_ascii=False))
 
 	# transitive closure of equalities
 	equalities = transitive_closure(equalities)
@@ -254,8 +254,8 @@ def extract_CM_mapping(sid,inputString,parse,DESCRIPTION,LCCannotation):
 	target_strucs = createDStruc(subtargets,subsubtargets)
 	source_strucs = createDStruc(sources,subsources)
 
-	#print json.dumps(target_strucs, ensure_ascii=False)
-	#print json.dumps(source_strucs, ensure_ascii=False)
+	print("SOURCES_STRUCT: "+json.dumps(target_strucs, ensure_ascii=False))
+	print("TARGETS_STRUCT: "+json.dumps(source_strucs, ensure_ascii=False))
 
 	#print json.dumps(equalities, ensure_ascii=False)
 	#exit(0)
@@ -293,40 +293,44 @@ def extract_CM_mapping(sid,inputString,parse,DESCRIPTION,LCCannotation):
 		bestSVars = []
 		for sourceS in source_strucs:
 			for sarg in source_strucs[sourceS]:
-				for (ssubS,ssarg) in source_strucs[sourceS][sarg]:
-					sargs = [ssarg]
-					sargs += equalities[ssarg].keys()
-					link = -1
-					print (sourceS,ssubS,sargs)
-					link=test(Set(tV),Set(sargs),equalities,otherArgs)
-					print(link)
-					#for tv in tV:
-					#	for sv in sargs:
-					#		newlink = isLinkedbyParse(tv,sv,word_props,equalities,[],0)
-					#		#printerr(targetS,sourceS,ssubS,tv,sv,newlink)
-					#		if newlink<link:
-					#			link=newlink
-					#			if newlink<2:
-					#				break
-					#	if link<2: break
-					Sdomains.append((sourceS,ssubS,(1-0.05-0.1*link)))
-					#print "%s,%s,%s" % (sourceS,ssubS,(1-0.05-0.1*link))
-					#exit(0)
+                                sargs=[]
+                                sargs.append(sarg)
+                                sargs.extend(equalities[sarg].keys())
+                                ssubS=sourceS
+				#for (ssubS,ssarg) in source_strucs[sourceS][sarg]:
+                                #sargs = [ssarg]
+                                #sargs += equalities[ssarg].keys()
+                                link = -1
+                                print (sourceS,tV,sargs)
+                                link=test(Set(tV),Set(sargs),equalities,otherArgs)
+                                print(link)
+                                #for tv in tV:
+                                #	for sv in sargs:
+                                #		newlink = isLinkedbyParse(tv,sv,word_props,equalities,[],0)
+                                #		#printerr(targetS,sourceS,ssubS,tv,sv,newlink)
+                                #		if newlink<link:
+                                #			link=newlink
+                                #			if newlink<2:
+                                #				break
+                                #	if link<2: break
+                                Sdomains.append((sourceS,ssubS,(1-0.05-0.1*link)))
+                                #print "%s,%s,%s" % (sourceS,ssubS,(1-0.05-0.1*link))
+                                #exit(0)
 
-					#for domain in targets:
-					for (t,ts) in Tdomains:
-						domain=t
-						for (s,ss,c) in Sdomains:
-								#explanationAppendix += "ECONOMIC_INEQUALITY,%s,%s,%s,%s,%s\n" % (t,ts,s,ss,c)
+                                #for domain in targets:
+                                for (t,ts) in Tdomains:
+                                        domain=t
+                                        for (s,ss,c) in Sdomains:
+                                                        #explanationAppendix += "ECONOMIC_INEQUALITY,%s,%s,%s,%s,%s\n" % (t,ts,s,ss,c)
 
-								TSpair = "%s,%s,%s,%s,%s" % (domain,t,ts,s,ss)
-								if CMs.has_key(TSpair):
-									if CMs[TSpair] < c: CMs[TSpair] = c
-								else: CMs[TSpair] = c
+                                                        TSpair = "%s,%s,%s,%s,%s" % (domain,t,ts,s,ss)
+                                                        if CMs.has_key(TSpair):
+                                                                if CMs[TSpair] < c: CMs[TSpair] = c
+                                                        else: CMs[TSpair] = c
 
-								if c>bestlink:
-									bestlink = c
-									bestCM = "%s,%s,%s,%s,%s" % (domain,t,ts,s,ss)
+                                                        if c>bestlink:
+                                                                bestlink = c
+                                                                bestCM = "%s,%s,%s,%s,%s" % (domain,t,ts,s,ss)
 
 	#print 'BEST: ' + bestCM
 	#exit(0)

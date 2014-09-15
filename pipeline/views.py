@@ -162,23 +162,25 @@ def user_logout(request):
 def run_pipeline(request):
 
     if request.method == "POST":
-
+        last_msg=""
         try:
             task = AnnotationTask(request_addr=request.META.get("REMOTE_ADDR"))
             task.request_body = request.body
             task.save()
             logger.info("Task created. Id=%d." % task.id)
         except Exception:
-            msg = "Cannot create tack."
-            logger.error(msg + " Traceback: %s" % traceback.format_exc())
+            msg = "Cannot create task. Traceback: %s" % traceback.format_exc()
+            last_msg=msg
+            logger.error(msg)
             return HttpResponse(msg, status=500)
 
         try:
             pipeline = Annotator(logger, task)
             logger.info("Pipeline initialized")
         except Exception:
-            msg = "Cannot initialize pipeline."
-            logger.error(msg + " Traceback: %s" % traceback.format_exc())
+            msg = "Cannot initialize pipeline. Traceback: %s" % traceback.format_exc()
+            last_msg=msg
+            logger.error(msg)
             return HttpResponse(msg, status=500)
 
         try:
@@ -186,19 +188,24 @@ def run_pipeline(request):
         except Exception:
             debug_option = False
             msg = "Error while annotating document. Traceback:\n%s." % traceback.format_exc()
+            last_msg=msg
             logger.error(msg)
             try:
                 task.log_error(msg)
             except Exception:
-                logger.error("Error while saving failed task. Traceback: %s" % traceback.format_exc())
+                msg="Error 1 while saving failed task. Traceback: %s" % traceback.format_exc()
+                last_msg=msg
+                logger.error(msg)
 
         try:
             response = task.to_response(save=True, enable_debug=debug_option)
             return response
         except Exception:
-            logger.error("Error while saving failed task. Traceback: %s" % traceback.format_exc())
+            msg="Error 2 while saving failed task. Traceback: %s" % traceback.format_exc()
+            last_msg=msg
+            logger.error(msg)
 
-        return HttpResponse("", status=500)
+        return HttpResponse(last_msg, status=500)
 
     else:
         return HttpResponse("<b>Error: use POST method to submit query file.</b>",

@@ -12,7 +12,7 @@ import pipeline.external as adb
 
 from lccsrv import paths
 from pipeline.models import TASK_STATUS
-import regex
+
 
 class Annotator(object):
 
@@ -30,29 +30,6 @@ class Annotator(object):
             self.task.task_error_count += 1
         return self.task
 
-    def removePunctuation(self,string):
-        return regex.sub(ur"\p{P}+", "", string)
-
-    def normalize(self,string,language):
-        if language == "EN":
-            # Replacing single quote, double quote (start/end), dash
-            ascii_metaphor = string.replace(u"\u2019", u"\u0027")\
-                .replace(u"\u201c", u"\u0022")\
-                .replace(u"\u201d", u"\u0022")\
-                .replace(u"\u2014", u"\u002d")
-            return ascii_metaphor
-        else:
-            return string
-
-    def forceSpans(self,metaphors,sourcePhrases,targetPhrases):
-        if metaphors and sourcePhrases and targetPhrases:
-            for sid in metaphors:
-                if sid in sourcePhrases and sid in targetPhrases:
-                    metaphors[sid]=sourcePhrases[sid]+" "+targetPhrases[sid]
-                    log_msg = "changed metaphor "+sid+" to span only: '"+sourcePhrases[sid]+"' and '"+targetPhrases[sid]+"'"
-                    self.logger.info(log_msg)
-                    self.task.log_error(log_msg)
-
     def annotate(self):
 
         # 1.
@@ -60,8 +37,6 @@ class Annotator(object):
         self.logger.info(log_msg)
         self.task.log_error(log_msg)
         metaphors = {}
-        sourcePhrases={}
-        targetPhrases={}
         request_document_body = self.task.request_body
 
 
@@ -141,23 +116,25 @@ class Annotator(object):
             # 5.2
             try:
                 metaphor = annotation["linguisticMetaphor"]
-                metaphors[str(annotation_id)]=self.normalize(metaphor,language).encode("utf-8")
+                if language == "EN":
+                    # Replacing single quote, double quote (start/end), dash
+                    ascii_metaphor = metaphor.replace(u"\u2019", u"\u0027")\
+                                             .replace(u"\u201c", u"\u0022")\
+                                             .replace(u"\u201d", u"\u0022")\
+                                             .replace(u"\u2014", u"\u002d")
+
+                    metaphors[str(annotation_id)] = ascii_metaphor.encode("utf-8")
+
+                else:
+
+                    metaphors[str(annotation_id)] = metaphor.encode("utf-8")
+
             except KeyError:
                 error_msg = "Ann #%d. No metaphor available (skip it). Task=%d" % (
                     annotation_no,
                     self.task.id,
                 )
                 self.task_error(error_msg, error_code=None, count_error=True)
-            if "annotationMappings" in annotation:
-                ams=annotation["annotationMappings"]
-                am=None
-                if ams and len(ams)>0:
-                    am=ams[0]
-                if am and "source" in am:
-                    sourcePhrases[str(annotation_id)]=self.normalize(self.removePunctuation(am["source"]),language).encode("utf-8")
-                if am and "target" in am:
-                    targetPhrases[str(annotation_id)]=self.normalize(self.removePunctuation(am["target"]),language).encode("utf-8")
-
 
         self.logger.info("Task %d language=%s" % (self.task.id, language))
         self.task.language = language
@@ -168,7 +145,7 @@ class Annotator(object):
         if len(metaphors) == 0:
             error_msg = "Found 0 metaphors for annotation. Task id=#%d."
             return self.task_error(error_msg, 6)
-        self.forceSpans(metaphors,sourcePhrases,targetPhrases)
+
         result = adb.run_annotation(request_document,
                                     metaphors,
                                     language,

@@ -12,7 +12,7 @@ import pipeline.external as adb
 
 from lccsrv import paths
 from pipeline.models import TASK_STATUS
-import regex
+
 
 class Annotator(object):
 
@@ -44,7 +44,7 @@ class Annotator(object):
         else:
             return string
 
-    def forceSpans(self,metaphors,sourcePhrases,targetPhrases):
+    def forceSpans(metaphors,sourcePhrases,targetPhrases):
         if metaphors and sourcePhrases and targetPhrases:
             for sid in metaphors:
                 if sid in sourcePhrases and sid in targetPhrases:

@@ -1,0 +1,15 @@
+{
+   "metaphorAnnotationRecords": [
+      {
+         "sentenceId": 1, 
+         "linguisticMetaphor": "La iniciativa de reforma hacendaria del presidente Enrique Pe\u00f1a Nieto no lastima la clase media, sino que salva a millones de caer en las filas de la pobreza, defendi\u00f3 este lunes la secretaria de Desarrollo Social (Sedesol), Rosario Robles Berlanga.", 
+         "targetConceptSubDomain": "POVERTY", 
+         "targetConceptDomain": "POVERTY", 
+         "sourceConceptSubDomain": "ENTRANCE", 
+         "isiDescription": "Abductive engine output; targetFrame: Is currently equal to targetConceptSubDomain;targetConceptDomain: Target concept domain defined by abduction; targetConceptSubDomain: Target concept subdomain defined by abduction ; sourceFrame: Source frame proposed by abduction ; sourceConceptSubDomain: Source subdomain proposed by abduction ; targetFrameElementSentence: List of words denoting the target found by abduction; sourceFrameElementSentence: List of words denoting the source found by abduction; annotationMappings: Target-Source mapping structures. isiAbductiveExplanation: Target-Source mapping (metaphor interpretation) as logical form found by abduction.", 
+         "sourceFrame": "ABYSS", 
+         "isiAbductiveExplanation": "iniciativa-nn(e1,x1) ^ de-in(e2,x1,x2) ^ reforma-nn(e3,x2) ^ hacendaria-adj(e4,x2) ^ del-in(e5,x2,x3) ^ presidente-nn(e6,x3) ^ enrique-nn(e7,x4) ^ pe\u00f1a-nn(e8,x5) ^ nieto-nn(e9,x6) ^ not(e10,e11) ^ lastimar-vb(e11,x1,x7,u9) ^ clase-nn(e12,x7) ^ medio-adj(e13,x7) ^ sino-in(e14,e11,u12) ^ salvar-vb(e15,x1,u14,u15) ^ a-in(e16,e15,e17) ^ card(e17,u18,millones) ^ de-in(e18,u19,e19) ^ caer-vb(e19,u21,u22,u23) ^ en-in(e20,e19,x8) ^ fila-nn(e21,x8) ^ de-in(e22,x8,x9) ^ pobreza-nn(e23,x9) ^ defender-vb(e24,x11,u29,u30) ^ lunes-nn(e25,x10) ^ secretario-nn(e26,x11) ^ de-in(e27,x11,x12) ^ desarrollo-nn(e28,x12) ^ social-nn(e29,x13) ^ sedesol-nn(e30,x14) ^ rosario-nn(e31,x15) ^ robles-nn(e32,x16) ^ berlanga-nn(e33,x17) ^ !=(e2,e18,e22,e27) ^ TS#GOVERNMENT(e3) ^ S#PHYSICAL_HARM(e11) ^ SS#PHYSICAL_HARM%TYPE(e11,e11) ^ R#HARM-VICTIM(x7,e11) ^ R#HARM-AGENT(x1,e11) ^ TS#WEALTH(e12) ^ TS#WEALTH(e12) ^ TS#POVERTY(e16) ^ R#RICH(e19,e12) ^ S#ABYSS(e19) ^ SS#ABYSS%ENTRANCE(e19,e19) ^ R#ABYSS-THEME(u21,e19) ^ R#RICH(x9,e12) ^ TS#POVERTY(e23) ^ R#RICH(x12,e12) ^ S#RESOURCE(e28) ^ S#ABYSS(e19) ^ SS#ABYSS%ENTRANCE(e19,e19) ^ R#ABYSS-THEME(u22,_5) ^ R#ABYSS-CAUSE(u21,_5) ^ =(u21,u22) ^ =(e13,x8,u19,e23,e16,e12,x11) ^ =(_5,x9,e19,x12)\n%%BEGIN_CM_LIST\nPOVERTY,POVERTY,POVERTY,ABYSS,ABYSS,0.85\n%%END_CM_LIST"
+      }
+   ], 
+   "language": "ES"
+}
