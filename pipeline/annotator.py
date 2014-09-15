@@ -205,9 +205,6 @@ class Annotator(object):
 	if henry_time != "Absent":
 		request_document["henry_time"] = ""
 	# 11 used to indicate whether to use the input metaphor or just the parser output
-	parser_output = request_document.get("parser_output", "Absent")
-	if parser_output != "Absent":
-		request_document["parser_output"] = parser_output 
         result = adb.run_annotation(request_document,
                                     metaphors,
                                     language,

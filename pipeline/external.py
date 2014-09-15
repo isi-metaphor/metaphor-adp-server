@@ -220,7 +220,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
 	# Parser pipeline
 	
 	if language == "FA":
-		tokenizer_proc = os.path.join(METAPHOR_DIR, "pipelines/Farsi/LF_Pipeline")
+		tokenizer_proc = os.path.join(METAPHOR_DIR, "pipelines/Farsi/pre-parser")
 		MALT_PARSER_DIR = os.path.join(METAPHOR_DIR, "external-tools/malt-1.5")
 		parser_proc = "java -cp " + MALT_PARSER_DIR + "/dist/malt/malt.jar:" + MALT_PARSER_DIR + " maltParserWrap_FA"
 		createLF_proc = os.path.join(METAPHOR_DIR, "pipelines/Farsi/createLF")
@@ -232,10 +232,10 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
 			KBPATH = kb
 		
 	elif language == "ES":
-		tokenizer_proc = SPANISH_PIPELINE 
+		tokenizer_proc = os.path.join(METAPHOR_DIR, "pipelines/Spanish/pre-parser") 
 		MALT_PARSER_DIR = os.path.join(METAPHOR_DIR, "external-tools/maltparser-1.7.2") 
 		parser_proc = "java -cp " + MALT_PARSER_DIR + "/maltparser-1.7.2.jar:" + MALT_PARSER_DIR + " maltParserWrap_ES" 
-		createLF_proc =  METAPHOR_DIR + "/pipelines/Spanish/create_LF"
+		createLF_proc =  METAPHOR_DIR + "/pipelines/Spanish/createLF"
 		parser_output_append = ""
 		b2h_proc = "python " + PARSER2HENRY + " --nonmerge sameid freqpred"
 		if kb is None:
@@ -244,11 +244,11 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
 			KBPATH = kb
 		
 	elif language == "RU":
-		tokenizer_proc = os.path.join(METAPHOR_DIR, "pipelines/Russian/run_russian.sh")
+		tokenizer_proc = os.path.join(METAPHOR_DIR, "pipelines/Russian/pre-parser")
 		MALT_PARSER_DIR = os.path.join(METAPHOR_DIR, "external-tools/malt-1.5")
 		RU_PARSER_DIR = os.path.join(METAPHOR_DIR, "external-tools/malt-ru")
 		parser_proc = "java -cp " + MALT_PARSER_DIR + "/dist/malt/malt.jar:" + RU_PARSER_DIR + " maltParserWrap_RU"
-		createLF_proc = os.path.join(METAPHOR_DIR, "pipelines/Russian/create_LF")
+		createLF_proc = os.path.join(METAPHOR_DIR, "pipelines/Russian/createLF")
 		parser_output_append = ""
 		b2h_proc = "python " + PARSER2HENRY + " --nonmerge sameid freqpred"
 		if kb is None:
@@ -268,14 +268,16 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
 			KBPATH = kb
 	
 	parser_start_time = time.time()
+	annotations = request_body_dict["metaphorAnnotationRecords"]
 	while True:
-		if "parser_output" in request_body_dict and request_body_dict["parser_output"] != "":
-			createLF_output = request_body_dict["parser_output"].encode("utf-8")
-			break
 		if getParserLock(language):
 			setParserLock(language, False)
 			for key in input_metaphors.keys():
 				metaphor_count += 1
+				if "parser_output" in annotations[metaphor_count - 1] and annotations[metaphor_count - 1]["parser_output"] != "":
+					createLF_output += annotations[metaphor_count - 1]["parser_output"]
+					continue
+					
 				input_str = "<META>" + str(key) + "\n\n" + input_metaphors[key] + "\n\n"
 				logger.info("Processing metaphor " + str(metaphor_count))
 				logger.info("Running tokenizing command: '%s'." % tokenizer_proc)
@@ -359,6 +361,8 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
 							stderr=None,
 							close_fds=True)
 				createLF_output_temp, createLF_stderr_temp = createLF_pipeline.communicate(input=parser_output_inter)
+				if "parser_output" in annotations[metaphor_count-1]:
+					annotations[metaphor_count-1]["parser_output"] = createLF_output_temp
 				createLF_output += createLF_output_temp
 			setParserLock(language, True)
 			break
@@ -366,10 +370,6 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
 	parser_end_time = time.time()
 	logger.info("createLF output:\n%r" % createLF_output)
 	task.log_error("createLF output:\n%r" % createLF_output)
-	if last_step == 1:
-		return createLF_output
-	if "parser_output" in request_body_dict:
-		request_body_dict["parser_output"] = createLF_output
 	if "parser_time" in request_body_dict:
 		request_body_dict["parser_time"] = str((parser_end_time-parser_start_time))
 	logger.info("Running boxer-2-henry command: '%s'." % b2h_proc)
@@ -385,11 +385,14 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
 	logger.info("B2H output:\n%s\n" % parser_output)
 	task.log_error("B2H output: \n%r" % parser_output)
 	task.parse_out = parser_output
-	
 	# Parser processing time in seconds
 	parser_time = (time.time() - start_time) * 0.001
 	logger.info("Command finished. Processing time: %r." % parser_time)
-	henry_start_time = time.time()
+	if last_step == 1:
+                task.henry_out = " "
+                task.dot_out = " "
+                result = json.dumps(request_body_dict, encoding="utf-8", indent=4)
+                return result
 
 	parses = extract_parses(parser_output)
 	logger.info("Parses:\n%r\n" % parses)
@@ -400,9 +403,10 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
 	task.log_error(msg)
 	parser_output=filterParserOutput(parses,word2ids,sources,targets)
 	msg="final parser output: \n"+parser_output
+
 	logger.info(msg)
 	task.log_error(msg)
-	
+	henry_start_time = time.time()
 
 	# time to generate final output in seconds
 	generate_output_time = 2
@@ -569,7 +573,6 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
 	if "enableDebug" in request_body_dict:
 		del request_body_dict["enableDebug"];
 	result = json.dumps(request_body_dict, encoding="utf-8", indent=4)
-
 	logger.info("Processed: %d." % processed)
 	logger.info("Failed: %d." % failed)
 	logger.info("Total: %d." % total)
