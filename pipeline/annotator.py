@@ -159,15 +159,15 @@ class Annotator(object):
                     self.task.id,
                 )
                 self.task_error(error_msg, error_code=None, count_error=True)
+            am=annotation
             if "annotationMappings" in annotation:
                 ams=annotation["annotationMappings"]
-                am=None
                 if ams and len(ams)>0:
                     am=ams[0]
-                if am and "source" in am:
-                    sourcePhrases[str(annotation_id)]=self.normalize(self.removePunctuation(am["source"]),language).encode("utf-8")
-                if am and "target" in am:
-                    targetPhrases[str(annotation_id)]=self.normalize(self.removePunctuation(am["target"]),language).encode("utf-8")
+            if am and "source" in am:
+                sourcePhrases[str(annotation_id)]=self.normalize(self.removePunctuation(am["source"]),language).encode("utf-8")
+            if am and "target" in am:
+                targetPhrases[str(annotation_id)]=self.normalize(self.removePunctuation(am["target"]),language).encode("utf-8")
 
         self.logger.info("Task %d language=%s" % (self.task.id, language))
         self.task.language = language
