@@ -194,6 +194,17 @@ def filterParserOutput(parses,word2ids,sources,targets):
 				parser_output+=parses[key]+"\n"
 	return parser_output
 
+def needToGenerateGraph(dograph):
+	if dograph == "NOGRAPH":
+		return False
+	elif dograph == "SOLUTION":
+		return True
+	elif dograph == "ALL":
+		return True
+	elif dograph == True:
+		return True
+	return False
+
 child = {'FA':"",'ES':"",'RU':"",'EN':""}
 expectChild = {'FA': FAexpect, 'ES': ESexpect, 'RU': RUexpect, 'EN': ENexpect}
 def run_annotation(request_body_dict, input_metaphors, language, task, logger, with_pdf_content, last_step=3, kb=None,depth='3', extractor=None,
@@ -414,7 +425,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
 	# time left for Henry in seconds
 	time_all_henry = 122 - generate_output_time
 
-	if with_pdf_content:
+	if needToGenerateGraph(with_pdf_content):
 		# time for graph generation subtracted from Henry time in seconds
 		time_all_henry -= - 3
 
@@ -459,11 +470,11 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
 	input_annotations = request_body_dict["metaphorAnnotationRecords"]
 
 
-	if with_pdf_content:
+	if needToGenerateGraph(with_pdf_content):
 		logger.info("Generating proofgraphs.")
 		unique_id = get_unique_id()
 		logger.info("unique id: %s\n" % unique_id) 
-		proofgraphs = generate_graph(input_metaphors, henry_output, unique_id)
+		proofgraphs = generate_graph(input_metaphors, henry_output, unique_id,with_pdf_content)
 		task.dot_out = proofgraphs
 
 	logger.info("Input annotations count:\n%r\n" % len(input_annotations))
@@ -566,12 +577,16 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
 				annotation["isiAbductiveExplanation"]=exp
 
 	#request_body_dict["kb"] = KBPATH
+	#removes json fields that can be added by the code. (compliance with lcc json format)
 	if "kb" in request_body_dict:
 		del request_body_dict["kb"];
 	if "step" in request_body_dict:
 		del request_body_dict["step"];
 	if "enableDebug" in request_body_dict:
 		del request_body_dict["enableDebug"];
+	#task_id contains the id used to access the log entry for thsi request.
+	if "task_id" in request_body_dict:
+		request_body_dict["task_id"]=task.id
 	result = json.dumps(request_body_dict, encoding="utf-8", indent=4)
 	logger.info("Processed: %d." % processed)
 	logger.info("Failed: %d." % failed)
@@ -582,7 +597,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
 
 
 
-def generate_graph(input_dict, henry_output, unique_id):
+def generate_graph(input_dict, henry_output, unique_id,graphtype):
 
 	# create proofgraphs directory if it doesn't exist
 	graph_dir = TMP_DIR + "/proofgraphs"
@@ -596,8 +611,10 @@ def generate_graph(input_dict, henry_output, unique_id):
 		print "Generating a proofgraph for " + key
 		graph_output = os.path.join(graph_dir, unique_id + "_" + key + ".pdf")
 
-		viz = "python " + HENRY_DIR + "/tools/proofgraph.py --graph " + key + \
-			  " | dot -T png > " + graph_output
+		if graphtype=="ALL":
+			viz = "python " + HENRY_DIR + "/tools/proofgraph.py --potential --graph " + key + " | dot -T png > " + graph_output
+		else:
+			viz = "python " + HENRY_DIR + "/tools/proofgraph.py --graph " + key + " | dot -T png > " + graph_output
 
 		graphical_processing = Popen(viz, shell=True, stdin=PIPE, stdout=PIPE,
 									 stderr=None, close_fds=True)
