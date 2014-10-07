@@ -7,7 +7,7 @@ checkout the README.pdf file for further instructions.
 mkdir installation-dir
 cd installation-dir
 git clone https://github.com/isi-metaphor/Metaphor-ADP.git
-git clone https://github.com/naoya-i/henry-n700.wiki.git
+git clone https://github.com/naoya-i/henry-n700.git
 > install boxer in a separate subdirectory of installation-dir (called boxer maybe)
 > install gurobi in a separate subdirectory of installation-dir (called gurobi maybe), install the license file also somewhere
 git clone https://github.com/isi-metaphor/lcc-service.git
