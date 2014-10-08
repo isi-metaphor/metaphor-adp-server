@@ -582,6 +582,8 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
 		del request_body_dict["kb"];
 	if "step" in request_body_dict:
 		del request_body_dict["step"];
+        if "task_id" in request_body_dict:
+                request_body_dict["task_id"]=task.id
 	if "enableDebug" in request_body_dict:
 		del request_body_dict["enableDebug"];
 	#task_id contains the id used to access the log entry for thsi request.
