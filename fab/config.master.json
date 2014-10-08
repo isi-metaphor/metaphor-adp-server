@@ -1,5 +1,5 @@
 {
-    "STAGE":                    "prod",
+    "STAGE":                    "master",
     "ROOT":                     "/home/metaphor/oct-2014-latest/lcc-service-deployed",
 
     "ADMIN_NAME":               "metaphor",
