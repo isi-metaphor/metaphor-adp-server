@@ -1,0 +1,1 @@
+python manage.py runserver 0.0.0.0:{{NGINX_PORT}} --settings=lccsrv.settings

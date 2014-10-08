@@ -1,3 +1,4 @@
+this is a list of python packages needed
 lz4 (python module; use easy_install)
 uwsgi
 jinja2
@@ -5,9 +6,7 @@ fabric
 django
 gitpython
 pypy
-java (?)
-nginx
-aptitude
+java jdk (jre is no compiling needed, probable v7)
+nginx (python mod)
 simplejson (python mod)
-sexpdata
-regex
+regex (python mod)
