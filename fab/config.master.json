@@ -6,7 +6,7 @@
     "ADMIN_EMAIL":              "metaphor@isi.edu",
 
     "DJANGO_DEBUG":             "True",
-    "DJANGO_DB_NAME":           "/home/metaphor/oct-2014-latest/data/lcc_service/lcc-service.db",
+    "DJANGO_DB_NAME":           "/home/metaphor/oct-2014-latest/data/lcc-service/lcc-service.db",
 
     "NGINX_PORT":               8082,
     "NGINX_SERVER_NAME":        "colo-pm4.isi.edu",
