@@ -10,3 +10,6 @@ java jdk (jre is no compiling needed, probable v7)
 nginx (python mod)
 simplejson (python mod)
 regex (python mod)
+sexpdata
+pexpect
+GitPython (0.3.2 or later you need to force the version)
