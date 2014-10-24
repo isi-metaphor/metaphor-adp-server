@@ -43,7 +43,14 @@ edit the file lcc-service/fab/config.{branch_name}.json dependig if you want to 
  - edit the ssh username and ssh private key to use (remoteConfig function in fabfile.py)
  - make sure you replace localConfig() with remoteConfig() in the install function in fabfile.py
  - execute fab install:branch_name
+ 
+ 
+-initialize the database file:
+ - go into the deployed directory and run: "python manage.py syncdb --noinput --settings=lccsrv.settings"
+ - create a user for the web interface by running:
+   python manage.py createsuperuser --username=username_to_create --email=whatever@whatever --settings=lccsrv.settings
 ```
+
 to run:
 - edit the shell.sh script to set the name of the screen session it'll start (-S option)
 - run the shell.sh command
