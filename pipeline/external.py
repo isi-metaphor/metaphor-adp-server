@@ -229,11 +229,11 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
 	createLF_output = ""
 	   
 	# Parser pipeline
-	
 	if language == "FA":
+                parser_args="-c farsiMALTModel -m parse -w "+METAPHOR_DIR+"/external-tools/malt-1.5 -lfi parser.log"
 		tokenizer_proc = os.path.join(METAPHOR_DIR, "pipelines/Farsi/pre-parser")
 		MALT_PARSER_DIR = os.path.join(METAPHOR_DIR, "external-tools/malt-1.5")
-		parser_proc = "java -cp " + MALT_PARSER_DIR + "/dist/malt/malt.jar:" + MALT_PARSER_DIR + " maltParserWrap_FA"
+		parser_proc = "java -cp " + MALT_PARSER_DIR + "/dist/malt/malt.jar:" + MALT_PARSER_DIR + " MaltParserWrap "+parser_args
 		createLF_proc = os.path.join(METAPHOR_DIR, "pipelines/Farsi/createLF")
 		parser_output_append = ""
 		b2h_proc = "python " + PARSER2HENRY + " --nonmerge sameid freqpred"	
@@ -243,9 +243,10 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
 			KBPATH = kb
 		
 	elif language == "ES":
+                parser_args="-c ancora_under40 -m parse -w "+METAPHOR_DIR+"/external-tools/maltparser-1.7.2 -lfi parser.log"
 		tokenizer_proc = os.path.join(METAPHOR_DIR, "pipelines/Spanish/pre-parser") 
 		MALT_PARSER_DIR = os.path.join(METAPHOR_DIR, "external-tools/maltparser-1.7.2") 
-		parser_proc = "java -cp " + MALT_PARSER_DIR + "/maltparser-1.7.2.jar:" + MALT_PARSER_DIR + " maltParserWrap_ES" 
+		parser_proc = "java -cp " + MALT_PARSER_DIR + "/maltparser-1.7.2.jar:" + MALT_PARSER_DIR + " MaltParserWrap "+parser_args
 		createLF_proc =  METAPHOR_DIR + "/pipelines/Spanish/createLF"
 		parser_output_append = ""
 		b2h_proc = "python " + PARSER2HENRY + " --nonmerge sameid freqpred"
@@ -255,10 +256,11 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
 			KBPATH = kb
 		
 	elif language == "RU":
+                parser_args="-c rus-test -m parse -w "+METAPHOR_DIR+"/external-tools/malt-ru -lfi parser.log"
 		tokenizer_proc = os.path.join(METAPHOR_DIR, "pipelines/Russian/pre-parser")
 		MALT_PARSER_DIR = os.path.join(METAPHOR_DIR, "external-tools/malt-1.5")
 		RU_PARSER_DIR = os.path.join(METAPHOR_DIR, "external-tools/malt-ru")
-		parser_proc = "java -cp " + MALT_PARSER_DIR + "/dist/malt/malt.jar:" + RU_PARSER_DIR + " maltParserWrap_RU"
+		parser_proc = "java -cp " + MALT_PARSER_DIR + "/dist/malt/malt.jar:" + RU_PARSER_DIR + " MaltParserWrap "+parser_args
 		createLF_proc = os.path.join(METAPHOR_DIR, "pipelines/Russian/createLF")
 		parser_output_append = ""
 		b2h_proc = "python " + PARSER2HENRY + " --nonmerge sameid freqpred"
