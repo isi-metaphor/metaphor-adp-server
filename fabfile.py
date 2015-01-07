@@ -54,9 +54,6 @@ def deploy():
         print(green("Switching branch."))
         run("git checkout {branch}".format(**config))
 
-        print(green("Pulling from GitHub."))
-        run("git pull")
-
         print(green("Uploading bashrc"))
         bashrcFile="fab/bashrc.sh"
         generateBashConfig(bashrcFile)
