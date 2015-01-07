@@ -347,6 +347,13 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
                 logger.info(msg)
                 task.log_error(msg)
                 annotation["isiAbductiveExplanation"]=exp
+		data = bestkey.split(',')
+		l=len(data)
+		annotation["targetConceptDomain"] = data[0] if l>0 else ''
+		annotation["targetConceptSubDomain"] = data[1] if l>1 else ''
+		annotation["targetFrame"] = data[2] if l>2 else ''
+		annotation["sourceFrame"] = data[3] if l>3 else ''
+		annotation["sourceConceptSubDomain"] = data[4] if l>4 else ''
 
     #request_body_dict["kb"] = KBPATH
     if "kb" in request_body_dict:
