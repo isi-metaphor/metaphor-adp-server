@@ -40,7 +40,7 @@ def remoteConfig():
 def deploy():
 
     if not fabric.contrib.files.exists(env.config["path"]):
-        run("git clone {repository} -b {branch} {path}".format(**env.config))
+        run("git clone {repository} {path}".format(**env.config))
     env.lcwd = os.path.dirname(__file__)
 
     config = env.config
