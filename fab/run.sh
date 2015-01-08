@@ -1,6 +1,6 @@
 #!/bin/bash
 
-./checkService.sh {{NGINX_PORT}} &
+./checkService.sh &
 
 SUBJECT=`hostname`":"`pwd`": {{STAGE}}_{{NGINX_PORT}}"
 
