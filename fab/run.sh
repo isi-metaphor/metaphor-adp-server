@@ -3,7 +3,6 @@
 ./checkService.sh {{NGINX_PORT}} &
 
 SUBJECT=`hostname`":"`pwd`": {{STAGE}}_{{NGINX_PORT}}"
-EMAILS="fmorbini@gmail.com morbini@ict.usc.edu"
 
 while [ 1 == 1 ]
 do
