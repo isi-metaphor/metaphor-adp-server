@@ -1,7 +1,6 @@
 #!/bin/bash
 
 yest_date=`date "+%s"`
-EMAILS="fmorbini@gmail.com morbini@ict.usc.edu"
 SUBJECT=`hostname`":"`pwd`": {{STAGE}}_{{NGINX_PORT}}"
 outputFile="/tmp/${$}-`date +%s`.tmp"
 
