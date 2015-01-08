@@ -115,6 +115,6 @@ def generateBashConfig(file):
     fo.write("export PATH=${PATH}:/usr/sbin:/sbin:/usr/bin:${GUROBI_HOME}/bin:${JAVA_HOME}/bin\n")
     fo.write("export LD_LIBRARY_PATH=:${GUROBI_HOME}/lib/:${LD_LIBRARY_PATH}\n")
     fo.write("export LIBRARY_PATH=${GUROBI_HOME}/lib\n")
-    fo.write("export EMAILS="+env.config["context"]["ADMIN_EMAIL"]+" "+env.config["context"]["OTHER_EMAILS"]+"\n")
+    fo.write("export EMAILS=\""+env.config["context"]["ADMIN_EMAIL"]+" "+env.config["context"]["OTHER_EMAILS"]+"\"\n")
     fo.close()
 
