@@ -54,9 +54,6 @@ def deploy():
         print(green("Switching branch."))
         run("git checkout {branch}".format(**config))
 
-        print(green("Pulling from GitHub."))
-        run("git pull")
-
         print(green("Uploading bashrc"))
         bashrcFile="fab/bashrc.sh"
         generateBashConfig(bashrcFile)
@@ -78,8 +75,16 @@ def deploy():
                                              "{path}/tempRun.sh".format(**config),
                                              context=context,
                                              use_jinja=True)
+        fabric.contrib.files.upload_template("fab/run.sh",
+                                             "{path}/run.sh".format(**config),
+                                             context=context,
+                                             use_jinja=True)
         fabric.contrib.files.upload_template("fab/shell.sh",
                                              "{path}/shell.sh".format(**config),
+                                             context=context,
+                                             use_jinja=True)
+        fabric.contrib.files.upload_template("fab/checkService.sh",
+                                             "{path}/checkService.sh".format(**config),
                                              context=context,
                                              use_jinja=True)
 
