@@ -75,8 +75,16 @@ def deploy():
                                              "{path}/tempRun.sh".format(**config),
                                              context=context,
                                              use_jinja=True)
+        fabric.contrib.files.upload_template("fab/run.sh",
+                                             "{path}/run.sh".format(**config),
+                                             context=context,
+                                             use_jinja=True)
         fabric.contrib.files.upload_template("fab/shell.sh",
                                              "{path}/shell.sh".format(**config),
+                                             context=context,
+                                             use_jinja=True)
+        fabric.contrib.files.upload_template("fab/checkService.sh",
+                                             "{path}/checkService.sh".format(**config),
                                              context=context,
                                              use_jinja=True)
 
