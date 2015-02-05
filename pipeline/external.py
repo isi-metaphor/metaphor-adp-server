@@ -105,7 +105,7 @@ def RUexpect():
 
 def ENexpect():
 	
-	index = child['EN'].expect (["ccg\(.*\)*\)\)\.\r\n\r\nccg\(\d.*'END', 'END', .*\)\)\.\r\n\r\n", pexpect.TIMEOUT, pexpect.EOF])
+	index = child['EN'].expect (["ccg\(.*\)*\)\)\.\r\n\r\nccg\(\d+.*'END', 'END', .*\)\)\.\r\n\r\n", pexpect.TIMEOUT, pexpect.EOF])
 	
 	#child['EN'].expect(pexpect.EOF)
 	return index
@@ -338,9 +338,9 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
 							junk = child[language].stdout.readlines()
 						except Exception:
 							junk = ""
-						parser_output_inter = parser_output_append + parser_output_inter
-						if language == "EN":
-							parser_output_inter += "\r\nid(" + str(key) + ",[1]).\r\n\r\n"
+						#parser_output_inter = parser_output_append + parser_output_inter
+						#if language == "EN":
+						#	parser_output_inter += "\r\nid(" + str(key) + ",[1]).\r\n\r\n"
 						else:	
 							parser_output_inter = parser_output_inter.replace("END","")
 						reattempts = 2
@@ -364,10 +364,29 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
 					setParserStatus(language, False)
 			
 				if language == "EN":
+					parser_output_inter = re.sub("\n", "\t", parser_output_inter)
 					#parser_output_inter = re.sub("ccg\(\d+", "ccg(1", parser_output_inter)
-					regex = r'(ccg\((.*[\w\s]{1})+)[\w\s]{2}'
+					regex = r'(ccg\(.*\)\.\r\t\r\t)'
 					ccgs = re.findall(regex, parser_output_inter)
 					logger.info("separate ccgs: " + str(ccgs))
+					logger.info("ccgs[0].split()" + str(ccgs[0].split("\r\t\r\t")))
+					final_parser_output = parser_output_append
+					ccg_split = ccgs[0].split("\r\t\r\t")
+					for i in range(len(ccg_split)-2):
+						"""
+						if i == 0:
+							regex = r'ccg\((\d+).*'
+							ccg_id = re.findall(regex, ccg_split[i])
+							print ccg_id[0]
+							ccg_split[i] = re.sub("ccg\(\d+", "ccg(1", ccg_split[i])
+						"""
+						ccg_replace = "ccg(" + str(i+1)
+						ccg_split[i] = re.sub("ccg\(\d+" , ccg_replace, ccg_split[i])
+						ccg_split[i] = re.sub("\t","\n", ccg_split[i])
+						final_parser_output += ccg_split[i] + "\r\n\r\n"
+                                        final_parser_output += "id(" + str(key) + ",[1]).\r\n\r\n"
+					parser_output_inter = final_parser_output
+					
 				if language == "ES":
 					parser_output_inter = parser_output_inter.replace("ROOT", "sentence")
 				logger.info("Parser output:\n%r" % parser_output_inter)
