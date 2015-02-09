@@ -182,7 +182,7 @@ def filterParserOutput(parses,word2ids,sources,targets):
 									keepThisOne=True
 									break
 						if keepThisOne:
-							filtered[key]+=sexpdata.dumps(p).replace(": [",":[").encode("utf-8")
+							filtered[key]+=printPred(p)
 					#print("filtered[key]: "+filtered[key])
 				filtered[key]+="))"
 	parser_output=""
@@ -204,6 +204,40 @@ def needToGenerateGraph(dograph):
 	elif dograph == True:
 		return True
 	return False
+
+def printPred(p):
+        return sexpdata.dumps(p).replace(": [",":[").encode("utf-8")
+
+def mergeMultipleObservations(parser_output):
+        ret=parser_output
+        if parser_output:
+                lines=parser_output.splitlines()
+                if lines and len(lines)>1:
+                        ret=[]
+                        counter=0
+                        preds=[sexpdata.Symbol("^")]
+                
+                        for l in lines:
+                                o=sexpdata.loads(l)
+                                if not ret:
+                                        ret.append(o[0])
+                                        ret.append(o[1])
+                                for p in o[2]:
+                                        if type(p)==list:
+                                                np=[p[0]]
+                                                for a in p[1:]:
+                                                        if type(a)==sexpdata.Symbol:
+                                                                n=a.value()
+                                                                if n[0].islower():
+                                                                        np.append(sexpdata.Symbol(a.value()+"_"+str(counter)))
+                                                                        continue
+                                                        np.append(a)
+                                                preds.append(np)
+                                #print(sexpdata.dumps(o))
+                                counter+=1
+                        ret.append(preds)
+                        ret=printPred(ret)
+        return ret
 
 child = {'FA':"",'ES':"",'RU':"",'EN':""}
 expectChild = {'FA': FAexpect, 'ES': ESexpect, 'RU': RUexpect, 'EN': ENexpect}
@@ -384,7 +418,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
 						ccg_split[i] = re.sub("ccg\(\d+" , ccg_replace, ccg_split[i])
 						ccg_split[i] = re.sub("\t","\n", ccg_split[i])
 						final_parser_output += ccg_split[i] + "\r\n\r\n"
-                                        final_parser_output += "id(" + str(key) + ",[1]).\r\n\r\n"
+                                                final_parser_output += "id(" + str(key) + ",["+str(i+1)+"]).\r\n\r\n"
 					parser_output_inter = final_parser_output
 					
 				if language == "ES":
@@ -426,6 +460,9 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
 	parser_output, parser_stderr = b2h_pipeline.communicate(input=createLF_output)
 	logger.info("B2H output:\n%s\n" % parser_output)
 	task.log_error("B2H output: \n%r" % parser_output)
+        parser_output = mergeMultipleObservations(parser_output)
+	logger.info("B2H output after merging:\n%s\n" % parser_output)
+	task.log_error("B2H output after merging: \n%r" % parser_output)
 	task.parse_out = parser_output
 	# Parser processing time in seconds
 	parser_time = (time.time() - start_time) * 0.001
