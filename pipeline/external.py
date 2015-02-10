@@ -372,12 +372,10 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
 							junk = child[language].stdout.readlines()
 						except Exception:
 							junk = ""
-						#parser_output_inter = parser_output_append + parser_output_inter
-						#if language == "EN":
-						#	parser_output_inter += "\r\nid(" + str(key) + ",[1]).\r\n\r\n"
-						else:	
-							parser_output_inter = parser_output_inter.replace("END","")
-						reattempts = 2
+						if not language == "EN":
+                                                        parser_output_inter = parser_output_append + parser_output_inter
+                                                        parser_output_inter = parser_output_inter.replace("END","")
+						break
 					elif reattempts == 0:
 						#logger.info("child before: " + child[language].before + "\n")
 						reattempts += 1
@@ -402,24 +400,27 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
 					#parser_output_inter = re.sub("ccg\(\d+", "ccg(1", parser_output_inter)
 					regex = r'(ccg\(.*\)\.\r\t\r\t)'
 					ccgs = re.findall(regex, parser_output_inter)
-					logger.info("separate ccgs: " + str(ccgs))
-					logger.info("ccgs[0].split()" + str(ccgs[0].split("\r\t\r\t")))
-					final_parser_output = parser_output_append
-					ccg_split = ccgs[0].split("\r\t\r\t")
-					for i in range(len(ccg_split)-2):
-						"""
-						if i == 0:
+                                        if ccgs:
+                                                logger.info("separate ccgs: " + str(ccgs))
+                                                task.log_error("ccgs[0].split()" + str(ccgs[0].split("\r\t\r\t")))
+                                                logger.info("separate ccgs: " + str(ccgs))
+                                                task.log_error("ccgs[0].split()" + str(ccgs[0].split("\r\t\r\t")))
+                                                final_parser_output = parser_output_append
+                                                ccg_split = ccgs[0].split("\r\t\r\t")
+                                                for i in range(len(ccg_split)-2):
+                                                        """
+                                                        if i == 0:
 							regex = r'ccg\((\d+).*'
 							ccg_id = re.findall(regex, ccg_split[i])
 							print ccg_id[0]
 							ccg_split[i] = re.sub("ccg\(\d+", "ccg(1", ccg_split[i])
-						"""
-						ccg_replace = "ccg(" + str(i+1)
-						ccg_split[i] = re.sub("ccg\(\d+" , ccg_replace, ccg_split[i])
-						ccg_split[i] = re.sub("\t","\n", ccg_split[i])
-						final_parser_output += ccg_split[i] + "\r\n\r\n"
-                                                final_parser_output += "id(" + str(key) + ",["+str(i+1)+"]).\r\n\r\n"
-					parser_output_inter = final_parser_output
+                                                        """
+                                                        ccg_replace = "ccg(" + str(i+1)
+                                                        ccg_split[i] = re.sub("ccg\(\d+" , ccg_replace, ccg_split[i])
+                                                        ccg_split[i] = re.sub("\t","\n", ccg_split[i])
+                                                        final_parser_output += ccg_split[i] + "\r\n\r\n"
+                                                        final_parser_output += "id(" + str(key) + ",["+str(i+1)+"]).\r\n\r\n"
+                                                parser_output_inter = final_parser_output
 					
 				if language == "ES":
 					parser_output_inter = parser_output_inter.replace("ROOT", "sentence")
