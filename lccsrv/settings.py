@@ -33,7 +33,7 @@ DATABASES = {
     }
 }
 
-TIME_ZONE = "America/Chicago"
+TIME_ZONE = "America/Los_Angeles"
 LANGUAGE_CODE = "en-us"
 
 SITE_ID = 1
