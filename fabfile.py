@@ -54,9 +54,6 @@ def deploy():
         print(green("Switching branch."))
         run("git checkout {branch}".format(**config))
 
-        print(green("Pulling from GitHub."))
-        run("git pull")
-
         print(green("Uploading bashrc"))
         bashrcFile="fab/bashrc.sh"
         generateBashConfig(bashrcFile)
@@ -78,8 +75,16 @@ def deploy():
                                              "{path}/tempRun.sh".format(**config),
                                              context=context,
                                              use_jinja=True)
+        fabric.contrib.files.upload_template("fab/run.sh",
+                                             "{path}/run.sh".format(**config),
+                                             context=context,
+                                             use_jinja=True)
         fabric.contrib.files.upload_template("fab/shell.sh",
                                              "{path}/shell.sh".format(**config),
+                                             context=context,
+                                             use_jinja=True)
+        fabric.contrib.files.upload_template("fab/checkService.sh",
+                                             "{path}/checkService.sh".format(**config),
                                              context=context,
                                              use_jinja=True)
 
@@ -110,5 +115,6 @@ def generateBashConfig(file):
     fo.write("export PATH=${PATH}:/usr/sbin:/sbin:/usr/bin:${GUROBI_HOME}/bin:${JAVA_HOME}/bin\n")
     fo.write("export LD_LIBRARY_PATH=:${GUROBI_HOME}/lib/:${LD_LIBRARY_PATH}\n")
     fo.write("export LIBRARY_PATH=${GUROBI_HOME}/lib\n")
+    fo.write("export EMAILS=\""+env.config["context"]["ADMIN_EMAIL"]+" "+env.config["context"]["OTHER_EMAILS"]+"\"\n")
     fo.close()
 

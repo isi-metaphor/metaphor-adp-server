@@ -71,7 +71,18 @@ but then it needs to be configured and deployed.
     function in fabfile.py
   - Execute `fab install:branch_name`
 
-7. Run:
+7. Initialize the database file:
+- Go into the deployed directory and run: 
+```
+python manage.py syncdb --noinput --settings=lccsrv.settings
+```
+- Create a user for the web interface by running:
+```
+python manage.py createsuperuser --username=username_to_create \
+    --email=whatever@whatever --settings=lccsrv.settings
+```
+
+8. Run:
 - Edit the shell.sh script to set the name of the screen session it'll start
   (the -S option)
 - Run the shell.sh command

@@ -105,7 +105,7 @@ def RUexpect():
 
 def ENexpect():
 	
-	index = child['EN'].expect (["ccg\(.*\)*\)\)\.\r\n\r\n", pexpect.TIMEOUT, pexpect.EOF])
+	index = child['EN'].expect (["ccg\(.*\)*\)\)\.\r\n\r\nccg\(\d+.*'END', 'END', .*\)\)\.\r\n\r\n", pexpect.TIMEOUT, pexpect.EOF])
 	
 	#child['EN'].expect(pexpect.EOF)
 	return index
@@ -182,7 +182,7 @@ def filterParserOutput(parses,word2ids,sources,targets):
 									keepThisOne=True
 									break
 						if keepThisOne:
-							filtered[key]+=sexpdata.dumps(p).replace(": [",":[").encode("utf-8")
+							filtered[key]+=printPred(p)
 					#print("filtered[key]: "+filtered[key])
 				filtered[key]+="))"
 	parser_output=""
@@ -204,6 +204,40 @@ def needToGenerateGraph(dograph):
 	elif dograph == True:
 		return True
 	return False
+
+def printPred(p):
+        return sexpdata.dumps(p).replace(": [",":[").encode("utf-8")
+
+def mergeMultipleObservations(parser_output):
+        ret=parser_output
+        if parser_output:
+                lines=parser_output.splitlines()
+                if lines and len(lines)>1:
+                        ret=[]
+                        counter=0
+                        preds=[sexpdata.Symbol("^")]
+                
+                        for l in lines:
+                                o=sexpdata.loads(l)
+                                if not ret:
+                                        ret.append(o[0])
+                                        ret.append(o[1])
+                                for p in o[2]:
+                                        if type(p)==list:
+                                                np=[p[0]]
+                                                for a in p[1:]:
+                                                        if type(a)==sexpdata.Symbol:
+                                                                n=a.value()
+                                                                if n[0].islower():
+                                                                        np.append(sexpdata.Symbol(a.value()+"_"+str(counter)))
+                                                                        continue
+                                                        np.append(a)
+                                                preds.append(np)
+                                #print(sexpdata.dumps(o))
+                                counter+=1
+                        ret.append(preds)
+                        ret=printPred(ret)
+        return ret
 
 child = {'FA':"",'ES':"",'RU':"",'EN':""}
 expectChild = {'FA': FAexpect, 'ES': ESexpect, 'RU': RUexpect, 'EN': ENexpect}
@@ -229,11 +263,11 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
 	createLF_output = ""
 	   
 	# Parser pipeline
-	
 	if language == "FA":
+                parser_args="-c farsiMALTModel -m parse -w "+METAPHOR_DIR+"/external-tools/malt-1.5 -lfi parser.log"
 		tokenizer_proc = os.path.join(METAPHOR_DIR, "pipelines/Farsi/pre-parser")
 		MALT_PARSER_DIR = os.path.join(METAPHOR_DIR, "external-tools/malt-1.5")
-		parser_proc = "java -cp " + MALT_PARSER_DIR + "/dist/malt/malt.jar:" + MALT_PARSER_DIR + " maltParserWrap_FA"
+		parser_proc = "java -cp " + MALT_PARSER_DIR + "/dist/malt/malt.jar:" + MALT_PARSER_DIR + " MaltParserWrap "+parser_args
 		createLF_proc = os.path.join(METAPHOR_DIR, "pipelines/Farsi/createLF")
 		parser_output_append = ""
 		b2h_proc = "python " + PARSER2HENRY + " --nonmerge sameid freqpred"	
@@ -243,9 +277,10 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
 			KBPATH = kb
 		
 	elif language == "ES":
+                parser_args="-c ancora_under40 -m parse -w "+METAPHOR_DIR+"/external-tools/maltparser-1.7.2 -lfi parser.log"
 		tokenizer_proc = os.path.join(METAPHOR_DIR, "pipelines/Spanish/pre-parser") 
 		MALT_PARSER_DIR = os.path.join(METAPHOR_DIR, "external-tools/maltparser-1.7.2") 
-		parser_proc = "java -cp " + MALT_PARSER_DIR + "/maltparser-1.7.2.jar:" + MALT_PARSER_DIR + " maltParserWrap_ES" 
+		parser_proc = "java -cp " + MALT_PARSER_DIR + "/maltparser-1.7.2.jar:" + MALT_PARSER_DIR + " MaltParserWrap "+parser_args
 		createLF_proc =  METAPHOR_DIR + "/pipelines/Spanish/createLF"
 		parser_output_append = ""
 		b2h_proc = "python " + PARSER2HENRY + " --nonmerge sameid freqpred"
@@ -255,10 +290,11 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
 			KBPATH = kb
 		
 	elif language == "RU":
+                parser_args="-c rus-test -m parse -w "+METAPHOR_DIR+"/external-tools/malt-ru -lfi parser.log"
 		tokenizer_proc = os.path.join(METAPHOR_DIR, "pipelines/Russian/pre-parser")
 		MALT_PARSER_DIR = os.path.join(METAPHOR_DIR, "external-tools/malt-1.5")
 		RU_PARSER_DIR = os.path.join(METAPHOR_DIR, "external-tools/malt-ru")
-		parser_proc = "java -cp " + MALT_PARSER_DIR + "/dist/malt/malt.jar:" + RU_PARSER_DIR + " maltParserWrap_RU"
+		parser_proc = "java -cp " + MALT_PARSER_DIR + "/dist/malt/malt.jar:" + RU_PARSER_DIR + " MaltParserWrap "+parser_args
 		createLF_proc = os.path.join(METAPHOR_DIR, "pipelines/Russian/createLF")
 		parser_output_append = ""
 		b2h_proc = "python " + PARSER2HENRY + " --nonmerge sameid freqpred"
@@ -269,7 +305,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
 		
 	elif language == "EN":
 		tokenizer_proc = BOXER_DIR + "/bin/tokkie --stdin"
-		parser_proc = BOXER_DIR + "/bin/candc --models " + BOXER_DIR + "/models/boxer --candc-printer boxer"
+		parser_proc = BOXER_DIR + "/bin/candc --models " + BOXER_DIR + "/models/boxer --candc-printer boxer 2>null"
 		createLF_proc = BOXER_DIR + "/bin/boxer --semantics tacitus --resolve true --stdin"
 		parser_output_append = ":- op(601, xfx, (/)).\n:- op(601, xfx, (\)).\n:- multifile ccg/2, id/2.\n:- discontiguous ccg/2, id/2.\n"
 		b2h_proc = "python " + BOXER2HENRY + " --nonmerge sameid freqpred"
@@ -289,7 +325,11 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
 					createLF_output += annotations[metaphor_count - 1]["parser_output"]
 					continue
 					
-				input_str = "<META>" + str(key) + "\n\n" + input_metaphors[key] + "\n\n"
+				input_str = "<META>" + str(key) + "\n\n" + input_metaphors[key]
+				if language == "EN":
+					input_str = input_str + "\n"
+				else:
+					input_str += "\n\n"
 				logger.info("Processing metaphor " + str(metaphor_count))
 				logger.info("Running tokenizing command: '%s'." % tokenizer_proc)
 				logger.info("Input str: %r" % input_str)
@@ -302,12 +342,14 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
 							stderr=None,
 							close_fds=True)
 				tokenizer_output, tokenizer_stderr = tokenizer_pipeline.communicate(input=input_str)
+				
 				if language == "EN":
-					lines = ""
-					lines = tokenizer_output.replace("\n", " ")
-					lines = lines.rstrip()
-					lines = re.sub(r'(<META>)(\d+)(\s)', r'\1\2\n\n', lines)					
-					tokenizer_output = lines + "\n"
+					#lines = ""
+					#lines = tokenizer_output.replace("\n", " ")
+					#lines = lines.rstrip()
+					#lines = re.sub(r'(<META>)(\d+)(\s)', r'\1\2\n\n', lines)					
+					tokenizer_output += "END\n\n"
+				
 				logger.info("Tokenizer Output:\n%r" % tokenizer_output)
 				task.log_error("Tokenizer Output:\n%r" % tokenizer_output)
 				word2ids[key]=getWpos(tokenizer_output,language)
@@ -330,13 +372,12 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
 							junk = child[language].stdout.readlines()
 						except Exception:
 							junk = ""
-						parser_output_inter = parser_output_append + parser_output_inter
-						if language == "EN":
-							parser_output_inter += "\r\nid(" + str(key) + ",[1]).\r\n\r\n"
-						else:	
-							parser_output_inter = parser_output_inter.replace("END","")
-						reattempts = 2
+						if not language == "EN":
+                                                        parser_output_inter = parser_output_append + parser_output_inter
+                                                        parser_output_inter = parser_output_inter.replace("END","")
+						break
 					elif reattempts == 0:
+						#logger.info("child before: " + child[language].before + "\n")
 						reattempts += 1
 						child[language].terminate()
 						child[language] = pexpect.spawn('/bin/bash', ['-c',parser_proc], timeout=30)
@@ -355,7 +396,32 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
 					setParserStatus(language, False)
 			
 				if language == "EN":
-					parser_output_inter = re.sub("ccg\(\d+", "ccg(1", parser_output_inter)
+					parser_output_inter = re.sub("\n", "\t", parser_output_inter)
+					#parser_output_inter = re.sub("ccg\(\d+", "ccg(1", parser_output_inter)
+					regex = r'(ccg\(.*\)\.\r\t\r\t)'
+					ccgs = re.findall(regex, parser_output_inter)
+                                        if ccgs:
+                                                logger.info("separate ccgs: " + str(ccgs))
+                                                task.log_error("ccgs[0].split()" + str(ccgs[0].split("\r\t\r\t")))
+                                                logger.info("separate ccgs: " + str(ccgs))
+                                                task.log_error("ccgs[0].split()" + str(ccgs[0].split("\r\t\r\t")))
+                                                final_parser_output = parser_output_append
+                                                ccg_split = ccgs[0].split("\r\t\r\t")
+                                                for i in range(len(ccg_split)-2):
+                                                        """
+                                                        if i == 0:
+							regex = r'ccg\((\d+).*'
+							ccg_id = re.findall(regex, ccg_split[i])
+							print ccg_id[0]
+							ccg_split[i] = re.sub("ccg\(\d+", "ccg(1", ccg_split[i])
+                                                        """
+                                                        ccg_replace = "ccg(" + str(i+1)
+                                                        ccg_split[i] = re.sub("ccg\(\d+" , ccg_replace, ccg_split[i])
+                                                        ccg_split[i] = re.sub("\t","\n", ccg_split[i])
+                                                        final_parser_output += ccg_split[i] + "\r\n\r\n"
+                                                        final_parser_output += "id(" + str(key) + ",["+str(i+1)+"]).\r\n\r\n"
+                                                parser_output_inter = final_parser_output
+					
 				if language == "ES":
 					parser_output_inter = parser_output_inter.replace("ROOT", "sentence")
 				logger.info("Parser output:\n%r" % parser_output_inter)
@@ -395,6 +461,9 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
 	parser_output, parser_stderr = b2h_pipeline.communicate(input=createLF_output)
 	logger.info("B2H output:\n%s\n" % parser_output)
 	task.log_error("B2H output: \n%r" % parser_output)
+        parser_output = mergeMultipleObservations(parser_output)
+	logger.info("B2H output after merging:\n%s\n" % parser_output)
+	task.log_error("B2H output after merging: \n%r" % parser_output)
 	task.parse_out = parser_output
 	# Parser processing time in seconds
 	parser_time = (time.time() - start_time) * 0.001
@@ -575,6 +644,13 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
 				logger.info(msg)
 				task.log_error(msg)
 				annotation["isiAbductiveExplanation"]=exp
+                                data = bestkey.split(',')
+                                l=len(data)
+                                annotation["targetConceptDomain"] = data[0] if l>0 else ''
+                                annotation["targetConceptSubDomain"] = data[1] if l>1 else ''
+                                annotation["targetFrame"] = data[2] if l>2 else ''
+                                annotation["sourceFrame"] = data[3] if l>3 else ''
+                                annotation["sourceConceptSubDomain"] = data[4] if l>4 else ''
 
 	#request_body_dict["kb"] = KBPATH
 	#removes json fields that can be added by the code. (compliance with lcc json format)

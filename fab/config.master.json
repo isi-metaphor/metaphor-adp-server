@@ -1,32 +1,33 @@
 {
     "STAGE":                    "master",
-    "ROOT":                     "/home/metaphor/oct-2014-latest/lcc-service-deployed",
+    "ROOT":                     "/lfs1/metaphor/research/repo/oct-2014-latest/lcc-service-deployed",
 
     "ADMIN_NAME":               "metaphor",
     "ADMIN_EMAIL":              "metaphor@isi.edu",
+    "OTHER_EMAILS":              "other@isi.edu another@isi.edu",
 
     "DJANGO_DEBUG":             "True",
-    "DJANGO_DB_NAME":           "/home/metaphor/oct-2014-latest/data/lcc_service/lcc-service.db",
+    "DJANGO_DB_NAME":           "/lfs1/metaphor/research/repo/oct-2014-latest/data/lcc-service/lcc-service.db",
 
-    "NGINX_PORT":               8082,
+    "NGINX_PORT":               8084,
     "NGINX_SERVER_NAME":        "colo-pm4.isi.edu",
 
-    "LOGGING_REQUESTS_FILE":    "/home/metaphor/oct-2014-latest/logs/lcc-service/app.requests.log",
-    "LOGGING_DJANGO_FILE":      "/home/metaphor/oct-2014-latest/logs/lcc-service/app.django.log",
-    "LOGGING_PIPELINE_FILE":    "/home/metaphor/oct-2014-latest/logs/lcc-service/app.pipeline.log",
+    "LOGGING_REQUESTS_FILE":    "/lfs1/metaphor/research/repo/oct-2014-latest/logs/lcc-service/app.requests.log",
+    "LOGGING_DJANGO_FILE":      "/lfs1/metaphor/research/repo/oct-2014-latest/logs/lcc-service/app.django.log",
+    "LOGGING_PIPELINE_FILE":    "/lfs1/metaphor/research/repo/oct-2014-latest/logs/lcc-service/app.pipeline.log",
 
     "PIPELINE_CONFIG":          {
-        "METAPHOR_DIR":         "/home/metaphor/oct-2014-latest/Metaphor-ADP",
-        "HENRY_DIR":            "/home/metaphor/oct-2014-latest/henry-n700",
-        "BOXER_DIR":            "/home/metaphor/oct-2014-latest/boxer",
-        "TMP_DIR":              "/home/metaphor/oct-2014-latest/temp/lcc-service.tmp",
-        "GUROBI_HOME":          "/home/metaphor/oct-2014-latest/gurobi563/linux64/",
-        "GRB_LICENSE_FILE":     "/home/metaphor/oct-2014-latest/gurobi.lic",
+        "METAPHOR_DIR":         "/lfs1/metaphor/research/repo/oct-2014-latest/Metaphor-ADP",
+        "HENRY_DIR":            "/lfs1/metaphor/research/repo/oct-2014-latest/henry-n700",
+        "BOXER_DIR":            "/lfs1/metaphor/research/repo/oct-2014-latest/boxer",
+        "TMP_DIR":              "/lfs1/metaphor/research/repo/oct-2014-latest/temp/lcc-service.tmp",
+        "GUROBI_HOME":          "/lfs1/metaphor/research/repo/oct-2014-latest/gurobi563/linux64/",
+        "GRB_LICENSE_FILE":     "/lfs1/metaphor/research/repo/oct-2014-latest/gurobi.lic",
         "CPLUS_INCLUDE_PATH":   "/usr/include/python2.7/:${GUROBI_HOME}/include",
         "PATH":                 ".:${TEAM_LOCAL}/bin:${TEAM_PUBLIC}/bin:${PATH}:/usr/sbin:/sbin:/usr/bin:${GUROBI_HOME}/bin:${JAVA_HOME}/bin",
         "LD_LIBRARY_PATH":      ":${GUROBI_HOME}/lib/:${LD_LIBRARY_PATH}",
         "LIBRARY_PATH":         "${GUROBI_HOME}/lib",
-        "UPLOADS_DIR":          "/home/metaphor/oct-2014-latest/data/metaphor_kbs"
+        "UPLOADS_DIR":          "/lfs1/metaphor/research/repo/oct-2014-latest/data/metaphor_kbs"
    }
 
 }
