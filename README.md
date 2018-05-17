@@ -7,7 +7,7 @@ Check README.pdf for further instructions.
 This is how to install the entire metaphor pipeline, including the web
 service in this repository:
 
-1. Clone repositories for the Metaphor pipeloine and for the Henry
+1. Clone repositories for the Metaphor pipeline and for the Henry
 abductive reasoner:
 ```
 mkdir installation-dir
@@ -77,3 +77,14 @@ but then it needs to be configured and deployed.
 - Run the shell.sh command
 - Within the screen it started, start tempRun.sh
 - Disconnect from the screen (CTRL-A D)
+
+## Acknowledgments
+
+This work was supported by the Intelligence Advanced Research Projects
+Activity (IARPA) via Department of Defense US Army Research Lab contract
+W911NF-12-C-0025. The US Government is authorized to reproduce and
+distribute reprints for Governmental purposes notwithstanding any
+copyright annotation thereon. Disclaimer: The views and conclusions
+contained herein are those of the authors and should not be interpreted
+as necessarily representing the official policies or endorsements,
+either expressed or implied, of IARPA, DoD/ARL, or the US Government.
