@@ -1,8 +1,8 @@
 # coding: utf-8
 
-# Copyright (C) University of Southern California (http://usc.edu)
+# Copyright (C) University of Southern California (https://usc.edu)
 # Author: Vladimir M. Zaytsev <zaytsev@usc.edu>
-# URL: <http://nlg.isi.edu/>
+# URL: <https://nlg.isi.edu>
 # For more information, see README.md
 # For license information, see LICENSE
 
@@ -24,7 +24,7 @@ class TASK_STATUS:
 
 class LogsDisplay(models.Model):
     class Meta:
-	db_table = "light_t_tasks"
+        db_table = "light_t_tasks"
     id                  = models.IntegerField(primary_key=True)
     request_addr        = models.CharField(null=True, blank=True, max_length=16)
     request_time        = models.DateTimeField(auto_now_add=True, null=False)
@@ -35,7 +35,7 @@ class LogsDisplay(models.Model):
     task_status         = models.SmallIntegerField(null=False, default=TASK_STATUS.DOCUMENT_RECEIVED)
     task_error_count    = models.IntegerField(default=0, null=False)
     task_error_code     = models.IntegerField(null=False, default=0)
-    
+
     def status_str(self):
         if self.task_status == TASK_STATUS.DOCUMENT_RECEIVED:
             return "RECEIVED"
@@ -58,17 +58,17 @@ class LogsDisplay(models.Model):
         return "UNKNOWN"
 
     def fill_table(self, task):
-	self.id = task.id
-	self.request_addr = task.request_addr
-	self.request_time = task.request_time
-	self.request_lang = task.request_lang
-	self.response_time = task.response_time
-	self.response_status = task.response_status
-	self.task_status = task.task_status
-	self.task_error_count = task.task_error_count
-	self.error_code = task.task_error_code
-	self.save()
-    
+        self.id = task.id
+        self.request_addr = task.request_addr
+        self.request_time = task.request_time
+        self.request_lang = task.request_lang
+        self.response_time = task.response_time
+        self.response_status = task.response_status
+        self.task_status = task.task_status
+        self.task_error_count = task.task_error_count
+        self.error_code = task.task_error_code
+        self.save()
+
 class AnnotationTask(models.Model):
 
     class Meta:
@@ -174,8 +174,8 @@ class AnnotationTask(models.Model):
 
     @henry_out.setter
     def henry_out(self, value):
-	self.henry_out_blob = lz4.compressHC(value)
-	
+        self.henry_out_blob = lz4.compressHC(value)
+
 
     @property
     def parse_out(self):

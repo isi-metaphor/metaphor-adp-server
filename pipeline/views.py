@@ -1,8 +1,8 @@
 # coding: utf-8
 
-# Copyright (C) University of Southern California (http://usc.edu)
+# Copyright (C) University of Southern California (https://usc.edu)
 # Author: Vladimir M. Zaytsev <zaytsev@usc.edu>
-# URL: <http://nlg.isi.edu/>
+# URL: <https://nlg.isi.edu>
 # For more information, see README.md
 # For license information, see LICENSE
 
@@ -199,9 +199,9 @@ def run_pipeline(request):
 
         try:
             response = task.to_response(save=True, enable_debug=debug_option)
-	    logsDisplay = LogsDisplay()
-	    logsDisplay.fill_table(task)
-	    
+            logsDisplay = LogsDisplay()
+            logsDisplay.fill_table(task)
+
             return response
         except Exception:
             msg="Error 2 while saving failed task. Traceback: %s" % traceback.format_exc()

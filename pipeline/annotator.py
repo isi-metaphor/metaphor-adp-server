@@ -1,8 +1,8 @@
 # coding: utf-8
 
-# Copyright (C) University of Southern California (http://usc.edu)
+# Copyright (C) University of Southern California (https://usc.edu)
 # Author: Vladimir M. Zaytsev <zaytsev@usc.edu>
-# URL: <http://nlg.isi.edu/>
+# URL: <https://nlg.isi.edu>
 # For more information, see README.md
 # For license information, see LICENSE
 
@@ -16,7 +16,6 @@ from pipeline.models import TASK_STATUS
 import regex
 
 class Annotator(object):
-
     def __init__(self, logger, task):
         self.logger = logger
         self.task = task
@@ -46,7 +45,6 @@ class Annotator(object):
             return string
 
     def annotate(self):
-
         # 1.
         log_msg = "Start annotating document."
         self.logger.info(log_msg)
@@ -147,7 +145,7 @@ class Annotator(object):
                 self.task_error(error_msg, error_code=None, count_error=True)
                 annotation_id_index += 1
                 annotation_id = annotation_id_index
-                
+
             # 5.2
             try:
                 metaphor = annotation["linguisticMetaphor"]
@@ -197,14 +195,14 @@ class Annotator(object):
         self.logger.info(log_msg)
         self.task.log_error(log_msg)
 
-	# 10 include parser and henry processing times
-	parser_time = request_document.get("parser_time", "Absent")
-	if parser_time != "Absent":
-		request_document["parser_time"] = ""
-	henry_time = request_document.get("henry_time", "Absent")
-	if henry_time != "Absent":
-		request_document["henry_time"] = ""
-	# 11 used to indicate whether to use the input metaphor or just the parser output
+        # 10 include parser and henry processing times
+        parser_time = request_document.get("parser_time", "Absent")
+        if parser_time != "Absent":
+                request_document["parser_time"] = ""
+        henry_time = request_document.get("henry_time", "Absent")
+        if henry_time != "Absent":
+                request_document["henry_time"] = ""
+        # 11 used to indicate whether to use the input metaphor or just the parser output
         result = adb.run_annotation(request_document,
                                     metaphors,
                                     language,
