@@ -12,7 +12,8 @@ import traceback
 
 from lccsrv.paths import *
 from subprocess import Popen, PIPE
-from manage import getParserStatus, setParserStatus, getParserLock, setParserLock, getParserFlag, setParserFlag
+from manage import getParserStatus, setParserStatus, getParserLock, \
+    setParserLock, getParserFlag, setParserFlag
 import pexpect
 import re
 import imp
@@ -24,16 +25,16 @@ ENV = os.environ
 input_metaphors_count = 0
 kbcompiled = True
 
-DESCRIPTION = "Abductive engine output; "                               \
-              "targetFrame: Is currently equal to targetConceptSubDomain;"              \
-              "targetConceptDomain: Target concept domain defined by abduction; "           \
-              "targetConceptSubDomain: Target concept subdomain defined by abduction ; "        \
-              "sourceFrame: Source frame proposed by abduction ; "                  \
-              "sourceConceptSubDomain: Source subdomain proposed by abduction ; "           \
-              "targetFrameElementSentence: List of words denoting the target found by abduction; "  \
-              "sourceFrameElementSentence: List of words denoting the source found by abduction; "  \
-              "annotationMappings: Target-Source mapping structures. "                  \
-              "isiAbductiveExplanation: Target-Source mapping (metaphor interpretation) as "    \
+DESCRIPTION = "Abductive engine output; " \
+              "targetFrame: Is currently equal to targetConceptSubDomain;" \
+              "targetConceptDomain: Target concept domain defined by abduction; " \
+              "targetConceptSubDomain: Target concept subdomain defined by abduction ; " \
+              "sourceFrame: Source frame proposed by abduction ; " \
+              "sourceConceptSubDomain: Source subdomain proposed by abduction ; " \
+              "targetFrameElementSentence: List of words denoting the target found by abduction; " \
+              "sourceFrameElementSentence: List of words denoting the source found by abduction; " \
+              "annotationMappings: Target-Source mapping structures. " \
+              "isiAbductiveExplanation: Target-Source mapping (metaphor interpretation) as " \
               "logical form found by abduction."
 
 
@@ -85,11 +86,13 @@ def strcut(some_str, max_size=120):
         return some_str
     return "<NONE>"
 
+
 def FAexpect():
     index = child['FA'].expect([".*\r\n\r\n.*\r\n\r\n", pexpect.TIMEOUT, pexpect.EOF])
     index = child['FA'].expect(["END\r\n", pexpect.TIMEOUT, pexpect.EOF])
     index = child['FA'].expect([".*\r\n\r\n.*\r\n\r\nEND", pexpect.TIMEOUT, pexpect.EOF])
     return index
+
 
 def ESexpect():
     index = child['ES'].expect([".*\r\n\r\n.*\r\n\r\n.*\r\n\r\n", pexpect.TIMEOUT, pexpect.EOF])
@@ -97,102 +100,108 @@ def ESexpect():
     index = child['ES'].expect([".*\r\n\r\n.*\r\n\r\n.*\r\n\r\nEND", pexpect.TIMEOUT, pexpect.EOF])
     return index
 
+
 def RUexpect():
     index = child['RU'].expect([".*\r\n\r\n.*\r\n\r\n.*\r\n\r\n", pexpect.TIMEOUT, pexpect.EOF])
     index = child['RU'].expect(["END\r\n", pexpect.TIMEOUT, pexpect.EOF])
     index = child['RU'].expect([".*\r\n\r\n.*\r\n\r\n.*\r\n\r\nEND", pexpect.TIMEOUT, pexpect.EOF])
     return index
 
-def ENexpect():
 
+def ENexpect():
     index = child['EN'].expect (["ccg\(.*\)*\)\)\.\r\n\r\nccg\(\d+.*'END', 'END', .*\)\)\.\r\n\r\n", pexpect.TIMEOUT, pexpect.EOF])
 
     #child['EN'].expect(pexpect.EOF)
     return index
     #return 0
 
-metaPattern=re.compile("^<META>[\s]*[0-9]+$")
+
+metaPattern = re.compile("^<META>[\s]*[0-9]+$")
+
 def getWpos(tokenizer_output,language):
-    word2ids=defaultdict(list)
-    if language=="ES" or language=="FA" or language=="RU":
+    word2ids = defaultdict(list)
+    if language in ["ES", "FA", "RU"]:
         for line in tokenizer_output.splitlines():
-            line=line.strip()
+            line = line.strip()
             if line:
-                words=line.split()
-                if words and len(words)>1:
+                words = line.split()
+                if words and len(words) > 1:
                     word2ids[words[1]].append(int(words[0]))
-    elif language=="EN":
+    elif language == "EN":
         for line in tokenizer_output.splitlines():
-            line=line.strip()
+            line = line.strip()
             if line and not metaPattern.match(line):
-                words=line.split()
+                words = line.split()
                 for i in xrange(len(words)):
                     word2ids[words[i]].append(i+1)
     return word2ids
 
+
 def removeThousands(pid):
-    if pid and type(pid)==int:
-        while pid>999:
-            pid=pid-1000
+    if pid and type(pid) == int:
+        while pid > 999:
+            pid = pid - 1000
     return pid
 
-idPattern=re.compile("^.*\[([^\]]+)\].*$")
-def filterParserOutput(parses,word2ids,sources,targets):
-    filtered={}
+
+idPattern = re.compile("^.*\[([^\]]+)\].*$")
+def filterParserOutput(parses, word2ids, sources, targets):
+    filtered = {}
     if sources and targets and parses and word2ids:
         for key in parses:
-            allfound=False
-            toKeep=Set()
+            allfound = False
+            toKeep = Set()
             if key in sources and key in targets and key in word2ids:
-                allfound=True
-                wids=word2ids[key]
+                allfound = True
+                wids = word2ids[key]
                 for w in sources[key].strip().split():
                     if w in wids:
                         toKeep.update(wids[w])
                     else:
-                        allfound=False
+                        allfound = False
                         break
                 for w in targets[key].strip().split():
                     if w in wids:
                         toKeep.update(wids[w])
                     else:
-                        allfound=False
+                        allfound = False
                         break
             if allfound and toKeep:
-                filtered[key]="(O (name "+str(key)+") (^ "
-                o=sexpdata.loads(parses[key])
+                filtered[key] = "(O (name " + str(key) + ") (^ "
+                o = sexpdata.loads(parses[key])
                 for p in o[2]:
-                    if type(p)==list:
+                    if type(p) == list:
                         #print("p: "+str(p))
-                        pidstring=sexpdata.dumps(p[-1])
+                        pidstring = sexpdata.dumps(p[-1])
                         #print("pidstring: "+pidstring)
-                        result=idPattern.match(pidstring)
-                        keepThisOne=True
+                        result = idPattern.match(pidstring)
+                        keepThisOne = True
                         if result:
-                            keepThisOne=False
-                            pids=result.group(1).split(",")
+                            keepThisOne = False
+                            pids = result.group(1).split(",")
                             for pid in pids:
                                 try:
-                                    pid=int(result.group(1)) if result else None
-                                    pid=removeThousands(pid)
+                                    pid = int(result.group(1)) if result else None
+                                    pid = removeThousands(pid)
                                 except ValueError:
-                                    pid=None
+                                    pid = None
                                 #print("pid number: "+str(pid))
                                 if not pid or pid in toKeep:
-                                    keepThisOne=True
+                                    keepThisOne = True
                                     break
                         if keepThisOne:
-                            filtered[key]+=printPred(p)
+                            filtered[key] += printPred(p)
                     #print("filtered[key]: "+filtered[key])
-                filtered[key]+="))"
-    parser_output=""
+                filtered[key] += "))"
+    parser_output = ""
     if parses:
         for key in parses:
             if key in filtered:
-                parser_output+=filtered[key]+"\n"
+                parser_output += filtered[key]+"\n"
             else:
-                parser_output+=parses[key]+"\n"
+                parser_output += parses[key]+"\n"
     return parser_output
+
 
 def needToGenerateGraph(dograph):
     if dograph == "NOGRAPH":
@@ -205,29 +214,31 @@ def needToGenerateGraph(dograph):
         return True
     return False
 
+
 def printPred(p):
     return sexpdata.dumps(p).replace(": [",":[").encode("utf-8")
 
+
 def mergeMultipleObservations(parser_output):
-    ret=parser_output
+    ret = parser_output
     if parser_output:
-        lines=parser_output.splitlines()
-        if lines and len(lines)>1:
-            ret=[]
-            counter=0
-            preds=[sexpdata.Symbol("^")]
+        lines = parser_output.splitlines()
+        if lines and len(lines) > 1:
+            ret = []
+            counter = 0
+            preds = [sexpdata.Symbol("^")]
 
             for l in lines:
-                o=sexpdata.loads(l)
+                o = sexpdata.loads(l)
                 if not ret:
                     ret.append(o[0])
                     ret.append(o[1])
                 for p in o[2]:
-                    if type(p)==list:
-                        np=[p[0]]
+                    if type(p) == list:
+                        np = [p[0]]
                         for a in p[1:]:
-                            if type(a)==sexpdata.Symbol:
-                                n=a.value()
+                            if type(a) == sexpdata.Symbol:
+                                n = a.value()
                                 if n[0].islower():
                                     np.append(sexpdata.Symbol(a.value()+"_"+str(counter)))
                                     continue
@@ -239,16 +250,19 @@ def mergeMultipleObservations(parser_output):
             ret=printPred(ret)
     return ret
 
-child = {'FA':"",'ES':"",'RU':"",'EN':""}
+child = {'FA': "", 'ES': "", 'RU': "", 'EN': ""}
+
 expectChild = {'FA': FAexpect, 'ES': ESexpect, 'RU': RUexpect, 'EN': ENexpect}
-def run_annotation(request_body_dict, input_metaphors, language, task, logger, with_pdf_content, last_step=3, kb=None,depth='3', extractor=None,
-           sources=None,targets=None):
-    word2ids=defaultdict(list)
-    extractor_module=None
+
+def run_annotation(request_body_dict, input_metaphors, language, task,
+                   logger, with_pdf_content, last_step=3, kb=None, depth='3',
+                   extractor=None, sources=None, targets=None):
+    word2ids = defaultdict(list)
+    extractor_module = None
     # load up the extractor code to use for extracting the metaphor
     if extractor:
-             module_desc=imp.find_module(extractor,["legacy"])
-             extractor_module=imp.load_module(extractor,*module_desc)
+        module_desc = imp.find_module(extractor, ["legacy"])
+        extractor_module = imp.load_module(extractor, *module_desc)
     global child
     start_time = time.time()
     #input_str = generate_text_input(input_metaphors, language)
@@ -264,7 +278,8 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
 
     # Parser pipeline
     if language == "FA":
-        parser_args="-c farsiMALTModel -m parse -w "+METAPHOR_DIR+"/external-tools/malt-1.5 -lfi parser.log"
+        parser_args = "-c farsiMALTModel -m parse -w " + \
+                      METAPHOR_DIR + "/external-tools/malt-1.5 -lfi parser.log"
         tokenizer_proc = os.path.join(METAPHOR_DIR, "pipelines/Farsi/pre-parser")
         MALT_PARSER_DIR = os.path.join(METAPHOR_DIR, "external-tools/malt-1.5")
         parser_proc = "java -cp " + MALT_PARSER_DIR + "/dist/malt/malt.jar:" + MALT_PARSER_DIR + " MaltParserWrap "+parser_args
@@ -277,7 +292,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
             KBPATH = kb
 
     elif language == "ES":
-        parser_args="-c ancora_under40 -m parse -w "+METAPHOR_DIR+"/external-tools/maltparser-1.7.2 -lfi parser.log"
+        parser_args = "-c ancora_under40 -m parse -w " + METAPHOR_DIR + "/external-tools/maltparser-1.7.2 -lfi parser.log"
         tokenizer_proc = os.path.join(METAPHOR_DIR, "pipelines/Spanish/pre-parser")
         MALT_PARSER_DIR = os.path.join(METAPHOR_DIR, "external-tools/maltparser-1.7.2")
         parser_proc = "java -cp " + MALT_PARSER_DIR + "/maltparser-1.7.2.jar:" + MALT_PARSER_DIR + " MaltParserWrap "+parser_args
@@ -290,11 +305,11 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
             KBPATH = kb
 
     elif language == "RU":
-        parser_args="-c rus-test -m parse -w "+METAPHOR_DIR+"/external-tools/malt-ru -lfi parser.log"
+        parser_args = "-c rus-test -m parse -w " + METAPHOR_DIR + "/external-tools/malt-ru -lfi parser.log"
         tokenizer_proc = os.path.join(METAPHOR_DIR, "pipelines/Russian/pre-parser")
         MALT_PARSER_DIR = os.path.join(METAPHOR_DIR, "external-tools/malt-1.5")
         RU_PARSER_DIR = os.path.join(METAPHOR_DIR, "external-tools/malt-ru")
-        parser_proc = "java -cp " + MALT_PARSER_DIR + "/dist/malt/malt.jar:" + RU_PARSER_DIR + " MaltParserWrap "+parser_args
+        parser_proc = "java -cp " + MALT_PARSER_DIR + "/dist/malt/malt.jar:" + RU_PARSER_DIR + " MaltParserWrap " + parser_args
         createLF_proc = os.path.join(METAPHOR_DIR, "pipelines/Russian/createLF")
         parser_output_append = ""
         b2h_proc = "python " + PARSER2HENRY + " --nonmerge sameid freqpred"
@@ -582,8 +597,8 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
                 task.task_error_count += 1
     task.log_error("Parser output: \n%r" % parser_output)
 
-    answer=dict()
-    count=0
+    answer = dict()
+    count = 0
     for annotation in input_annotations:
         if u"sentenceId" in annotation:
             sID = str(annotation["sentenceId"])
@@ -613,9 +628,9 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
     logger.info(msg)
     task.log_error(msg)
     for key in answer:
-        answer[key]=answer[key]/count
-    best=-1
-    bestkey=''
+        answer[key] = answer[key]/count
+    best = -1
+    bestkey = ''
     if answer:
         for key in answer:
             if answer[key]>=best:
@@ -627,20 +642,20 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
         for annotation in input_annotations:
             if u"isiAbductiveExplanation" in annotation:
                 exp = str(annotation["isiAbductiveExplanation"])
-                start=-1
-                end=-1
-                lines=exp.split('\n');
+                start = -1
+                end = -1
+                lines = exp.split('\n');
                 for idx, line in enumerate(lines):
                     if line == "%%BEGIN_CM_LIST":
-                        start=idx
+                        start = idx
                     elif line == "%%END_CM_LIST":
-                        end=idx
+                        end = idx
                         break
-                if start>=0 and end>=0:
-                    exp="\n".join(lines[0:start+1]+[bestkey+","+`best`]+[lines[end]])
+                if start >= 0 and end >= 0:
+                    exp = "\n".join(lines[0:start+1]+[bestkey+","+`best`]+[lines[end]])
                 else:
-                    exp=exp+"\n"+"%%BEGIN_CM_LIST"+"\n"+bestkey+","+`best`+"\n"+"%%END_CM_LIST"
-                msg="changing interpretation from:\n%s\n to:\n%s" % (annotation["isiAbductiveExplanation"],exp)
+                    exp = exp+"\n"+"%%BEGIN_CM_LIST"+"\n"+bestkey+","+`best`+"\n"+"%%END_CM_LIST"
+                msg = "changing interpretation from:\n%s\n to:\n%s" % (annotation["isiAbductiveExplanation"],exp)
                 logger.info(msg)
                 task.log_error(msg)
                 annotation["isiAbductiveExplanation"]=exp
@@ -659,13 +674,13 @@ def run_annotation(request_body_dict, input_metaphors, language, task, logger, w
     if "step" in request_body_dict:
         del request_body_dict["step"];
     if "task_id" in request_body_dict:
-        request_body_dict["task_id"]=task.id
+        request_body_dict["task_id"] = task.id
     if "enableDebug" in request_body_dict:
         del request_body_dict["enableDebug"];
-    #task_id contains the id used to access the log entry for thsi request.
+    #task_id contains the id used to access the log entry for this request.
     if "task_id" in request_body_dict:
-        request_body_dict["task_id"]=task.id
-    result = json.dumps(request_body_dict, encoding="utf-8", indent=4)
+        request_body_dict["task_id"] = task.id
+    result = json.dumps(request_body_dict, encoding="utf-8", indent=2)
     logger.info("Processed: %d." % processed)
     logger.info("Failed: %d." % failed)
     logger.info("Total: %d." % total)

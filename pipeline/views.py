@@ -162,7 +162,7 @@ def user_logout(request):
 def run_pipeline(request):
 
     if request.method == "POST":
-        last_msg=""
+        last_msg = ""
         try:
             task = AnnotationTask(request_addr=request.META.get("REMOTE_ADDR"))
             task.request_body = request.body
@@ -188,13 +188,13 @@ def run_pipeline(request):
         except Exception:
             debug_option = False
             msg = "Error while annotating document. Traceback:\n%s." % traceback.format_exc()
-            last_msg=msg
+            last_msg = msg
             logger.error(msg)
             try:
                 task.log_error(msg)
             except Exception:
-                msg="Error 1 while saving failed task. Traceback: %s" % traceback.format_exc()
-                last_msg=msg
+                msg = "Error 1 while saving failed task. Traceback: %s" % traceback.format_exc()
+                last_msg = msg
                 logger.error(msg)
 
         try:

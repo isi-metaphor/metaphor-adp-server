@@ -1,35 +1,37 @@
 {
-    "STAGE":                    "master",
-    "ROOT":                     "/lfs1/metaphor/research/repo/oct-2014-latest/lcc-service-deployed",
+    "STAGE": "master",
+    "ROOT": "/research/repo/lcc-service",
 
-    "ADMIN_NAME":               "metaphor",
-    "ADMIN_EMAIL":              "metaphor@isi.edu",
-    "OTHER_EMAILS":              "other@isi.edu another@isi.edu",
+    "ADMIN_NAME": "MICS",
+    "ADMIN_EMAIL": "",
+    "OTHER_EMAILS": "",
 
-    "DJANGO_DEBUG":             "True",
-    "DJANGO_DB_NAME":           "/lfs1/metaphor/research/repo/oct-2014-latest/data/lcc-service/lcc-service.db",
+    "DJANGO_DEBUG": "True",
+    "DJANGO_DB_NAME": "/research/data/lcc-service/lcc-service.db",
 
-    "NGINX_PORT":               8084,
-    "NGINX_SERVER_NAME":        "colo-pm4.isi.edu",
+    "NGINX_PORT": 8000,
+    "NGINX_SERVER_NAME": "localhost",
 
-    "LOGGING_REQUESTS_FILE":    "/lfs1/metaphor/research/repo/oct-2014-latest/logs/lcc-service/app.requests.log",
-    "LOGGING_DJANGO_FILE":      "/lfs1/metaphor/research/repo/oct-2014-latest/logs/lcc-service/app.django.log",
-    "LOGGING_PIPELINE_FILE":    "/lfs1/metaphor/research/repo/oct-2014-latest/logs/lcc-service/app.pipeline.log",
+    "NGINX_LOG_ACCESS": "/research/logs/lcc-service/nginx.access.log",
+    "NGINX_LOG_ERROR": "/research/logs/lcc-service/nginx.error.log",
 
-    "PIPELINE_CONFIG":          {
-        "METAPHOR_DIR":         "/lfs1/metaphor/research/repo/oct-2014-latest/Metaphor-ADP",
-        "HENRY_DIR":            "/lfs1/metaphor/research/repo/oct-2014-latest/henry-n700",
-        "BOXER_DIR":            "/lfs1/metaphor/research/repo/oct-2014-latest/boxer",
-        "TMP_DIR":              "/lfs1/metaphor/research/repo/oct-2014-latest/temp/lcc-service.tmp",
-        "GUROBI_HOME":          "/lfs1/metaphor/research/repo/oct-2014-latest/gurobi563/linux64/",
-        "GRB_LICENSE_FILE":     "/lfs1/metaphor/research/repo/oct-2014-latest/gurobi.lic",
-        "CPLUS_INCLUDE_PATH":   "/usr/include/python2.7/:${GUROBI_HOME}/include",
-        "PATH":                 ".:${TEAM_LOCAL}/bin:${TEAM_PUBLIC}/bin:${PATH}:/usr/sbin:/sbin:/usr/bin:${GUROBI_HOME}/bin:${JAVA_HOME}/bin",
-        "LD_LIBRARY_PATH":      ":${GUROBI_HOME}/lib/:${LD_LIBRARY_PATH}",
-        "LIBRARY_PATH":         "${GUROBI_HOME}/lib",
-        "UPLOADS_DIR":          "/lfs1/metaphor/research/repo/oct-2014-latest/data/metaphor_kbs"
+    "LOGGING_REQUESTS_FILE": "/research/logs/lcc-service/app.requests.log",
+    "LOGGING_DJANGO_FILE": "/research/logs/lcc-service/app.django.log",
+    "LOGGING_PIPELINE_FILE": "/research/logs/lcc-service/app.pipeline.log",
+    "LOGGING_UWSGI_FILE": "/research/logs/lcc-service/uwsgi.log",
+
+    "PIPELINE_CONFIG": {
+        "METAPHOR_DIR": "/research/repo/metaphor",
+        "HENRY_DIR": "/research/repo/henry",
+        "BOXER_DIR": "/research/ext/boxer",
+        "TMP_DIR": "/research/temp/lcc-service.tmp",
+        "GUROBI_HOME": "/research/ext/gurobi/linux64/",
+        "GRB_LICENSE_FILE": "/research/ext/gurobi/license/gurobi.lic",
+        "CPLUS_INCLUDE_PATH":  "/usr/include/python2.7:${GUROBI_HOME}/include",
+        "PATH": ".:${TEAM_LOCAL}/bin:${TEAM_PUBLIC}/bin:${PATH}:/usr/sbin:/sbin:/usr/bin:${GUROBI_HOME}/bin:${JAVA_HOME}/bin",
+        "LD_LIBRARY_PATH": ":${GUROBI_HOME}/lib/:${LD_LIBRARY_PATH}",
+        "LIBRARY_PATH": "${GUROBI_HOME}/lib",
+        "UPLOADS_DIR": "/research/data/kbs"
    }
 
 }
-
-

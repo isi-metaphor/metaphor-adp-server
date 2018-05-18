@@ -1,47 +1,50 @@
 # coding: utf-8
 
-# Copyright (C) University of Southern California (http://usc.edu)
+# Copyright (C) University of Southern California (https://usc.edu)
 # Author: Vladimir M. Zaytsev <zaytsev@usc.edu>
-# URL: <http://nlg.isi.edu/>
+# URL: <https://nlg.isi.edu>
 # For more information, see README.md
 # For license information, see LICENSE
 
-import os
 import sys
+import os
+import os.path as path
 import logging
 
 
 logger = logging.getLogger("pipeline")
 
 
-METAPHOR_DIR        =  "{{PIPELINE_CONFIG.METAPHOR_DIR}}"
-HENRY_DIR           =  "{{PIPELINE_CONFIG.HENRY_DIR}}"
-BOXER_DIR           =  "{{PIPELINE_CONFIG.BOXER_DIR}}"
-TMP_DIR             =  "{{PIPELINE_CONFIG.TMP_DIR}}"
-GUROBI_HOME         =  "{{PIPELINE_CONFIG.GUROBI_HOME}}"
-GRB_LICENSE_FILE    =  "{{PIPELINE_CONFIG.GRB_LICENSE_FILE}}"
-CPLUS_INCLUDE_PATH  =  "{{PIPELINE_CONFIG.CPLUS_INCLUDE_PATH}}"
-PATH                =  "{{PIPELINE_CONFIG.PATH}}"
-LD_LIBRARY_PATH     =  "{{PIPELINE_CONFIG.LD_LIBRARY_PATH}}"
-LIBRARY_PATH        =  "{{PIPELINE_CONFIG.LIBRARY_PATH}}"
+METAPHOR_DIR = "/research/repo/metaphor"
+HENRY_DIR = "/research/repo/henry"
+BOXER_DIR = "/research/ext/boxer"
+TMP_DIR = "/research/temp"
+GUROBI_HOME = "/research/ext/gurobi/linux64"
+GRB_LICENSE_FILE = "/research/ext/gurobi/license/gurobi.lic"
+CPLUS_INCLUDE_PATH = "/usr/include/python2.7:/research/ext/gurobi/linux64/include"
+PATH = "/bin:/sbin:/usr/bin:/usr/sbin:/research/ext/gurboi/linux64/bin"
+LD_LIBRARY_PATH = "/research/ext/gurobi/linux64/lib:${LD_LIBRARY_PATH}"
+LIBRARY_PATH = "/research/ext/gurobi/linux64/lib:$LIBRARY_PATH}"
 
-FARSI_PIPELINE      =  os.path.join(METAPHOR_DIR, "pipelines/Farsi/LF_Pipeline")
-SPANISH_PIPELINE    =  os.path.join(METAPHOR_DIR, "pipelines/Spanish/run_spanish.sh")
-RUSSIAN_PIPELINE    =  os.path.join(METAPHOR_DIR, "pipelines/Russian/run_russian.sh")
+FARSI_PIPELINE = path.join(METAPHOR_DIR, "pipelines/Farsi/LF_Pipeline")
+SPANISH_PIPELINE = path.join(METAPHOR_DIR, "pipelines/Spanish/run_spanish.sh")
+RUSSIAN_PIPELINE = path.join(METAPHOR_DIR, "pipelines/Russian/run_russian.sh")
 
-BOXER2HENRY         =   os.path.join(METAPHOR_DIR, "pipelines/English/Boxer2Henry.py")
-PARSER2HENRY        =   os.path.join(METAPHOR_DIR, "pipelines/common/IntParser2Henry.py")
+BOXER2HENRY = path.join(METAPHOR_DIR, "pipelines/English/Boxer2Henry.py")
+PARSER2HENRY = path.join(METAPHOR_DIR, "pipelines/common/IntParser2Henry.py")
 
-EN_KBPATH           =   os.path.join(METAPHOR_DIR, "KBs/English/English_compiled_KB.da")
-ES_KBPATH           =   os.path.join(METAPHOR_DIR, "KBs/Spanish/Spanish_compiled_KB.da")
-RU_KBPATH           =   os.path.join(METAPHOR_DIR, "KBs/Russian/Russian_compiled_KB.da")
-FA_KBPATH           =   os.path.join(METAPHOR_DIR, "KBs/Farsi/Farsi_compiled_KB.da")
+KBS_DIR = path.join(METAPHOR_DIR, "KBs")
 
-CODE_RU             =   os.path.join(METAPHOR_DIR, "pipelines/Russian/")
-CODE_EN             =   os.path.join(METAPHOR_DIR, "pipelines/English/")
-CODE_ES             =   os.path.join(METAPHOR_DIR, "pipelines/Spanish/")
-CODE_FA             =   os.path.join(METAPHOR_DIR, "pipelines/Farsi/")
-CODE_COMMON         =   os.path.join(METAPHOR_DIR, "pipelines/common/")
+EN_KBPATH = path.join(KBS_DIR, "English/English_compiled_KB.da")
+ES_KBPATH = path.join(KBS_DIR, "Spanish/Spanish_compiled_KB.da")
+RU_KBPATH = path.join(KBS_DIR, "Russian/Russian_compiled_KB.da")
+FA_KBPATH = path.join(KBS_DIR, "Farsi/Farsi_compiled_KB.da")
+
+CODE_RU = path.join(METAPHOR_DIR, "pipelines/Russian")
+CODE_EN = path.join(METAPHOR_DIR, "pipelines/English")
+CODE_ES = path.join(METAPHOR_DIR, "pipelines/Spanish")
+CODE_FA = path.join(METAPHOR_DIR, "pipelines/Farsi")
+CODE_COMMON = path.join(METAPHOR_DIR, "pipelines/common")
 
 
 sys.path.extend([CODE_RU, CODE_EN, CODE_ES, CODE_FA, CODE_COMMON])
