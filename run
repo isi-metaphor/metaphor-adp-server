@@ -1,0 +1,5 @@
+#!/bin/bash
+
+docker run -it -p 8000:8000 \
+       -v $PWD/lic:/research/ext/gurobi/license \
+       --rm --name metaphor-server metaphor-server
