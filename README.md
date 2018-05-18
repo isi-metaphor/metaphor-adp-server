@@ -1,61 +1,84 @@
-# lcc-service
+# Metaphor Interpretation Web Service
 
-Check README.pdf for further instructions.
+The code in this repository provides both the end-user interface and the
+JSON API for handling requests to interpret metaphors.
 
 ## Installation
+
+The directory structure should look like this:
+
+![Directory tree](docs/directories.png)
+
+The instructions below assume you're installing in /research, but this can
+be any directory you prefer.
 
 This is how to install the entire metaphor pipeline, including the web
 service in this repository:
 
 1. Clone repositories for the Metaphor pipeline and for the Henry
-abductive reasoner:
+   abductive reasoner:
+
 ```
-mkdir installation-dir
-cd installation-dir
-git clone https://github.com/isi-metaphor/Metaphor-ADP.git
-git clone https://github.com/naoya-i/henry-n700.git
+mkdir -p /research/repo
+cd /research/repo
+git clone https://github.com/isi-metaphor/Metaphor-ADP.git metaphor
+git clone https://github.com/isi-metaphor/henry-n700.git henry
 ```
 
 2. Compile Henry:
-- `cd` to the henry directory and run `make -B`
-- You may need to install python-dev, libsqlite3-dev, graphviz and python-lxml
+- Install dependencies: python-dev, libsqlite3-dev, graphviz and python-lxml
+- Compile:
+
+```
+cd /research/repo/henry
+make -B
+```
 
 3. Install Boxer:
-- Install boxer in a separate subdirectory of installation-dir (called
-  boxer maybe).
-- First register at: http://svn.ask.it.usyd.edu.au/trac/candc/wiki/Register
 - Install Prolog: `sudo apt-get install swi-prolog`
+- The official Boxer Subversion repository is no longer available, so
+  clone an unofficial Git repository:
+
 ```
-svn co http://svn.ask.it.usyd.edu.au/candc/trunk boxer
-cd boxer
-ln -s Makefile.unix Makefile
+cd /research/repo
+git clone https://github.com/chrzyki/candc.git
+cd candc/candc
 make
 make bin/boxer
 make bin/tokkie
 ```
-- Download the models: http://svn.ask.it.usyd.edu.au/download/candc/models-1.02.tgz
-- Uncompress them in the boxer installation directory
+- Uncompress the model in the Boxer installation directory:
+```
+cd /research/repo/candc/models
+tar xvzf models-1.02.tgz
+mv models /research/repo/candc/candc
+```
 
 4. Install Gurobi: Install gurobi in a separate subdirectory of
-installation-dir (called gurobi maybe), and install the license file
-somewhere.
+   installation-dir (called gurobi maybe), and install the license file
+   somewhere.
 
 5. Clone the web service and set up its directories:
 
 ```
+cd /research/rep
 git clone https://github.com/isi-metaphor/lcc-service.git
 
-mkdir temp
-mkdir temp/lcc-service.tmp
-mkdir data
-mkdir data/metaphor_kbs
-mkdir data/lcc-service
-mkdir logs
-mkdir logs/lcc-service
+mkdir -p /research/temp/lcc-service.tmp
+mkdir -p /research/data/metaphor_kbs
+mkdir -p /research/data/lcc-service
+mkdir -p /research/logs/lcc-service
 ```
 
-6. Deploy the web service: The git clone command just downloads the code
-but then it needs to be configured and deployed.
+6. Install dependencies:
+
+```
+sudo apt-get install fabric openssh-server screen
+sudo pip install jinja2 django lz4 gitpython pexpect regex sexpdata simplejson
+```
+
+7. Deploy the web service: The git clone command just downloads the code
+   but then it needs to be configured and deployed.
 
 - Edit the file `lcc-service/fab/config.{branch_name}.json` depending on if
   you want to install the prod or dev branch of the web service
@@ -71,8 +94,8 @@ but then it needs to be configured and deployed.
     function in fabfile.py
   - Execute `fab install:branch_name`
 
-7. Initialize the database file:
-- Go into the deployed directory and run: 
+8. Initialize the database file:
+- Go into the deployed directory and run:
 ```
 python manage.py syncdb --noinput --settings=lccsrv.settings
 ```
@@ -82,11 +105,12 @@ python manage.py createsuperuser --username=username_to_create \
     --email=whatever@whatever --settings=lccsrv.settings
 ```
 
-8. Run:
+9. Run:
 - Edit the shell.sh script to set the name of the screen session it'll start
   (the -S option)
-- Run the shell.sh command
-- Within the screen it started, start tempRun.sh
+- Run the `shell.sh` command
+- Within the screen it started, start `tempRun.sh`; for monitored mode
+  run `run.sh`.
 - Disconnect from the screen (CTRL-A D)
 
 ## Acknowledgments
