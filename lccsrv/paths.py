@@ -25,6 +25,7 @@ CPLUS_INCLUDE_PATH = "/usr/include/python2.7:/research/ext/gurobi/linux64/includ
 PATH = "/bin:/sbin:/usr/bin:/usr/sbin:/research/ext/gurboi/linux64/bin"
 LD_LIBRARY_PATH = "/research/ext/gurobi/linux64/lib:${LD_LIBRARY_PATH}"
 LIBRARY_PATH = "/research/ext/gurobi/linux64/lib:$LIBRARY_PATH}"
+UPLOADS_DIR = "/research/temp/uploads"
 
 FARSI_PIPELINE = path.join(METAPHOR_DIR, "pipelines/Farsi/LF_Pipeline")
 SPANISH_PIPELINE = path.join(METAPHOR_DIR, "pipelines/Spanish/run_spanish.sh")
