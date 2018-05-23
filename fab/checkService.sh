@@ -24,10 +24,10 @@ do
     runCheck "ru"
     runCheck "fa"
     runCheck "es"
-    time_diff=$((`date "+%s"` - $yest_date)) 
+    time_diff=$((`date "+%s"` - $yest_date))
     if [ $time_diff -gt 86400 ]; then
-    yest_date=`date "+%s"`
-    echo ""|mail -s "checkServiceScript for $SUBJECT is running." $EMAILS
+        yest_date=`date "+%s"`
+        echo ""|mail -s "checkServiceScript for $SUBJECT is running." $EMAILS
     fi
     sleep 5m
 done
