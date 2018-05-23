@@ -92,6 +92,22 @@ RUN mkdir /research/data/kbs
 
 WORKDIR /research/repo/lcc-service
 
+ENV METAPHOR_DIR=/research/repo/metaphor
+ENV PYTHONPATH=$PYTHONPATH:$METAPHOR_DIR/pipelines/common
+ENV PYTHONPATH=$PYTHONPATH:$METAPHOR_DIR/pipelines/Russian
+ENV PYTHONPATH=$PYTHONPATH:$METAPHOR_DIR/pipelines/English
+ENV PYTHONPATH=$PYTHONPATH:$METAPHOR_DIR/pipelines/Farsi
+ENV PYTHONPATH=$PYTOHNPATH:$METAPHOR_DIR/pipelines/Spanish
+ENV HENRY_DIR=/research/repo/henry
+ENV BOXER_DIR=/research/ext/boxer
+ENV TMP_DIR=/research/temp
+ENV GUROBI_HOME=/research/ext/gurobi
+ENV GRB_LICENSE_FILE=/research/ext/gurobi/license/gurobi.lic
+ENV CPLUS_INCLUDE_PATH=/usr/include/python2.7:$GUROBI_HOME/include
+ENV PATH=$PATH:/usr/sbin:/sbin:/usr/bin:$GUROBI_HOME/bin:$JAVA_HOME/bin
+ENV LD_LIBRARY_PATH=$GUROBI_HOME/lib:$LD_LIBRARY_PATH
+ENV LIBRARY_PATH=$GUROBI_HOME/lib
+
 ENV DJANGO_SETTINGS_MODULE=lccsrv.settings
 
 RUN ./manage.py syncdb --noinput
