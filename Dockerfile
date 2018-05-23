@@ -51,23 +51,17 @@ RUN make -B
 # Install Boxer.
 
 WORKDIR /research/ext
-RUN git clone https://github.com/chrzyki/candc.git
 
-RUN cd /research/ext/candc/candc && \
-    make clean && \
+RUN git clone https://github.com/jgordon/boxer
+
+RUN cd boxer && \
     make && \
     make bin/boxer && \
     make bin/tokkie
 
-RUN cd /research/ext/candc/models && \
-    tar xvzf models-1.02.tgz && \
-    rm *.tgz && \
-    mv models/* . && \
-    rm -r models
-
-RUN mv /research/ext/candc/candc /research/ext/boxer && \
-    mv /research/ext/candc/models /research/ext/boxer/models && \
-    rm -r /research/ext/candc
+RUN cd boxer && \
+    tar xvjf models-1.02.tar.bz2 && \
+    rm models-1.02.tar.bz2
 
 
 # Install Metaphor-ADP.
@@ -89,7 +83,7 @@ COPY . /research/repo/lcc-service
 
 #
 
-RUN mkdir /research/temp
+RUN mkdir -p /research/temp/uploads
 RUN mkdir -p /research/logs/lcc-service
 RUN mkdir -p /research/data/lcc-service
 RUN mkdir /research/data/kbs
