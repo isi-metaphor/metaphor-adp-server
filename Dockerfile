@@ -86,7 +86,6 @@ COPY . /research/repo/lcc-service
 RUN mkdir -p /research/temp/uploads
 RUN mkdir -p /research/logs/lcc-service
 RUN mkdir -p /research/data/lcc-service
-RUN mkdir /research/data/kbs
 
 #
 

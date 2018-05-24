@@ -12,13 +12,9 @@
     "NGINX_PORT": 8000,
     "NGINX_SERVER_NAME": "localhost",
 
-    "NGINX_LOG_ACCESS": "/research/logs/lcc-service/nginx.access.log",
-    "NGINX_LOG_ERROR": "/research/logs/lcc-service/nginx.error.log",
-
     "LOGGING_REQUESTS_FILE": "/research/logs/lcc-service/app.requests.log",
     "LOGGING_DJANGO_FILE": "/research/logs/lcc-service/app.django.log",
     "LOGGING_PIPELINE_FILE": "/research/logs/lcc-service/app.pipeline.log",
-    "LOGGING_UWSGI_FILE": "/research/logs/lcc-service/uwsgi.log",
 
     "PIPELINE_CONFIG": {
         "METAPHOR_DIR": "/research/repo/metaphor",
@@ -31,7 +27,7 @@
         "PATH": ".:${TEAM_LOCAL}/bin:${TEAM_PUBLIC}/bin:${PATH}:/usr/sbin:/sbin:/usr/bin:${GUROBI_HOME}/bin:${JAVA_HOME}/bin",
         "LD_LIBRARY_PATH": ":${GUROBI_HOME}/lib/:${LD_LIBRARY_PATH}",
         "LIBRARY_PATH": "${GUROBI_HOME}/lib",
-        "UPLOADS_DIR": "/research/data/kbs"
+        "UPLOADS_DIR": "/research/temp/uploads"
    }
 
 }
