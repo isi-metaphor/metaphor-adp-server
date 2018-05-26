@@ -1,8 +1,8 @@
 # coding: utf-8
 
-# Copyright (C) University of Southern California (http://usc.edu)
+# Copyright (C) University of Southern California (https://usc.edu)
 # Author: Vladimir M. Zaytsev <zaytsev@usc.edu>
-# URL: <http://nlg.isi.edu/>
+# URL: <https://nlg.isi.edu>
 # For more information, see README.md
 # For license information, see LICENSE
 
@@ -25,11 +25,11 @@ ADMINS = ()
 MANAGERS = ADMINS
 DATABASES = {
     "default": {
-        "ENGINE":   "django.db.backends.sqlite3",
-        "NAME":     "local.db",
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": "local.db",
         "OPTIONS": {
             "timeout": 20,
-            }
+        }
     }
 }
 
@@ -104,29 +104,27 @@ LOGGING = {
             "class": "logging.StreamHandler",
             "formatter": "simple",
         },
-
         "pipeline-file": {
             "class": "logging.handlers.RotatingFileHandler",
-            "filename": "logs/pipeline.log",
+            "filename": "/research/logs/lcc-service/pipeline.log",
             "formatter": "verbose",
             "backupCount": 3,
             "maxBytes": 1024 * 1024 * 16,
         },
         "django-file": {
             "class": "logging.handlers.RotatingFileHandler",
-            "filename": "logs/django.log",
+            "filename": "/research/logs/lcc-service/django.log",
             "formatter": "verbose",
             "backupCount": 3,
             "maxBytes": 1024 * 1024 * 16,
         },
         "requests-file": {
             "class": "logging.handlers.RotatingFileHandler",
-            "filename": "logs/requests.log",
+            "filename": "/research/logs/lcc-service/requests.log",
             "formatter": "verbose",
             "backupCount": 3,
             "maxBytes": 1024 * 1024 * 16,
         },
-
         "mail_admins": {
             "level": "ERROR",
             "class": "django.utils.log.AdminEmailHandler",
@@ -135,19 +133,16 @@ LOGGING = {
         }
     },
     "loggers": {
-
         "pipeline": {
             "handlers": ["pipeline-file", "console"],
             "propagate": True,
             "level": "DEBUG",
         },
-
         "django": {
             "handlers": ["django-file"],
             "propagate": True,
             "level": "DEBUG",
         },
-
         "django.requests": {
             "handlers": ["requests-file"],
             "propagate": True,

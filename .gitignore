@@ -7,7 +7,6 @@
 *.egg
 *.egg-info
 dist
-build
 eggs
 parts
 bin
@@ -40,3 +39,5 @@ local.db
 logs/*
 paths.py
 settings.py
+
+gurobi.lic

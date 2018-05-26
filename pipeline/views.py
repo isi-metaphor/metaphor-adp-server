@@ -1,8 +1,8 @@
 # coding: utf-8
 
-# Copyright (C) University of Southern California (http://usc.edu)
+# Copyright (C) University of Southern California (https://usc.edu)
 # Author: Vladimir M. Zaytsev <zaytsev@usc.edu>
-# URL: <http://nlg.isi.edu/>
+# URL: <https://nlg.isi.edu>
 # For more information, see README.md
 # For license information, see LICENSE
 
@@ -74,10 +74,10 @@ def app_status(request):
         return redirect("/app/")
     repo = git.Repo(".")
     return render(request, "app_status.html", {
-        "branch":   repo.active_branch,
-        "commit":   base64.b64encode(repo.active_branch.commit.binsha),
+        "branch": repo.git.execute(["git","describe","--all","--exact-match",str(repo.head.commit)]),
+        "commit": str(repo.head.commit),
         "settings": settings,
-        "paths":    paths,
+        "paths": paths
     })
 
 
@@ -162,7 +162,7 @@ def user_logout(request):
 def run_pipeline(request):
 
     if request.method == "POST":
-        last_msg=""
+        last_msg = ""
         try:
             task = AnnotationTask(request_addr=request.META.get("REMOTE_ADDR"))
             task.request_body = request.body
@@ -188,20 +188,20 @@ def run_pipeline(request):
         except Exception:
             debug_option = False
             msg = "Error while annotating document. Traceback:\n%s." % traceback.format_exc()
-            last_msg=msg
+            last_msg = msg
             logger.error(msg)
             try:
                 task.log_error(msg)
             except Exception:
-                msg="Error 1 while saving failed task. Traceback: %s" % traceback.format_exc()
-                last_msg=msg
+                msg = "Error 1 while saving failed task. Traceback: %s" % traceback.format_exc()
+                last_msg = msg
                 logger.error(msg)
 
         try:
             response = task.to_response(save=True, enable_debug=debug_option)
-	    logsDisplay = LogsDisplay()
-	    logsDisplay.fill_table(task)
-	    
+            logsDisplay = LogsDisplay()
+            logsDisplay.fill_table(task)
+
             return response
         except Exception:
             msg="Error 2 while saving failed task. Traceback: %s" % traceback.format_exc()

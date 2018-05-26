@@ -1,8 +1,8 @@
 # coding: utf-8
 
-# Copyright (C) University of Southern California (http://usc.edu)
+# Copyright (C) University of Southern California (https://usc.edu)
 # Author: Vladimir M. Zaytsev <zaytsev@usc.edu>
-# URL: <http://nlg.isi.edu/>
+# URL: <https://nlg.isi.edu>
 # For more information, see README.md
 # For license information, see LICENSE
 
@@ -16,7 +16,6 @@ from pipeline.models import TASK_STATUS
 import regex
 
 class Annotator(object):
-
     def __init__(self, logger, task):
         self.logger = logger
         self.task = task
@@ -46,16 +45,14 @@ class Annotator(object):
             return string
 
     def annotate(self):
-
         # 1.
         log_msg = "Start annotating document."
         self.logger.info(log_msg)
         self.task.log_error(log_msg)
         metaphors = {}
-        sourcePhrases={}
-        targetPhrases={}
+        sourcePhrases = {}
+        targetPhrases = {}
         request_document_body = self.task.request_body
-
 
         # 2. Parse document JSON
         log_msg = "Parse document json. Task id=%d, document size=%d.." % (self.task.id, len(request_document_body))
@@ -88,20 +85,24 @@ class Annotator(object):
             log_msg = "Selected KB full path is '%r'" % selected_kb
             self.logger.info(log_msg)
             self.task.log_error(log_msg)
-        # 2.2.1 Get kb content if supplied
+
+        # 2.2.1 Get KB content if supplied
         kb_content = request_document.get("kb_content", None)
-        inputHandleAndName=None
-        outputHandleAndName=None
+        inputHandleAndName = None
+        outputHandleAndName = None
         if kb_content is not None:
             log_msg = "KB content is NON NULL. overwriting selected_kb"
             self.logger.info(log_msg)
             self.task.log_error(log_msg)
-            inputHandleAndName=tempfile.mkstemp(dir=paths.UPLOADS_DIR)
-            outputHandleAndName=tempfile.mkstemp(dir=paths.UPLOADS_DIR)
+            inputHandleAndName = tempfile.mkstemp(dir=paths.UPLOADS_DIR)
+            outputHandleAndName = tempfile.mkstemp(dir=paths.UPLOADS_DIR)
             f = os.fdopen(inputHandleAndName[0], "w")
             f.write(kb_content)
             f.close()
-            subprocess.check_call([paths.HENRY_DIR+"/bin/henry", "-m", "compile_kb",inputHandleAndName[1],"-o",outputHandleAndName[1]])
+            subprocess.check_call([paths.HENRY_DIR+"/bin/henry",
+                                   "-m", "compile_kb",
+                                   inputHandleAndName[1],
+                                   "-o", outputHandleAndName[1]])
             selected_kb = outputHandleAndName[1]
             log_msg = "Selected KB full path is '%r'" % selected_kb
             self.logger.info(log_msg)
@@ -147,11 +148,11 @@ class Annotator(object):
                 self.task_error(error_msg, error_code=None, count_error=True)
                 annotation_id_index += 1
                 annotation_id = annotation_id_index
-                
+
             # 5.2
             try:
                 metaphor = annotation["linguisticMetaphor"]
-                metaphors[str(annotation_id)]=self.normalize(metaphor,language).encode("utf-8")
+                metaphors[str(annotation_id)] = self.normalize(metaphor, language).encode("utf-8")
 
             except KeyError:
                 error_msg = "Ann #%d. No metaphor available (skip it). Task=%d" % (
@@ -165,16 +166,16 @@ class Annotator(object):
                 if ams and len(ams)>0:
                     am=ams[0]
             if am and "source" in am:
-                sourcePhrases[str(annotation_id)]=self.normalize(self.removePunctuation(am["source"]),language).encode("utf-8")
+                sourcePhrases[str(annotation_id)] = self.normalize(self.removePunctuation(am["source"]), language).encode("utf-8")
             if am and "target" in am:
-                targetPhrases[str(annotation_id)]=self.normalize(self.removePunctuation(am["target"]),language).encode("utf-8")
+                targetPhrases[str(annotation_id)] = self.normalize(self.removePunctuation(am["target"]), language).encode("utf-8")
 
         self.logger.info("Task %d language=%s" % (self.task.id, language))
         self.task.language = language
         self.task.task_status = TASK_STATUS.PREPROCESSED
         self.task.response_status = 200
 
-        # 6. If there are no metaphors for annotation, return error.
+        # 6 If there are no metaphors for annotation, return error.
         if len(metaphors) == 0:
             error_msg = "Found 0 metaphors for annotation. Task id=#%d."
             return self.task_error(error_msg, 6)
@@ -185,26 +186,29 @@ class Annotator(object):
         self.logger.info(log_msg)
         self.task.log_error(log_msg)
 
-        # 8 generate graph (even if no debug option)
-        dograph = request_document.get("dograph",False) or debug_option
-        log_msg = "dograph is {0} {1}".format(dograph ,debug_option)
+        # 8 Generate graph (even if no debug option)
+        dograph = request_document.get("dograph", False) or debug_option
+        log_msg = "dograph is {0} {1}".format(dograph, debug_option)
         self.logger.info(log_msg)
         self.task.log_error(log_msg)
 
         # 9 select which extractor code to run
-        extractor = request_document.get("extractor","extractor-no-span-june-2014-eval")
+        extractor = request_document.get("extractor",
+                                         "extractor-2014-06-no-span")
         log_msg = "using this extractor code: legacy/{0}.py".format(extractor)
         self.logger.info(log_msg)
         self.task.log_error(log_msg)
 
-	# 10 include parser and henry processing times
-	parser_time = request_document.get("parser_time", "Absent")
-	if parser_time != "Absent":
-		request_document["parser_time"] = ""
-	henry_time = request_document.get("henry_time", "Absent")
-	if henry_time != "Absent":
-		request_document["henry_time"] = ""
-	# 11 used to indicate whether to use the input metaphor or just the parser output
+        # 10 include parser and henry processing times
+        parser_time = request_document.get("parser_time", "Absent")
+        if parser_time != "Absent":
+                request_document["parser_time"] = ""
+        henry_time = request_document.get("henry_time", "Absent")
+        if henry_time != "Absent":
+                request_document["henry_time"] = ""
+
+        # 11 used to indicate whether to use the input metaphor or just the
+        # parser output
         result = adb.run_annotation(request_document,
                                     metaphors,
                                     language,

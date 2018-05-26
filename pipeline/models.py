@@ -1,8 +1,8 @@
 # coding: utf-8
 
-# Copyright (C) University of Southern California (http://usc.edu)
+# Copyright (C) University of Southern California (https://usc.edu)
 # Author: Vladimir M. Zaytsev <zaytsev@usc.edu>
-# URL: <http://nlg.isi.edu/>
+# URL: <https://nlg.isi.edu>
 # For more information, see README.md
 # For license information, see LICENSE
 
@@ -17,25 +17,24 @@ from django.http import HttpResponse
 
 
 class TASK_STATUS:
-
     DOCUMENT_RECEIVED = 0
-    PREPROCESSED      = 1
-    PROCESSED         = 2
+    PREPROCESSED = 1
+    PROCESSED = 2
 
 class LogsDisplay(models.Model):
     class Meta:
-	db_table = "light_t_tasks"
-    id                  = models.IntegerField(primary_key=True)
-    request_addr        = models.CharField(null=True, blank=True, max_length=16)
-    request_time        = models.DateTimeField(auto_now_add=True, null=False)
-    request_lang        = models.CharField(max_length=32, null=True)
-    response_time       = models.DateTimeField(null=True)
-    response_status     = models.IntegerField(null=False, default=500)
+        db_table = "light_t_tasks"
+    id = models.IntegerField(primary_key=True)
+    request_addr = models.CharField(null=True, blank=True, max_length=16)
+    request_time = models.DateTimeField(auto_now_add=True, null=False)
+    request_lang = models.CharField(max_length=32, null=True)
+    response_time = models.DateTimeField(null=True)
+    response_status = models.IntegerField(null=False, default=500)
 
-    task_status         = models.SmallIntegerField(null=False, default=TASK_STATUS.DOCUMENT_RECEIVED)
-    task_error_count    = models.IntegerField(default=0, null=False)
-    task_error_code     = models.IntegerField(null=False, default=0)
-    
+    task_status = models.SmallIntegerField(null=False, default=TASK_STATUS.DOCUMENT_RECEIVED)
+    task_error_count = models.IntegerField(default=0, null=False)
+    task_error_code = models.IntegerField(null=False, default=0)
+
     def status_str(self):
         if self.task_status == TASK_STATUS.DOCUMENT_RECEIVED:
             return "RECEIVED"
@@ -44,6 +43,7 @@ class LogsDisplay(models.Model):
         if self.task_status == TASK_STATUS.PROCESSED:
             return "PROCESSED"
         return "UNKNOWN"
+
     def error_code_str(self):
         if self.task_error_code == 0:
             return "OK"
@@ -58,40 +58,41 @@ class LogsDisplay(models.Model):
         return "UNKNOWN"
 
     def fill_table(self, task):
-	self.id = task.id
-	self.request_addr = task.request_addr
-	self.request_time = task.request_time
-	self.request_lang = task.request_lang
-	self.response_time = task.response_time
-	self.response_status = task.response_status
-	self.task_status = task.task_status
-	self.task_error_count = task.task_error_count
-	self.error_code = task.task_error_code
-	self.save()
-    
+        self.id = task.id
+        self.request_addr = task.request_addr
+        self.request_time = task.request_time
+        self.request_lang = task.request_lang
+        self.response_time = task.response_time
+        self.response_status = task.response_status
+        self.task_status = task.task_status
+        self.task_error_count = task.task_error_count
+        self.error_code = task.task_error_code
+        self.save()
+
+
 class AnnotationTask(models.Model):
 
     class Meta:
         db_table = "t_tasks"
 
-    request_addr        = models.CharField(null=True, blank=True, max_length=16)
-    request_time        = models.DateTimeField(auto_now_add=True, null=False)
-    request_lang        = models.CharField(max_length=32, null=True)
-    request_body_blob   = models.BinaryField(null=False)
+    request_addr = models.CharField(null=True, blank=True, max_length=16)
+    request_time = models.DateTimeField(auto_now_add=True, null=False)
+    request_lang = models.CharField(max_length=32, null=True)
+    request_body_blob = models.BinaryField(null=False)
 
-    henry_out_blob      = models.BinaryField(null=True)
-    parse_out_blob      = models.BinaryField(null=True)
-    dot_out_blob        = models.BinaryField(null=True)
+    henry_out_blob = models.BinaryField(null=True)
+    parse_out_blob = models.BinaryField(null=True)
+    dot_out_blob = models.BinaryField(null=True)
 
-    response_body_blob  = models.BinaryField(default=None, null=True)
-    response_time       = models.DateTimeField(null=True)
-    response_status     = models.IntegerField(null=False, default=500)
+    response_body_blob = models.BinaryField(default=None, null=True)
+    response_time = models.DateTimeField(null=True)
+    response_status = models.IntegerField(null=False, default=500)
 
-    task_status         = models.SmallIntegerField(null=False, default=TASK_STATUS.DOCUMENT_RECEIVED)
-    task_error_count    = models.IntegerField(default=0, null=False)
-    task_log_blob       = models.BinaryField(null=False)
-    task_error_message  = models.CharField(max_length=256, null=True, blank=True)
-    task_error_code     = models.IntegerField(null=False, default=0)
+    task_status = models.SmallIntegerField(null=False, default=TASK_STATUS.DOCUMENT_RECEIVED)
+    task_error_count = models.IntegerField(default=0, null=False)
+    task_log_blob = models.BinaryField(null=False)
+    task_error_message = models.CharField(max_length=256, null=True, blank=True)
+    task_error_code = models.IntegerField(null=False, default=0)
 
     def __init__(self, *args, **kwargs):
         super(AnnotationTask, self).__init__(*args, **kwargs)
@@ -124,7 +125,6 @@ class AnnotationTask(models.Model):
         self.log.write("\n")
 
     def to_response(self, save=True, enable_debug=False):
-
         if self.task_error_code != 0:
             if self.response_body_blob is None:
                 response_body = self.request_body
@@ -174,8 +174,7 @@ class AnnotationTask(models.Model):
 
     @henry_out.setter
     def henry_out(self, value):
-	self.henry_out_blob = lz4.compressHC(value)
-	
+        self.henry_out_blob = lz4.compressHC(value)
 
     @property
     def parse_out(self):
@@ -192,7 +191,6 @@ class AnnotationTask(models.Model):
     @dot_out.setter
     def dot_out(self, value):
         self.dot_out_blob = lz4.compressHC(json.dumps(value))
-
 
     @property
     def log_body(self):
