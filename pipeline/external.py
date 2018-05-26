@@ -133,7 +133,7 @@ def getWpos(tokenizer_output,language):
             if line and not metaPattern.match(line):
                 words = line.split()
                 for i in xrange(len(words)):
-                    word2ids[words[i]].append(i+1)
+                    word2ids[words[i]].append(i + 1)
     return word2ids
 
 
@@ -216,7 +216,7 @@ def needToGenerateGraph(dograph):
 
 
 def printPred(p):
-    return sexpdata.dumps(p).replace(": [",":[").encode("utf-8")
+    return sexpdata.dumps(p).replace(": [", ":[").encode("utf-8")
 
 
 def mergeMultipleObservations(parser_output):
@@ -240,14 +240,14 @@ def mergeMultipleObservations(parser_output):
                             if type(a) == sexpdata.Symbol:
                                 n = a.value()
                                 if n[0].islower():
-                                    np.append(sexpdata.Symbol(a.value()+"_"+str(counter)))
+                                    np.append(sexpdata.Symbol(a.value() + "_" + str(counter)))
                                     continue
                             np.append(a)
                         preds.append(np)
                 #print(sexpdata.dumps(o))
-                counter+=1
+                counter += 1
             ret.append(preds)
-            ret=printPred(ret)
+            ret = printPred(ret)
     return ret
 
 child = {'FA': "", 'ES': "", 'RU': "", 'EN': ""}
@@ -259,7 +259,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
                    extractor=None, sources=None, targets=None):
     word2ids = defaultdict(list)
     extractor_module = None
-    # load up the extractor code to use for extracting the metaphor
+    # Load up the extractor code to use for extracting the metaphor
     if extractor:
         module_desc = imp.find_module(extractor, ["legacy"])
         extractor_module = imp.load_module(extractor, *module_desc)
@@ -278,49 +278,56 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
 
     # Parser pipeline
     if language == "FA":
-        parser_args = "-c farsiMALTModel -m parse -w " + \
-                      METAPHOR_DIR + "/external-tools/malt-1.5 -lfi parser.log"
-        tokenizer_proc = os.path.join(METAPHOR_DIR, "pipelines/Farsi/pre-parser")
         MALT_PARSER_DIR = os.path.join(METAPHOR_DIR, "external-tools/malt-1.5")
-        parser_proc = "java -cp " + MALT_PARSER_DIR + "/dist/malt/malt.jar:" + MALT_PARSER_DIR + " MaltParserWrap "+parser_args
+        parser_args = "-c farsiMALTModel -m parse -w " + \
+            MALT_PARSER_DIR + " -lfi parser-fa.log"
+        tokenizer_proc = os.path.join(METAPHOR_DIR, "pipelines/Farsi/pre-parser")
+        parser_proc = "java -cp " + MALT_PARSER_DIR + "/dist/malt/malt.jar:" \
+            + MALT_PARSER_DIR + " MaltParserWrap " + parser_args
         createLF_proc = os.path.join(METAPHOR_DIR, "pipelines/Farsi/createLF")
         parser_output_append = ""
-        b2h_proc = "python " + PARSER2HENRY + " --nonmerge sameid freqpred"
+        b2h_proc = "python2.7 " + PARSER2HENRY + " --nonmerge sameid freqpred"
         if kb is None:
             KBPATH = FA_KBPATH
         else:
             KBPATH = kb
 
     elif language == "ES":
-        parser_args = "-c ancora_under40 -m parse -w " + METAPHOR_DIR + "/external-tools/maltparser-1.7.2 -lfi parser.log"
-        tokenizer_proc = os.path.join(METAPHOR_DIR, "pipelines/Spanish/pre-parser")
         MALT_PARSER_DIR = os.path.join(METAPHOR_DIR, "external-tools/maltparser-1.7.2")
-        parser_proc = "java -cp " + MALT_PARSER_DIR + "/maltparser-1.7.2.jar:" + MALT_PARSER_DIR + " MaltParserWrap "+parser_args
+        parser_args = "-c ancora_under40 -m parse -w " + \
+            MALT_PARSER_DIR + " -lfi parser-es.log"
+        tokenizer_proc = os.path.join(METAPHOR_DIR, "pipelines/Spanish/pre-parser")
+        parser_proc = "java -cp " + MALT_PARSER_DIR + \
+            "/maltparser-1.7.2.jar:" + MALT_PARSER_DIR + " MaltParserWrap " \
+            + parser_args
         createLF_proc =  METAPHOR_DIR + "/pipelines/Spanish/createLF"
         parser_output_append = ""
-        b2h_proc = "python " + PARSER2HENRY + " --nonmerge sameid freqpred"
+        b2h_proc = "python2.7 " + PARSER2HENRY + " --nonmerge sameid freqpred"
         if kb is None:
             KBPATH = ES_KBPATH
         else:
             KBPATH = kb
 
     elif language == "RU":
-        parser_args = "-c rus-test -m parse -w " + METAPHOR_DIR + "/external-tools/malt-ru -lfi parser.log"
-        tokenizer_proc = os.path.join(METAPHOR_DIR, "pipelines/Russian/pre-parser")
         MALT_PARSER_DIR = os.path.join(METAPHOR_DIR, "external-tools/malt-1.5")
-        RU_PARSER_DIR = os.path.join(METAPHOR_DIR, "external-tools/malt-ru")
-        parser_proc = "java -cp " + MALT_PARSER_DIR + "/dist/malt/malt.jar:" + RU_PARSER_DIR + " MaltParserWrap " + parser_args
+        parser_args = "-c rus-test -m parse -w " + MALT_PARSER_DIR + \
+            " -lfi parser-ru.log"
+        tokenizer_proc = os.path.join(METAPHOR_DIR,
+                                      "pipelines/Russian/pre-parser")
+        parser_proc = "java -cp " + MALT_PARSER_DIR + "/dist/malt/malt.jar:" \
+            + MALT_PARSER_DIR + " MaltParserWrap " + parser_args
         createLF_proc = os.path.join(METAPHOR_DIR, "pipelines/Russian/createLF")
         parser_output_append = ""
-        b2h_proc = "python " + PARSER2HENRY + " --nonmerge sameid freqpred"
+        b2h_proc = "python2.7 " + PARSER2HENRY + " --nonmerge sameid freqpred"
         if kb is None:
-                KBPATH = RU_KBPATH
+            KBPATH = RU_KBPATH
         else:
-                KBPATH = kb
+            KBPATH = kb
 
     elif language == "EN":
         tokenizer_proc = BOXER_DIR + "/bin/tokkie --stdin"
-        parser_proc = BOXER_DIR + "/bin/candc --models " + BOXER_DIR + "/models/boxer --candc-printer boxer 2>null"
+        parser_proc = BOXER_DIR + "/bin/candc --models " + \
+                      BOXER_DIR + "/models/boxer --candc-printer boxer 2>null"
         createLF_proc = BOXER_DIR + "/bin/boxer --semantics tacitus --resolve true --stdin"
         parser_output_append = ":- op(601, xfx, (/)).\n:- op(601, xfx, (\)).\n:- multifile ccg/2, id/2.\n:- discontiguous ccg/2, id/2.\n"
         b2h_proc = "python " + BOXER2HENRY + " --nonmerge sameid freqpred"
@@ -336,7 +343,8 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
             setParserLock(language, False)
             for key in input_metaphors.keys():
                 metaphor_count += 1
-                if "parser_output" in annotations[metaphor_count - 1] and annotations[metaphor_count - 1]["parser_output"] != "":
+                if "parser_output" in annotations[metaphor_count - 1] and \
+                   annotations[metaphor_count - 1]["parser_output"] != "":
                     createLF_output += annotations[metaphor_count - 1]["parser_output"]
                     continue
 
@@ -403,7 +411,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
                         reattempts = 2
                         child[language].terminate()
                         setParserStatus(language, False)
-                logger.info("Parser Flag : " +str(getParserFlag()))
+                logger.info("Parser Flag : " + str(getParserFlag()))
                 if not getParserFlag():
                     logger.info("\nTerminating Parser Process\n")
                     child[language].terminate()
@@ -422,7 +430,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
                         task.log_error("ccgs[0].split()" + str(ccgs[0].split("\r\t\r\t")))
                         final_parser_output = parser_output_append
                         ccg_split = ccgs[0].split("\r\t\r\t")
-                        for i in range(len(ccg_split)-2):
+                        for i in range(len(ccg_split) - 2):
                             """
                             if i == 0:
                             regex = r'ccg\((\d+).*'
@@ -432,7 +440,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
                             """
                             ccg_replace = "ccg(" + str(i+1)
                             ccg_split[i] = re.sub("ccg\(\d+" , ccg_replace, ccg_split[i])
-                            ccg_split[i] = re.sub("\t","\n", ccg_split[i])
+                            ccg_split[i] = re.sub("\t", "\n", ccg_split[i])
                             final_parser_output += ccg_split[i] + "\r\n\r\n"
                             final_parser_output += "id(" + str(key) + ",["+str(i+1)+"]).\r\n\r\n"
                         parser_output_inter = final_parser_output
@@ -493,38 +501,40 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
     logger.info("Parses:\n%r\n" % parses)
     task.log_error("Parses:\n%r" % parses)
 
-    msg="initial parser output: \n"+str(parses)+"\n sources: "+str(sources)+"\n targets: "+str(targets)+"\n word2ids: "+str(word2ids)
+    msg = "initial parser output: \n" + str(parses) + "\n sources: " + \
+          str(sources) + "\n targets: " + str(targets) + "\n word2ids: " + \
+          str(word2ids)
     logger.info(msg)
     task.log_error(msg)
-    parser_output=filterParserOutput(parses,word2ids,sources,targets)
-    msg="final parser output: \n"+parser_output
+    parser_output = filterParserOutput(parses, word2ids, sources, targets)
+    msg = "final parser output: \n" + parser_output
 
     logger.info(msg)
     task.log_error(msg)
     henry_start_time = time.time()
 
-    # time to generate final output in seconds
+    # Time to generate final output in seconds
     generate_output_time = 2
 
-    # time left for Henry in seconds
+    # Time left for Henry in seconds
     time_all_henry = 122 - generate_output_time
 
     if needToGenerateGraph(with_pdf_content):
-        # time for graph generation subtracted from Henry time in seconds
+        # Time for graph generation subtracted from Henry time in seconds
         time_all_henry -= - 3
 
-    # time for one interpretation in Henry in seconds
+    # Time for one interpretation in Henry in seconds
     time_unit_henry = str(int(time_all_henry / len(input_metaphors)))
     if time_unit_henry < 20:
         time_unit_henry = 20
     # Henry processing
     if kbcompiled:
         henry_proc = HENRY_DIR + "/bin/henry -m infer -e " + HENRY_DIR +    \
-                     "/models/h93.py -d "+depth+" -t 4 -O proofgraph,statistics -T " +  \
+                     "/models/h93.py -d " + depth + " -t 4 -O proofgraph,statistics -T " +  \
                      time_unit_henry + " -b " + KBPATH
     else:
         henry_proc = HENRY_DIR + "/bin/henry -m infer -e " + HENRY_DIR +    \
-                     "/models/h93.py -d "+depth+" -t 4 -O proofgraph,statistics -T " +  \
+                     "/models/h93.py -d " + depth + " -t 4 -O proofgraph,statistics -T " +  \
                      time_unit_henry
 
     logger.info("Running Henry command: '%s'." % henry_proc)
@@ -550,7 +560,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
 
     processed, failed, empty = 0, 0, 0
 
-    # merge ADB result and input json document
+    # Merge ADB result and input json document
     input_annotations = request_body_dict["metaphorAnnotationRecords"]
 
 
@@ -558,7 +568,8 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
         logger.info("Generating proofgraphs.")
         unique_id = get_unique_id()
         logger.info("unique id: %s\n" % unique_id)
-        proofgraphs = generate_graph(input_metaphors, henry_output, unique_id,with_pdf_content)
+        proofgraphs = generate_graph(input_metaphors, henry_output,
+                                     unique_id, with_pdf_content)
         task.dot_out = proofgraphs
 
     logger.info("Input annotations count:\n%r\n" % len(input_annotations))
@@ -603,28 +614,28 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
         if u"sentenceId" in annotation:
             sID = str(annotation["sentenceId"])
             if sID in hkeys:
-                count=count+1
+                count = count + 1
                 exp = str(annotation["isiAbductiveExplanation"])
-                lines=exp.split('\n');
-                start=False
+                lines = exp.split('\n')
+                start = False
                 for line in lines:
                     if line == "%%BEGIN_CM_LIST":
-                        start=True
+                        start = True
                     elif line == "%%END_CM_LIST":
-                        start=False
+                        start = False
                     elif start:
-                        r=line.split(',')
+                        r = line.split(',')
                         if len(r) == 6:
-                            key=",".join(r[0:5])
-                            value=float(r[5])
+                            key = ",".join(r[0:5])
+                            value = float(r[5])
                             if key in answer:
-                                answer[key]=answer[key]+value
+                                answer[key] = answer[key] + value
                             else:
-                                answer[key]=value
-    msg="number of sentences: %d" % count
+                                answer[key] = value
+    msg = "number of sentences: %d" % count
     logger.info(msg)
     task.log_error(msg)
-    msg="raw cumulative result: %r" % answer
+    msg = "raw cumulative result: %r" % answer
     logger.info(msg)
     task.log_error(msg)
     for key in answer:
@@ -633,10 +644,10 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
     bestkey = ''
     if answer:
         for key in answer:
-            if answer[key]>=best:
-                best=answer[key]
-                bestkey=key
-        msg="best: %s,%s" % (bestkey,best)
+            if answer[key] >= best:
+                best = answer[key]
+                bestkey = key
+        msg = "best: %s,%s" % (bestkey,best)
         logger.info(msg)
         task.log_error(msg)
         for annotation in input_annotations:
@@ -644,7 +655,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
                 exp = str(annotation["isiAbductiveExplanation"])
                 start = -1
                 end = -1
-                lines = exp.split('\n');
+                lines = exp.split('\n')
                 for idx, line in enumerate(lines):
                     if line == "%%BEGIN_CM_LIST":
                         start = idx
@@ -652,9 +663,9 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
                         end = idx
                         break
                 if start >= 0 and end >= 0:
-                    exp = "\n".join(lines[0:start+1]+[bestkey+","+`best`]+[lines[end]])
+                    exp = "\n".join(lines[0:start+1] + [bestkey + "," + `best`] + [lines[end]])
                 else:
-                    exp = exp+"\n"+"%%BEGIN_CM_LIST"+"\n"+bestkey+","+`best`+"\n"+"%%END_CM_LIST"
+                    exp = exp + "\n%%BEGIN_CM_LIST\n" + bestkey + "," +`best` +"\n%%END_CM_LIST"
                 msg = "changing interpretation from:\n%s\n to:\n%s" % (annotation["isiAbductiveExplanation"],exp)
                 logger.info(msg)
                 task.log_error(msg)
@@ -670,14 +681,14 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
     #request_body_dict["kb"] = KBPATH
     #removes json fields that can be added by the code. (compliance with lcc json format)
     if "kb" in request_body_dict:
-        del request_body_dict["kb"];
+        del request_body_dict["kb"]
     if "step" in request_body_dict:
-        del request_body_dict["step"];
+        del request_body_dict["step"]
     if "task_id" in request_body_dict:
         request_body_dict["task_id"] = task.id
     if "enableDebug" in request_body_dict:
-        del request_body_dict["enableDebug"];
-    #task_id contains the id used to access the log entry for this request.
+        del request_body_dict["enableDebug"]
+    # task_id contains the id used to access the log entry for this request.
     if "task_id" in request_body_dict:
         request_body_dict["task_id"] = task.id
     result = json.dumps(request_body_dict, encoding="utf-8", indent=2)
@@ -691,7 +702,6 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
 
 
 def generate_graph(input_dict, henry_output, unique_id,graphtype):
-
     # create proofgraphs directory if it doesn't exist
     graph_dir = TMP_DIR + "/proofgraphs"
 
@@ -705,9 +715,12 @@ def generate_graph(input_dict, henry_output, unique_id,graphtype):
         graph_output = os.path.join(graph_dir, unique_id + "_" + key + ".pdf")
 
         if graphtype=="ALL":
-            viz = "python " + HENRY_DIR + "/tools/proofgraph.py --potential --graph " + key + " | dot -T png > " + graph_output
+            viz = "python2.7 " + HENRY_DIR + "/tools/proofgraph.py " + \
+                  "--potential --graph " + key + " | dot -T png > " + \
+                  graph_output
         else:
-            viz = "python " + HENRY_DIR + "/tools/proofgraph.py --graph " + key + " | dot -T png > " + graph_output
+            viz = "python2.7 " + HENRY_DIR + "/tools/proofgraph.py " + \
+                  "--graph " + key + " | dot -T png > " + graph_output
 
         graphical_processing = Popen(viz, shell=True, stdin=PIPE, stdout=PIPE,
                                      stderr=None, close_fds=True)
