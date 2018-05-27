@@ -13,6 +13,7 @@ def project_dir(dir_name):
     return os.path.join(os.path.dirname(__file__), "..", dir_name)\
         .replace("\\", "//")
 
+
 PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
 DEBUG = True
@@ -100,7 +101,7 @@ LOGGING = {
         },
     },
     "handlers": {
-        "console":{
+        "console": {
             "class": "logging.StreamHandler",
             "formatter": "simple",
         },

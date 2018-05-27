@@ -74,7 +74,8 @@ def app_status(request):
         return redirect("/app/")
     repo = git.Repo(".")
     return render(request, "app_status.html", {
-        "branch": repo.git.execute(["git","describe","--all","--exact-match",str(repo.head.commit)]),
+        "branch": repo.git.execute(["git", "describe", "--all",
+                                    "--exact-match", str(repo.head.commit)]),
         "commit": str(repo.head.commit),
         "settings": settings,
         "paths": paths
@@ -91,16 +92,16 @@ def app_logs(request):
     pages = Paginator(items, page_size)
 
     try:
-        page  = pages.page(page_num)
+        page = pages.page(page_num)
     except PageNotAnInteger:
-        page  = pages.page(1)
+        page = pages.page(1)
     except EmptyPage:
         page = pages.page(pages.num_pages)
 
-
     return render(request, "app_logs.html", {
         "page": page,
-        "page_range": xrange(max(1, page.number - 7), min(pages.num_pages+1, page.number + 7)),
+        "page_range": xrange(max(1, page.number - 7),
+                             min(pages.num_pages + 1, page.number + 7)),
     })
 
 
@@ -160,7 +161,6 @@ def user_logout(request):
 
 @csrf_exempt
 def run_pipeline(request):
-
     if request.method == "POST":
         last_msg = ""
         try:
@@ -170,7 +170,7 @@ def run_pipeline(request):
             logger.info("Task created. Id=%d." % task.id)
         except Exception:
             msg = "Cannot create task. Traceback: %s" % traceback.format_exc()
-            last_msg=msg
+            last_msg = msg
             logger.error(msg)
             return HttpResponse(msg, status=500)
 
@@ -178,8 +178,9 @@ def run_pipeline(request):
             pipeline = Annotator(logger, task)
             logger.info("Pipeline initialized")
         except Exception:
-            msg = "Cannot initialize pipeline. Traceback: %s" % traceback.format_exc()
-            last_msg=msg
+            msg = "Cannot initialize pipeline. Traceback: %s" \
+                  % traceback.format_exc()
+            last_msg = msg
             logger.error(msg)
             return HttpResponse(msg, status=500)
 
@@ -187,7 +188,8 @@ def run_pipeline(request):
             debug_option = pipeline.annotate()
         except Exception:
             debug_option = False
-            msg = "Error while annotating document. Traceback:\n%s." % traceback.format_exc()
+            msg = "Error while annotating document. Traceback:\n%s." \
+                  % traceback.format_exc()
             last_msg = msg
             logger.error(msg)
             try:
@@ -204,8 +206,9 @@ def run_pipeline(request):
 
             return response
         except Exception:
-            msg="Error 2 while saving failed task. Traceback: %s" % traceback.format_exc()
-            last_msg=msg
+            msg = "Error 2 while saving failed task. Traceback: %s" \
+                  % traceback.format_exc()
+            last_msg = msg
             logger.error(msg)
 
         return HttpResponse(last_msg, status=500)
@@ -213,6 +216,7 @@ def run_pipeline(request):
     else:
         return HttpResponse("<b>Error: use POST method to submit query file.</b>",
                             status=405)
+
 
 @csrf_exempt
 def app_upload(request):

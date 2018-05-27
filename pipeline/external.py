@@ -109,16 +109,17 @@ def RUexpect():
 
 
 def ENexpect():
-    index = child['EN'].expect (["ccg\(.*\)*\)\)\.\r\n\r\nccg\(\d+.*'END', 'END', .*\)\)\.\r\n\r\n", pexpect.TIMEOUT, pexpect.EOF])
+    index = child['EN'].expect(["ccg\(.*\)*\)\)\.\r\n\r\nccg\(\d+.*'END', 'END', .*\)\)\.\r\n\r\n", pexpect.TIMEOUT, pexpect.EOF])
 
-    #child['EN'].expect(pexpect.EOF)
+    # child['EN'].expect(pexpect.EOF)
     return index
-    #return 0
+    # return 0
 
 
 metaPattern = re.compile("^<META>[\s]*[0-9]+$")
 
-def getWpos(tokenizer_output,language):
+
+def getWpos(tokenizer_output, language):
     word2ids = defaultdict(list)
     if language in ["ES", "FA", "RU"]:
         for line in tokenizer_output.splitlines():
@@ -145,6 +146,8 @@ def removeThousands(pid):
 
 
 idPattern = re.compile("^.*\[([^\]]+)\].*$")
+
+
 def filterParserOutput(parses, word2ids, sources, targets):
     filtered = {}
     if sources and targets and parses and word2ids:
@@ -171,9 +174,9 @@ def filterParserOutput(parses, word2ids, sources, targets):
                 o = sexpdata.loads(parses[key])
                 for p in o[2]:
                     if type(p) == list:
-                        #print("p: "+str(p))
+                        # print("p: "+str(p))
                         pidstring = sexpdata.dumps(p[-1])
-                        #print("pidstring: "+pidstring)
+                        # print("pidstring: "+pidstring)
                         result = idPattern.match(pidstring)
                         keepThisOne = True
                         if result:
@@ -185,13 +188,13 @@ def filterParserOutput(parses, word2ids, sources, targets):
                                     pid = removeThousands(pid)
                                 except ValueError:
                                     pid = None
-                                #print("pid number: "+str(pid))
+                                # print("pid number: "+str(pid))
                                 if not pid or pid in toKeep:
                                     keepThisOne = True
                                     break
                         if keepThisOne:
                             filtered[key] += printPred(p)
-                    #print("filtered[key]: "+filtered[key])
+                    # print("filtered[key]: "+filtered[key])
                 filtered[key] += "))"
     parser_output = ""
     if parses:
@@ -210,7 +213,7 @@ def needToGenerateGraph(dograph):
         return True
     elif dograph == "ALL":
         return True
-    elif dograph == True:
+    elif dograph is True:
         return True
     return False
 
@@ -244,15 +247,17 @@ def mergeMultipleObservations(parser_output):
                                     continue
                             np.append(a)
                         preds.append(np)
-                #print(sexpdata.dumps(o))
+                # print(sexpdata.dumps(o))
                 counter += 1
             ret.append(preds)
             ret = printPred(ret)
     return ret
 
+
 child = {'FA': "", 'ES': "", 'RU': "", 'EN': ""}
 
 expectChild = {'FA': FAexpect, 'ES': ESexpect, 'RU': RUexpect, 'EN': ENexpect}
+
 
 def run_annotation(request_body_dict, input_metaphors, language, task,
                    logger, with_pdf_content, last_step=3, kb=None, depth='3',
@@ -265,7 +270,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
         extractor_module = imp.load_module(extractor, *module_desc)
     global child
     start_time = time.time()
-    #input_str = generate_text_input(input_metaphors, language)
+    # input_str = generate_text_input(input_metaphors, language)
     input_metaphors_count = len(input_metaphors.keys())
     metaphor_count = 0
     tokenizer_proc = ""
@@ -300,7 +305,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
         parser_proc = "java -cp " + MALT_PARSER_DIR + \
             "/maltparser-1.7.2.jar:" + MALT_PARSER_DIR + " MaltParserWrap " \
             + parser_args
-        createLF_proc =  METAPHOR_DIR + "/pipelines/Spanish/createLF"
+        createLF_proc = METAPHOR_DIR + "/pipelines/Spanish/createLF"
         parser_output_append = ""
         b2h_proc = "python2.7 " + PARSER2HENRY + " --nonmerge sameid freqpred"
         if kb is None:
@@ -327,7 +332,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
     elif language == "EN":
         tokenizer_proc = BOXER_DIR + "/bin/tokkie --stdin"
         parser_proc = BOXER_DIR + "/bin/candc --models " + \
-                      BOXER_DIR + "/models/boxer --candc-printer boxer 2>null"
+            BOXER_DIR + "/models/boxer --candc-printer boxer 2>null"
         createLF_proc = BOXER_DIR + "/bin/boxer --semantics tacitus --resolve true --stdin"
         parser_output_append = ":- op(601, xfx, (/)).\n:- op(601, xfx, (\)).\n:- multifile ccg/2, id/2.\n:- discontiguous ccg/2, id/2.\n"
         b2h_proc = "python " + BOXER2HENRY + " --nonmerge sameid freqpred"
@@ -357,31 +362,32 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
                 logger.info("Running tokenizing command: '%s'." % tokenizer_proc)
                 logger.info("Input str: %r" % input_str)
                 task.log_error("Input str: %r" % input_str)
-                tokenizer_pipeline = Popen(tokenizer_proc,
-                            env=ENV,
-                            shell=True,
-                            stdin=PIPE,
-                            stdout=PIPE,
-                            stderr=None,
-                            close_fds=True)
+                tokenizer_pipeline = Popen(
+                    tokenizer_proc,
+                    env=ENV,
+                    shell=True,
+                    stdin=PIPE,
+                    stdout=PIPE,
+                    stderr=None,
+                    close_fds=True)
                 tokenizer_output, tokenizer_stderr = tokenizer_pipeline.communicate(input=input_str)
 
                 if language == "EN":
-                    #lines = ""
-                    #lines = tokenizer_output.replace("\n", " ")
-                    #lines = lines.rstrip()
-                    #lines = re.sub(r'(<META>)(\d+)(\s)', r'\1\2\n\n', lines)
+                    # lines = ""
+                    # lines = tokenizer_output.replace("\n", " ")
+                    # lines = lines.rstrip()
+                    # lines = re.sub(r'(<META>)(\d+)(\s)', r'\1\2\n\n', lines)
                     tokenizer_output += "END\n\n"
 
                 logger.info("Tokenizer Output:\n%r" % tokenizer_output)
                 task.log_error("Tokenizer Output:\n%r" % tokenizer_output)
-                word2ids[key]=getWpos(tokenizer_output,language)
+                word2ids[key] = getWpos(tokenizer_output, language)
 
                 logger.info("Running parsing command: '%s'." % parser_proc)
                 logger.info("Input str: %r" % tokenizer_output)
                 logger.info(language + " Parser Running: " + str(getParserStatus(language)))
                 if not getParserStatus(language):
-                    child[language] = pexpect.spawn('/bin/bash', ['-c',parser_proc], timeout=30)
+                    child[language] = pexpect.spawn('/bin/bash', ['-c', parser_proc], timeout=30)
                     setParserStatus(language, True)
 
                 child[language].send(tokenizer_output)
@@ -397,13 +403,13 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
                             junk = ""
                         if not language == "EN":
                             parser_output_inter = parser_output_append + parser_output_inter
-                            parser_output_inter = parser_output_inter.replace("END","")
+                            parser_output_inter = parser_output_inter.replace("END", "")
                         break
                     elif reattempts == 0:
-                        #logger.info("child before: " + child[language].before + "\n")
+                        # logger.info("child before: " + child[language].before + "\n")
                         reattempts += 1
                         child[language].terminate()
-                        child[language] = pexpect.spawn('/bin/bash', ['-c',parser_proc], timeout=30)
+                        child[language] = pexpect.spawn('/bin/bash', ['-c', parser_proc], timeout=30)
                         child[language].send(tokenizer_output)
                     else:
                         logger.info("Parser not working\n")
@@ -420,7 +426,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
 
                 if language == "EN":
                     parser_output_inter = re.sub("\n", "\t", parser_output_inter)
-                    #parser_output_inter = re.sub("ccg\(\d+", "ccg(1", parser_output_inter)
+                    # parser_output_inter = re.sub("ccg\(\d+", "ccg(1", parser_output_inter)
                     regex = r'(ccg\(.*\)\.\r\t\r\t)'
                     ccgs = re.findall(regex, parser_output_inter)
                     if ccgs:
@@ -439,7 +445,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
                             ccg_split[i] = re.sub("ccg\(\d+", "ccg(1", ccg_split[i])
                             """
                             ccg_replace = "ccg(" + str(i+1)
-                            ccg_split[i] = re.sub("ccg\(\d+" , ccg_replace, ccg_split[i])
+                            ccg_split[i] = re.sub("ccg\(\d+", ccg_replace, ccg_split[i])
                             ccg_split[i] = re.sub("\t", "\n", ccg_split[i])
                             final_parser_output += ccg_split[i] + "\r\n\r\n"
                             final_parser_output += "id(" + str(key) + ",["+str(i+1)+"]).\r\n\r\n"
@@ -453,13 +459,14 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
                 logger.info("Running createLF command: '%s'." % createLF_proc)
                 logger.info("Input str: %r" % parser_output_inter)
 
-                createLF_pipeline = Popen(createLF_proc,
-                            env=ENV,
-                            shell=True,
-                            stdin=PIPE,
-                            stdout=PIPE,
-                            stderr=None,
-                            close_fds=True)
+                createLF_pipeline = Popen(
+                    createLF_proc,
+                    env=ENV,
+                    shell=True,
+                    stdin=PIPE,
+                    stdout=PIPE,
+                    stderr=None,
+                    close_fds=True)
                 createLF_output_temp, createLF_stderr_temp = createLF_pipeline.communicate(input=parser_output_inter)
                 if "parser_output" in annotations[metaphor_count-1]:
                     annotations[metaphor_count-1]["parser_output"] = createLF_output_temp
@@ -474,13 +481,14 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
         request_body_dict["parser_time"] = str((parser_end_time-parser_start_time))
     logger.info("Running boxer-2-henry command: '%s'." % b2h_proc)
     logger.info("Input str: %r" % createLF_output)
-    b2h_pipeline = Popen(b2h_proc,
-             env=ENV,
-             shell=True,
-             stdin=PIPE,
-             stdout=PIPE,
-             stderr=None,
-             close_fds=True)
+    b2h_pipeline = Popen(
+        b2h_proc,
+        env=ENV,
+        shell=True,
+        stdin=PIPE,
+        stdout=PIPE,
+        stderr=None,
+        close_fds=True)
     parser_output, parser_stderr = b2h_pipeline.communicate(input=createLF_output)
     logger.info("B2H output:\n%s\n" % parser_output)
     task.log_error("B2H output: \n%r" % parser_output)
@@ -534,7 +542,8 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
                      time_unit_henry + " -b " + KBPATH
     else:
         henry_proc = HENRY_DIR + "/bin/henry -m infer -e " + HENRY_DIR +    \
-                     "/models/h93.py -d " + depth + " -t 4 -O proofgraph,statistics -T " +  \
+                     "/models/h93.py -d " + depth + \
+                     " -t 4 -O proofgraph,statistics -T " +  \
                      time_unit_henry
 
     logger.info("Running Henry command: '%s'." % henry_proc)
@@ -563,7 +572,6 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
     # Merge ADB result and input json document
     input_annotations = request_body_dict["metaphorAnnotationRecords"]
 
-
     if needToGenerateGraph(with_pdf_content):
         logger.info("Generating proofgraphs.")
         unique_id = get_unique_id()
@@ -582,7 +590,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
             sID = str(annotation["sentenceId"])
             if sID in hkeys:
                 CM_output = extractor_module.extract_CM_mapping(sID, hypotheses[sID], parses[sID], DESCRIPTION, annotation)
-                msg="Sentence #%s has interpretation #%s" % (sID,CM_output['isiAbductiveExplanation'])
+                msg = "Sentence #%s has interpretation #%s" % (sID, CM_output['isiAbductiveExplanation'])
                 logger.info(msg)
                 task.log_error(msg)
                 try:
@@ -647,7 +655,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
             if answer[key] >= best:
                 best = answer[key]
                 bestkey = key
-        msg = "best: %s,%s" % (bestkey,best)
+        msg = "best: %s,%s" % (bestkey, best)
         logger.info(msg)
         task.log_error(msg)
         for annotation in input_annotations:
@@ -663,23 +671,28 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
                         end = idx
                         break
                 if start >= 0 and end >= 0:
-                    exp = "\n".join(lines[0:start+1] + [bestkey + "," + `best`] + [lines[end]])
+                    exp = "\n".join(lines[0:start + 1] +
+                                    [bestkey + "," + repr(best)] +
+                                    [lines[end]])
                 else:
-                    exp = exp + "\n%%BEGIN_CM_LIST\n" + bestkey + "," +`best` +"\n%%END_CM_LIST"
-                msg = "changing interpretation from:\n%s\n to:\n%s" % (annotation["isiAbductiveExplanation"],exp)
+                    exp = exp + "\n%%BEGIN_CM_LIST\n" + bestkey + "," + \
+                          repr(best) + "\n%%END_CM_LIST"
+                msg = "changing interpretation from:\n%s\n to:\n%s" \
+                      % (annotation["isiAbductiveExplanation"], exp)
                 logger.info(msg)
                 task.log_error(msg)
-                annotation["isiAbductiveExplanation"]=exp
+                annotation["isiAbductiveExplanation"] = exp
                 data = bestkey.split(',')
-                l=len(data)
-                annotation["targetConceptDomain"] = data[0] if l>0 else ''
-                annotation["targetConceptSubDomain"] = data[1] if l>1 else ''
-                annotation["targetFrame"] = data[2] if l>2 else ''
-                annotation["sourceFrame"] = data[3] if l>3 else ''
-                annotation["sourceConceptSubDomain"] = data[4] if l>4 else ''
+                l = len(data)
+                annotation["targetConceptDomain"] = data[0] if l > 0 else ''
+                annotation["targetConceptSubDomain"] = data[1] if l > 1 else ''
+                annotation["targetFrame"] = data[2] if l > 2 else ''
+                annotation["sourceFrame"] = data[3] if l > 3 else ''
+                annotation["sourceConceptSubDomain"] = data[4] if l > 4 else ''
 
-    #request_body_dict["kb"] = KBPATH
-    #removes json fields that can be added by the code. (compliance with lcc json format)
+    # request_body_dict["kb"] = KBPATH
+    # removes json fields that can be added by the code. (compliance with
+    # lcc json format)
     if "kb" in request_body_dict:
         del request_body_dict["kb"]
     if "step" in request_body_dict:
@@ -700,8 +713,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
     return result
 
 
-
-def generate_graph(input_dict, henry_output, unique_id,graphtype):
+def generate_graph(input_dict, henry_output, unique_id, graphtype):
     # create proofgraphs directory if it doesn't exist
     graph_dir = TMP_DIR + "/proofgraphs"
 
@@ -714,7 +726,7 @@ def generate_graph(input_dict, henry_output, unique_id,graphtype):
         print "Generating a proofgraph for " + key
         graph_output = os.path.join(graph_dir, unique_id + "_" + key + ".pdf")
 
-        if graphtype=="ALL":
+        if graphtype == "ALL":
             viz = "python2.7 " + HENRY_DIR + "/tools/proofgraph.py " + \
                   "--potential --graph " + key + " | dot -T png > " + \
                   graph_output
@@ -726,11 +738,11 @@ def generate_graph(input_dict, henry_output, unique_id,graphtype):
                                      stderr=None, close_fds=True)
 
         graphical_processing.communicate(input=henry_output)
-        #print "sleep"
-        #time.sleep(3)
+        # print "sleep"
+        # time.sleep(3)
 
         with open(graph_output, "rb") as fl:
-           out_data[key] = fl.read().encode("base64")
+            out_data[key] = fl.read().encode("base64")
 
     return out_data
 

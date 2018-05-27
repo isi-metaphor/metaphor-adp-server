@@ -18,14 +18,14 @@ ParserFlag = True
 
 def getParserFlag():
     global ParserFlag
-    #print "Value of ParserFlag is", ParserFlag
+    # print "Value of ParserFlag is", ParserFlag
     return ParserFlag
 
 
 def setParserFlag(value):
     global ParserFlag
     ParserFlag = value
-    #print "Parser Flag value set to", value
+    # print "Parser Flag value set to", value
 
 
 def getParserStatus(language):
