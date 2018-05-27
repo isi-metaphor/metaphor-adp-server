@@ -293,7 +293,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
             KBPATH = kb
 
     elif language == "ES":
-        MALT_PARSER_DIR = os.path.join(METAPHOR_DIR, "external-tools/maltparser-1.7.2")
+        MALT_PARSER_DIR = os.path.join(METAPHOR_DIR, "external-tools/malt-1.7.2")
         parser_args = "-c ancora_under40 -m parse -w " + \
             MALT_PARSER_DIR + " -lfi parser-es.log"
         tokenizer_proc = os.path.join(METAPHOR_DIR, "pipelines/Spanish/pre-parser")
