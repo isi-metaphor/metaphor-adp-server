@@ -75,8 +75,8 @@ WORKDIR /research/repo
 RUN git clone https://github.com/isi-metaphor/Metaphor-ADP.git metaphor
 
 WORKDIR /research/repo/metaphor/
-RUN git checkout develop
-RUN git pull
+# RUN git checkout develop
+# RUN git pull
 
 ENV METAPHOR_DIR=/research/repo/metaphor
 ENV PYTHONPATH=$PYTHONPATH:$METAPHOR_DIR/pipelines/common
