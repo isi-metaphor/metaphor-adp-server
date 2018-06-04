@@ -15,6 +15,7 @@ from lccsrv import paths
 from pipeline.models import TASK_STATUS
 import regex
 
+
 class Annotator(object):
     def __init__(self, logger, task):
         self.logger = logger
@@ -30,10 +31,10 @@ class Annotator(object):
             self.task.task_error_count += 1
         return self.task
 
-    def removePunctuation(self,string):
+    def removePunctuation(self, string):
         return regex.sub(ur"\p{P}+", "", string)
 
-    def normalize(self,string,language):
+    def normalize(self, string, language):
         if language == "EN":
             # Replacing single quote, double quote (start/end), dash
             ascii_metaphor = string.replace(u"\u2019", u"\u0027")\
@@ -43,6 +44,18 @@ class Annotator(object):
             return ascii_metaphor
         else:
             return string
+
+    def forceSpans(self, metaphors, sourcePhrases, targetPhrases):
+        if metaphors and sourcePhrases and targetPhrases:
+            for sid in metaphors:
+                if sid in sourcePhrases and sid in targetPhrases:
+                    metaphors[sid] = sourcePhrases[sid] + " " + \
+                                     targetPhrases[sid]
+                    log_msg = "changed metaphor " + sid + " to span only: '" \
+                              + sourcePhrases[sid] + "' and '" + \
+                              targetPhrases[sid]+"'"
+                    self.logger.info(log_msg)
+                    self.task.log_error(log_msg)
 
     def annotate(self):
         # 1.
@@ -160,11 +173,11 @@ class Annotator(object):
                     self.task.id,
                 )
                 self.task_error(error_msg, error_code=None, count_error=True)
-            am=annotation
+            am = annotation
             if "annotationMappings" in annotation:
-                ams=annotation["annotationMappings"]
-                if ams and len(ams)>0:
-                    am=ams[0]
+                ams = annotation["annotationMappings"]
+                if ams and len(ams) > 0:
+                    am = ams[0]
             if am and "source" in am:
                 sourcePhrases[str(annotation_id)] = self.normalize(self.removePunctuation(am["source"]), language).encode("utf-8")
             if am and "target" in am:
@@ -179,10 +192,11 @@ class Annotator(object):
         if len(metaphors) == 0:
             error_msg = "Found 0 metaphors for annotation. Task id=#%d."
             return self.task_error(error_msg, 6)
+        # self.forceSpans(metaphors, sourcePhrases, targetPhrases)
 
         # 7 Get henry max depth
-        depth = request_document.get("depth",'3')
-        log_msg = "Selected HENRY max depth is '%s'" % depth
+        depth = request_document.get("depth", '3')
+        log_msg = "Selected Henry max depth is '%s'" % depth
         self.logger.info(log_msg)
         self.task.log_error(log_msg)
 

@@ -12,7 +12,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update -q -y --fix-missing && \
     apt-get install -q -y --fix-missing --no-install-recommends \
         bzip2 ca-certificates g++ git-core graphviz libsqlite3-dev make \
-        python-dev python-lxml python-nltk swi-prolog wget
+        openjdk-7-jre python-dev python-lxml python-nltk swi-prolog wget
 
 RUN apt-get clean -q
 
@@ -21,11 +21,6 @@ RUN apt-get clean -q
 
 ENV GUROBI_INSTALL /research/ext/gurobi
 ENV GUROBI_HOME $GUROBI_INSTALL/linux64
-ENV PATH $PATH:$GUROBI_HOME/bin
-ENV CPLUS_INCLUDE_PATH $GUROBI_HOME/include:$CPLUS_INCLUDE_PATH
-ENV LD_LIBRARY_PATH $GUROBI_HOME/lib:$LD_LIBRARY_PATH
-ENV LIBRARY_PATH $GUROBI_HOME/lib:$LIBRARY_PATH
-ENV GRB_LICENSE_FILE $GUROBI_INSTALL/license/gurobi.lic
 
 RUN mkdir -p $GUROBI_INSTALL && \
     wget http://packages.gurobi.com/5.6/gurobi5.6.3_linux64.tar.gz && \
@@ -38,6 +33,12 @@ RUN mkdir -p $GUROBI_INSTALL && \
     rm -rf gurobi563 && \
     rm -f gurobi5.6.3_linux64.tar.gz
 
+ENV PATH $PATH:$GUROBI_HOME/bin
+ENV CPLUS_INCLUDE_PATH $GUROBI_HOME/include:$CPLUS_INCLUDE_PATH
+ENV LD_LIBRARY_PATH $GUROBI_HOME/lib:$LD_LIBRARY_PATH
+ENV LIBRARY_PATH $GUROBI_HOME/lib:$LIBRARY_PATH
+ENV GRB_LICENSE_FILE $GUROBI_INSTALL/license/gurobi.lic
+
 
 # Install Henry.
 
@@ -46,6 +47,8 @@ RUN git clone https://github.com/isi-metaphor/henry-n700.git henry
 
 WORKDIR /research/repo/henry
 RUN make -B
+
+ENV HENRY_DIR=/research/repo/henry
 
 
 # Install Boxer.
@@ -63,19 +66,31 @@ RUN cd boxer && \
     tar xvjf models-1.02.tar.bz2 && \
     rm models-1.02.tar.bz2
 
+ENV BOXER_DIR=/research/ext/boxer
+
 
 # Install Metaphor-ADP.
 
 WORKDIR /research/repo
 RUN git clone https://github.com/isi-metaphor/Metaphor-ADP.git metaphor
 
+WORKDIR /research/repo/metaphor/
+# RUN git checkout develop
+# RUN git pull
+
+ENV METAPHOR_DIR=/research/repo/metaphor
+ENV PYTHONPATH=$PYTHONPATH:$METAPHOR_DIR/pipelines/common
+ENV PYTHONPATH=$PYTHONPATH:$METAPHOR_DIR/pipelines/English
+ENV PYTHONPATH=$PYTOHNPATH:$METAPHOR_DIR/pipelines/Spanish
+ENV PYTHONPATH=$PYTHONPATH:$METAPHOR_DIR/pipelines/Farsi
+ENV PYTHONPATH=$PYTHONPATH:$METAPHOR_DIR/pipelines/Russian
+
 
 # Install lcc-service.
 
 RUN apt-get install -q -y --fix-missing --no-install-recommends \
-        fabric openjdk-7-jre python-django python-jinja2 python-git \
-        python-lz4 python-pexpect python-pip python-regex python-simplejson \
-        screen
+        fabric python-django python-jinja2 python-git python-lz4 \
+        python-pexpect python-pip python-regex python-simplejson
 
 RUN pip install sexpdata
 
@@ -84,33 +99,19 @@ COPY . /research/repo/lcc-service
 #
 
 RUN mkdir -p /research/temp/uploads
+ENV TMP_DIR=/research/temp
 RUN mkdir -p /research/logs/lcc-service
 RUN mkdir -p /research/data/lcc-service
+
 
 #
 
 WORKDIR /research/repo/lcc-service
 
-ENV METAPHOR_DIR=/research/repo/metaphor
-ENV PYTHONPATH=$PYTHONPATH:$METAPHOR_DIR/pipelines/common
-ENV PYTHONPATH=$PYTHONPATH:$METAPHOR_DIR/pipelines/Russian
-ENV PYTHONPATH=$PYTHONPATH:$METAPHOR_DIR/pipelines/English
-ENV PYTHONPATH=$PYTHONPATH:$METAPHOR_DIR/pipelines/Farsi
-ENV PYTHONPATH=$PYTOHNPATH:$METAPHOR_DIR/pipelines/Spanish
-ENV HENRY_DIR=/research/repo/henry
-ENV BOXER_DIR=/research/ext/boxer
-ENV TMP_DIR=/research/temp
-ENV GUROBI_HOME=/research/ext/gurobi
-ENV GRB_LICENSE_FILE=/research/ext/gurobi/license/gurobi.lic
-ENV CPLUS_INCLUDE_PATH=/usr/include/python2.7:$GUROBI_HOME/include
-ENV PATH=$PATH:/usr/sbin:/sbin:/usr/bin:$GUROBI_HOME/bin:$JAVA_HOME/bin
-ENV LD_LIBRARY_PATH=$GUROBI_HOME/lib:$LD_LIBRARY_PATH
-ENV LIBRARY_PATH=$GUROBI_HOME/lib
-
 ENV DJANGO_SETTINGS_MODULE=lccsrv.settings
 
 RUN ./manage.py syncdb --noinput
 
-RUN python -c "from django.contrib.auth.models import User; User.objects.create_superuser('metaphor', '', 'metaphor')"
+RUN python2.7 -c "from django.contrib.auth.models import User; User.objects.create_superuser('metaphor', '', 'metaphor')"
 
 CMD ["./manage.py", "runserver", "0.0.0.0:8000"]

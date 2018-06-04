@@ -10,7 +10,7 @@ import lz4
 import json
 import StringIO as stringio
 
-from  datetime import datetime
+from datetime import datetime
 
 from django.db import models
 from django.http import HttpResponse
@@ -20,6 +20,7 @@ class TASK_STATUS:
     DOCUMENT_RECEIVED = 0
     PREPROCESSED = 1
     PROCESSED = 2
+
 
 class LogsDisplay(models.Model):
     class Meta:
