@@ -307,7 +307,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
                                       "pipelines/Farsi/pre-parser")
         parser_proc = "java -Xmx16g " + \
                       "-cp " + MALT_PARSER_DIR + "/dist/malt/malt.jar:" + \
-                      MALT_PARSER_DIR + " MaltParserWrap " + parser_args
+                      MALT_PARSER_DIR + " MaltParserWrapService " + parser_args
         createLF_proc = os.path.join(METAPHOR_DIR, "pipelines/Farsi/createLF")
         parser_output_append = ""
         b2h_proc = "python2.7 " + PARSER2HENRY + " --nonmerge sameid freqpred"
@@ -325,7 +325,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
                                       "pipelines/Spanish/pre-parser")
         parser_proc = "java -Xmx16g " + \
                       "-cp " + MALT_PARSER_DIR + "/maltparser-1.7.2.jar:" + \
-                      MALT_PARSER_DIR + " MaltParserWrap " + parser_args
+                      MALT_PARSER_DIR + " MaltParserWrapService " + parser_args
         createLF_proc = METAPHOR_DIR + "/pipelines/Spanish/createLF"
         parser_output_append = ""
         b2h_proc = "python2.7 " + PARSER2HENRY + " --nonmerge sameid freqpred"
@@ -342,7 +342,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
                                       "pipelines/Russian/pre-parser")
         parser_proc = "java -Xmx16g " + \
                       "-cp " + MALT_PARSER_DIR + "/dist/malt/malt.jar:" + \
-                      MALT_PARSER_DIR + " MaltParserWrap " + parser_args
+                      MALT_PARSER_DIR + " MaltParserWrapService " + parser_args
         createLF_proc = os.path.join(METAPHOR_DIR,
                                      "pipelines/Russian/createLF")
         parser_output_append = ""
