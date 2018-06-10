@@ -388,8 +388,8 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
                 logger.info("Processing metaphor " + str(metaphor_count))
                 logger.info("Running tokenizing command: '%s'." %
                             tokenizer_proc)
-                logger.info("Input str: %r" % input_str)
-                task.log_error("Input str: %r" % input_str)
+                logger.info("Input: %s" % input_str)
+                task.log_error("Input: %s" % input_str)
                 tokenizer_pipeline = Popen(
                     tokenizer_proc,
                     env=ENV,
@@ -408,13 +408,13 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
                     # lines = re.sub(r'(<META>)(\d+)(\s)', r'\1\2\n\n', lines)
                     tokenizer_output += "END\n\n"
 
-                logger.info("Tokenizer Output:\n%r" % tokenizer_output)
-                task.log_error("Tokenizer Output:\n%r" % tokenizer_output)
+                logger.info("Tokenizer output:\n%s" % tokenizer_output)
+                task.log_error("Tokenizer output:\n%s" % tokenizer_output)
                 word2ids[key] = getWpos(tokenizer_output, language)
 
                 logger.info("Running parsing command: '%s'." % parser_proc)
-                logger.info("Input str: %r" % tokenizer_output)
-                logger.info(language + " Parser Running: " +
+                logger.info("Input: %s" % tokenizer_output)
+                logger.info(language + " parser running: " +
                             str(getParserStatus(language)))
                 if not getParserStatus(language):
                     child[language] = pexpect.spawn(
@@ -424,7 +424,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
                 child[language].send(tokenizer_output)
                 reattempts = 0
                 while reattempts < 2:
-                    logger.info("reattempts: %r\n" % str(reattempts))
+                    logger.info(language + " re-attempts: %d\n" % reattempts)
                     index = expectChild[language]()
                     if index == 0:
                         parser_output_inter = child[language].after
@@ -447,14 +447,16 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
                             '/bin/bash', ['-c', parser_proc], timeout=30)
                         child[language].send(tokenizer_output)
                     else:
-                        logger.info("Parser not working\n")
-                        task.log_error("\nParser not working\n")
+                        logger.info(language + " parser not working.\n")
+                        task.log_error("\n" + language +
+                                       " parser not working.\n")
                         reattempts = 2
                         child[language].terminate()
                         setParserStatus(language, False)
-                logger.info("Parser Flag : " + str(getParserFlag()))
+                logger.info("Parser flag: " + str(getParserFlag()))
                 if not getParserFlag():
-                    logger.info("\nTerminating Parser Process\n")
+                    logger.info("\nTerminating " + language +
+                                " parser process.\n")
                     child[language].terminate()
                     child[language] = ""
                     setParserStatus(language, False)
@@ -499,7 +501,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
                 task.log_error("Parser output:\n%r" % parser_output_inter)
 
                 logger.info("Running createLF command: '%s'." % createLF_proc)
-                logger.info("Input str: %r" % parser_output_inter)
+                logger.info("Input: %s" % parser_output_inter)
 
                 createLF_pipeline = Popen(
                     createLF_proc,
@@ -519,13 +521,13 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
             break
 
     parser_end_time = time.time()
-    logger.info("createLF output:\n%r" % createLF_output)
+    logger.info("createLF output:\n%s" % createLF_output)
     task.log_error("createLF output:\n%r" % createLF_output)
     if "parser_time" in request_body_dict:
         request_body_dict["parser_time"] \
             = str((parser_end_time - parser_start_time))
-    logger.info("Running boxer-2-henry command: '%s'." % b2h_proc)
-    logger.info("Input str: %r" % createLF_output)
+    logger.info("Running boxer-to-henry command: '%s'." % b2h_proc)
+    logger.info("Input: %s" % createLF_output)
     b2h_pipeline = Popen(
         b2h_proc,
         env=ENV,
@@ -548,23 +550,24 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
     if last_step == 1:
         task.henry_out = " "
         task.dot_out = " "
-        result = json.dumps(request_body_dict, encoding="utf-8", indent=4)
+        result = json.dumps(request_body_dict, encoding="utf-8", indent=2)
         return result
 
     parses = extract_parses(parser_output)
     logger.info("Parses:\n%r\n" % parses)
     task.log_error("Parses:\n%r" % parses)
 
-    msg = "initial parser output: \n" + str(parses) + "\n sources: " + \
+    msg = "Initial parser output: \n" + str(parses) + "\n sources: " + \
           str(sources) + "\n targets: " + str(targets) + "\n word2ids: " + \
           str(word2ids)
     logger.info(msg)
     task.log_error(msg)
-    parser_output = filterParserOutput(parses, word2ids, sources, targets)
-    msg = "final parser output: \n" + parser_output
 
+    parser_output = filterParserOutput(parses, word2ids, sources, targets)
+    msg = "Final parser output: \n" + parser_output
     logger.info(msg)
     task.log_error(msg)
+
     henry_start_time = time.time()
 
     # Time to generate final output in seconds
