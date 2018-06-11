@@ -189,9 +189,9 @@ def filterParserOutput(parses, word2ids, sources, targets):
                 o = sexpdata.loads(parses[key])
                 for p in o[2]:
                     if type(p) == list:
-                        # print("p: "+str(p))
+                        # print("p: " + str(p))
                         pidstring = sexpdata.dumps(p[-1])
-                        # print("pidstring: "+pidstring)
+                        # print("pidstring: " + pidstring)
                         result = idPattern.match(pidstring)
                         keepThisOne = True
                         if result:
@@ -204,13 +204,13 @@ def filterParserOutput(parses, word2ids, sources, targets):
                                     pid = removeThousands(pid)
                                 except ValueError:
                                     pid = None
-                                # print("pid number: "+str(pid))
+                                # print("pid number: " + str(pid))
                                 if not pid or pid in toKeep:
                                     keepThisOne = True
                                     break
                         if keepThisOne:
                             filtered[key] += printPred(p)
-                    # print("filtered[key]: "+filtered[key])
+                    # print("filtered[key]: " + filtered[key])
                 filtered[key] += "))"
     parser_output = ""
     if parses:
@@ -271,9 +271,9 @@ def mergeMultipleObservations(parser_output):
     return ret
 
 
-child = {'FA': "", 'ES': "", 'RU': "", 'EN': ""}
+child = {'EN': '', 'ES': '', 'FA': '', 'RU': ''}
 
-expectChild = {'FA': FAexpect, 'ES': ESexpect, 'RU': RUexpect, 'EN': ENexpect}
+expectChild = {'EN': ENexpect, 'ES': ESexpect, 'FA': FAexpect, 'RU': RUexpect}
 
 
 def run_annotation(request_body_dict, input_metaphors, language, task,
@@ -299,22 +299,17 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
     createLF_output = ""
 
     # Parser pipeline
-    if language == "FA":
-        MALT_PARSER_DIR = os.path.join(METAPHOR_DIR, "external-tools/malt-1.5")
-        parser_args = "-c farsiMALTModel -m parse -w " + \
-                      MALT_PARSER_DIR + " -lfi parser-fa.log"
-        tokenizer_proc = os.path.join(METAPHOR_DIR,
-                                      "pipelines/Farsi/pre-parser")
-        parser_proc = "java -Xmx16g " + \
-                      "-cp " + MALT_PARSER_DIR + "/dist/malt/malt.jar:" + \
-                      MALT_PARSER_DIR + " MaltParserWrapService " + parser_args
-        createLF_proc = os.path.join(METAPHOR_DIR, "pipelines/Farsi/createLF")
-        parser_output_append = ""
-        b2h_proc = "python2.7 " + PARSER2HENRY + " --nonmerge sameid freqpred"
-        if kb is None:
-            KBPATH = FA_KBPATH
-        else:
-            KBPATH = kb
+    if language == "EN":
+        tokenizer_proc = BOXER_DIR + "/bin/tokkie --stdin"
+        parser_proc = BOXER_DIR + "/bin/candc --models " + \
+            BOXER_DIR + "/models/boxer --candc-printer boxer 2>null"
+        createLF_proc = BOXER_DIR + "/bin/boxer --semantics tacitus " + \
+            "--resolve true --stdin"
+        parser_output_append \
+            = ":- op(601, xfx, (/)).\n:- op(601, xfx, (\\)).\n" + \
+            ":- multifile ccg/2, id/2.\n:- discontiguous ccg/2, id/2.\n"
+        b2h_proc = "python2.7 " + BOXER2HENRY + " --nonmerge sameid freqpred"
+        KBPATH = kb or EN_KBPATH
 
     elif language == "ES":
         MALT_PARSER_DIR = os.path.join(METAPHOR_DIR,
@@ -329,10 +324,21 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
         createLF_proc = METAPHOR_DIR + "/pipelines/Spanish/createLF"
         parser_output_append = ""
         b2h_proc = "python2.7 " + PARSER2HENRY + " --nonmerge sameid freqpred"
-        if kb is None:
-            KBPATH = ES_KBPATH
-        else:
-            KBPATH = kb
+        KBPATH = kb or ES_KBPATH
+
+    elif language == "FA":
+        MALT_PARSER_DIR = os.path.join(METAPHOR_DIR, "external-tools/malt-1.5")
+        parser_args = "-c farsiMALTModel -m parse -w " + \
+                      MALT_PARSER_DIR + " -lfi parser-fa.log"
+        tokenizer_proc = os.path.join(METAPHOR_DIR,
+                                      "pipelines/Farsi/pre-parser")
+        parser_proc = "java -Xmx16g " + \
+                      "-cp " + MALT_PARSER_DIR + "/dist/malt/malt.jar:" + \
+                      MALT_PARSER_DIR + " MaltParserWrapService " + parser_args
+        createLF_proc = os.path.join(METAPHOR_DIR, "pipelines/Farsi/createLF")
+        parser_output_append = ""
+        b2h_proc = "python2.7 " + PARSER2HENRY + " --nonmerge sameid freqpred"
+        KBPATH = kb or FA_KBPATH
 
     elif language == "RU":
         MALT_PARSER_DIR = os.path.join(METAPHOR_DIR, "external-tools/malt-1.5")
@@ -347,25 +353,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
                                      "pipelines/Russian/createLF")
         parser_output_append = ""
         b2h_proc = "python2.7 " + PARSER2HENRY + " --nonmerge sameid freqpred"
-        if kb is None:
-            KBPATH = RU_KBPATH
-        else:
-            KBPATH = kb
-
-    elif language == "EN":
-        tokenizer_proc = BOXER_DIR + "/bin/tokkie --stdin"
-        parser_proc = BOXER_DIR + "/bin/candc --models " + \
-            BOXER_DIR + "/models/boxer --candc-printer boxer 2>null"
-        createLF_proc = BOXER_DIR + "/bin/boxer --semantics tacitus " + \
-            "--resolve true --stdin"
-        parser_output_append \
-            = ":- op(601, xfx, (/)).\n:- op(601, xfx, (\\)).\n" + \
-            ":- multifile ccg/2, id/2.\n:- discontiguous ccg/2, id/2.\n"
-        b2h_proc = "python2.7 " + BOXER2HENRY + " --nonmerge sameid freqpred"
-        if kb is None:
-            KBPATH = EN_KBPATH
-        else:
-            KBPATH = kb
+        KBPATH = kb or RU_KBPATH
 
     parser_start_time = time.time()
     annotations = request_body_dict["metaphorAnnotationRecords"]
@@ -389,7 +377,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
                 logger.info("Running tokenizing command: '%s'." %
                             tokenizer_proc)
                 logger.info("Input: %s" % input_str)
-                task.log_error("Input: %s" % input_str)
+                task.log_error("Input: %r" % input_str)
                 tokenizer_pipeline = Popen(
                     tokenizer_proc,
                     env=ENV,
@@ -409,7 +397,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
                     tokenizer_output += "END\n\n"
 
                 logger.info("Tokenizer output:\n%s" % tokenizer_output)
-                task.log_error("Tokenizer output:\n%s" % tokenizer_output)
+                task.log_error("Tokenizer output:\n%r" % tokenizer_output)
                 word2ids[key] = getWpos(tokenizer_output, language)
 
                 logger.info("Running parsing command: '%s'." % parser_proc)
