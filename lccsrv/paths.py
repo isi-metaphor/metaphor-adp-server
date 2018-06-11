@@ -27,11 +27,11 @@ LD_LIBRARY_PATH = "/research/ext/gurobi/linux64/lib:${LD_LIBRARY_PATH}"
 LIBRARY_PATH = "/research/ext/gurobi/linux64/lib:$LIBRARY_PATH}"
 UPLOADS_DIR = "/research/temp/uploads"
 
-FARSI_PIPELINE = path.join(METAPHOR_DIR, "pipelines/Farsi/LF_Pipeline")
-SPANISH_PIPELINE = path.join(METAPHOR_DIR, "pipelines/Spanish/run_spanish.sh")
-RUSSIAN_PIPELINE = path.join(METAPHOR_DIR, "pipelines/Russian/run_russian.sh")
+FARSI_PIPELINE = path.join(METAPHOR_DIR, "pipelines/Farsi/run-fa.sh")
+SPANISH_PIPELINE = path.join(METAPHOR_DIR, "pipelines/Spanish/run-es.sh")
+RUSSIAN_PIPELINE = path.join(METAPHOR_DIR, "pipelines/Russian/run-ru.sh")
 
-BOXER2HENRY = path.join(METAPHOR_DIR, "pipelines/English/Boxer2Henry.py")
+BOXER2HENRY = path.join(METAPHOR_DIR, "pipelines/English/parse-to-lf/Boxer2Henry.py")
 PARSER2HENRY = path.join(METAPHOR_DIR, "pipelines/common/IntParser2Henry.py")
 
 KBS_DIR = path.join(METAPHOR_DIR, "KBs")

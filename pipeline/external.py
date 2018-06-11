@@ -308,7 +308,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
         parser_output_append \
             = ":- op(601, xfx, (/)).\n:- op(601, xfx, (\\)).\n" + \
             ":- multifile ccg/2, id/2.\n:- discontiguous ccg/2, id/2.\n"
-        b2h_proc = "python2.7 " + BOXER2HENRY + " --nonmerge sameid freqpred"
+        b2h_proc = BOXER2HENRY + " --nonmerge sameid freqpred"
         KBPATH = kb or EN_KBPATH
 
     elif language == "ES":
@@ -316,43 +316,39 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
                                        "external-tools/malt-1.7.2")
         parser_args = "-c ancora_under40 -m parse -w " + \
             MALT_PARSER_DIR + " -lfi parser-es.log"
-        tokenizer_proc = os.path.join(METAPHOR_DIR,
-                                      "pipelines/Spanish/pre-parser")
+        tokenizer_proc = METAPHOR_DIR + "/pipelines/Spanish/preproc.sh"
         parser_proc = "java -Xmx16g " + \
                       "-cp " + MALT_PARSER_DIR + "/maltparser-1.7.2.jar:" + \
                       MALT_PARSER_DIR + " MaltParserWrapService " + parser_args
-        createLF_proc = METAPHOR_DIR + "/pipelines/Spanish/createLF"
+        createLF_proc = METAPHOR_DIR + "/pipelines/Spanish/create-lf.sh"
         parser_output_append = ""
-        b2h_proc = "python2.7 " + PARSER2HENRY + " --nonmerge sameid freqpred"
+        b2h_proc = PARSER2HENRY + " --nonmerge sameid freqpred"
         KBPATH = kb or ES_KBPATH
 
     elif language == "FA":
         MALT_PARSER_DIR = os.path.join(METAPHOR_DIR, "external-tools/malt-1.5")
         parser_args = "-c farsiMALTModel -m parse -w " + \
                       MALT_PARSER_DIR + " -lfi parser-fa.log"
-        tokenizer_proc = os.path.join(METAPHOR_DIR,
-                                      "pipelines/Farsi/pre-parser")
+        tokenizer_proc = METAPHOR_DIR + "/pipelines/Farsi/preproc.sh"
         parser_proc = "java -Xmx16g " + \
                       "-cp " + MALT_PARSER_DIR + "/dist/malt/malt.jar:" + \
                       MALT_PARSER_DIR + " MaltParserWrapService " + parser_args
-        createLF_proc = os.path.join(METAPHOR_DIR, "pipelines/Farsi/createLF")
+        createLF_proc = METAPHOR_DIR + "/pipelines/Farsi/create-lf.sh"
         parser_output_append = ""
-        b2h_proc = "python2.7 " + PARSER2HENRY + " --nonmerge sameid freqpred"
+        b2h_proc = PARSER2HENRY + " --nonmerge sameid freqpred"
         KBPATH = kb or FA_KBPATH
 
     elif language == "RU":
         MALT_PARSER_DIR = os.path.join(METAPHOR_DIR, "external-tools/malt-1.5")
         parser_args = "-c rus-test -m parse -w " + MALT_PARSER_DIR + \
                       " -lfi parser-ru.log"
-        tokenizer_proc = os.path.join(METAPHOR_DIR,
-                                      "pipelines/Russian/pre-parser")
+        tokenizer_proc = METAPHOR_DIR + "/pipelines/Russian/preproc.sh"
         parser_proc = "java -Xmx16g " + \
                       "-cp " + MALT_PARSER_DIR + "/dist/malt/malt.jar:" + \
                       MALT_PARSER_DIR + " MaltParserWrapService " + parser_args
-        createLF_proc = os.path.join(METAPHOR_DIR,
-                                     "pipelines/Russian/createLF")
+        createLF_proc = METAPHOR_DIR + "/pipelines/Russian/create-lf.sh"
         parser_output_append = ""
-        b2h_proc = "python2.7 " + PARSER2HENRY + " --nonmerge sameid freqpred"
+        b2h_proc = PARSER2HENRY + " --nonmerge sameid freqpred"
         KBPATH = kb or RU_KBPATH
 
     parser_start_time = time.time()
