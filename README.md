@@ -5,6 +5,40 @@ JSON API for handling requests to interpret metaphors.
 
 ## Installation
 
+### Docker
+
+The easiest way to install the server is using Docker.
+
+1. Follow the [instructions](https://docs.docker.com/install/) to install
+   Docker.
+
+2. Clone the lcc-service repository:
+
+```
+git clone https://github.com/isi-metaphor/lcc-service
+```
+
+3. Build the Docker image for the metaphor server:
+
+```
+./build
+```
+
+4. Run the Docker image for the metaphor server:
+
+```
+./run
+```
+
+The server will now be started on localhost, port 8000. You can send JSON
+requests (see, e.g., the 'testing' directory in the Metaphor-ADP
+repository) or use the Web interface: http://localhost:8000/app
+
+The default username and password are both "metaphor".
+
+
+### Legacy
+
 The directory structure should look like this:
 
 ![Directory tree](docs/directories.png)
@@ -37,21 +71,20 @@ make -B
 3. Install Boxer:
 - Install Prolog: `sudo apt-get install swi-prolog`
 - The official Boxer Subversion repository is no longer available, so
-  clone an unofficial Git repository:
+  clone our unofficial Git repository:
 
 ```
 cd /research/repo
-git clone https://github.com/chrzyki/candc.git
-cd candc/candc
+git clone https://github.com/jgordon/boxer
+cd boxer
 make
 make bin/boxer
 make bin/tokkie
 ```
 - Uncompress the model in the Boxer installation directory:
 ```
-cd /research/repo/candc/models
-tar xvzf models-1.02.tgz
-mv models /research/repo/candc/candc
+cd /research/repo/boxer
+tar xvjf models-1.02.tar.bz2
 ```
 
 4. Install Gurobi: Install gurobi in a separate subdirectory of
@@ -97,11 +130,11 @@ sudo pip install jinja2 django lz4 gitpython pexpect regex sexpdata simplejson
 8. Initialize the database file:
 - Go into the deployed directory and run:
 ```
-python manage.py syncdb --noinput --settings=lccsrv.settings
+python2.7 manage.py syncdb --noinput --settings=lccsrv.settings
 ```
 - Create a user for the web interface by running:
 ```
-python manage.py createsuperuser --username=username_to_create \
+python2.7 manage.py createsuperuser --username=username_to_create \
     --email=whatever@whatever --settings=lccsrv.settings
 ```
 
