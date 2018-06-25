@@ -4,7 +4,7 @@
 from __future__ import print_function
 
 import re
-import json
+# import json
 import sys
 from sets import Set
 from collections import defaultdict
