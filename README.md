@@ -5,6 +5,38 @@ JSON API for handling requests to interpret metaphors.
 
 ## Installation
 
+### Docker
+
+The easiest way to install the server is using Docker.
+
+1. Follow the [instructions](https://docs.docker.com/install/) to install
+   Docker.
+
+2. Clone the lcc-service repository:
+
+```
+git clone https://github.com/isi-metaphor/lcc-service
+```
+
+3. Build the Docker image for the metaphor server:
+
+```
+./build
+```
+
+4. Run the Docker image for the metaphor server:
+
+```
+./run
+```
+
+The server will now be started on localhost, port 8000. You can send JSON
+requests (see, e.g., the 'testing' directory in the Metaphor-ADP
+repository) or use the Web interface: http://localhost:8000/app
+
+
+### Legacy
+
 The directory structure should look like this:
 
 ![Directory tree](docs/directories.png)
