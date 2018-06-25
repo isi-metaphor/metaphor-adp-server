@@ -96,11 +96,11 @@ sudo pip install jinja2 django lz4 gitpython pexpect regex sexpdata simplejson
 8. Initialize the database file:
 - Go into the deployed directory and run:
 ```
-python manage.py syncdb --noinput --settings=lccsrv.settings
+python2.7 manage.py syncdb --noinput --settings=lccsrv.settings
 ```
 - Create a user for the web interface by running:
 ```
-python manage.py createsuperuser --username=username_to_create \
+python2.7 manage.py createsuperuser --username=username_to_create \
     --email=whatever@whatever --settings=lccsrv.settings
 ```
 
