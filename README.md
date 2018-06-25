@@ -37,21 +37,20 @@ make -B
 3. Install Boxer:
 - Install Prolog: `sudo apt-get install swi-prolog`
 - The official Boxer Subversion repository is no longer available, so
-  clone an unofficial Git repository:
+  clone our unofficial Git repository:
 
 ```
 cd /research/repo
-git clone https://github.com/chrzyki/candc.git
-cd candc/candc
+git clone https://github.com/jgordon/boxer
+cd boxer
 make
 make bin/boxer
 make bin/tokkie
 ```
 - Uncompress the model in the Boxer installation directory:
 ```
-cd /research/repo/candc/models
-tar xvzf models-1.02.tgz
-mv models /research/repo/candc/candc
+cd /research/repo/boxer
+tar xvjf models-1.02.tar.bz2
 ```
 
 4. Install Gurobi: Install gurobi in a separate subdirectory of
