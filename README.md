@@ -34,6 +34,8 @@ The server will now be started on localhost, port 8000. You can send JSON
 requests (see, e.g., the 'testing' directory in the Metaphor-ADP
 repository) or use the Web interface: http://localhost:8000/app
 
+The default username and password are both "metaphor".
+
 
 ### Legacy
 
