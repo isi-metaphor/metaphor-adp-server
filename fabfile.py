@@ -118,8 +118,8 @@ def deploy():
             context=context,
             use_jinja=True)
         fabric.contrib.files.upload_template(
-            "fab/checkService.sh",
-            "{path}/checkService.sh".format(**config),
+            "fab/check_service.sh",
+            "{path}/check_service.sh".format(**config),
             context=context,
             use_jinja=True)
 
