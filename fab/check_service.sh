@@ -5,7 +5,7 @@ SUBJECT=`hostname`":"`pwd`": {{STAGE}}_{{NGINX_PORT}}"
 outputFile="/tmp/${$}-`date +%s`.tmp"
 
 runCheck() {
-    python testing/client.py -g 0.0.0.0 -p {{NGINX_PORT}} \
+    ./testing/client.py -g 0.0.0.0 -p {{NGINX_PORT}} \
         -j checkServiceFiles/$1.json > $outputFile
     if diff checkServiceFiles/$1_output.json $outputFile; then
         sleep 20
