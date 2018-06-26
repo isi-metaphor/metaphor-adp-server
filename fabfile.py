@@ -103,8 +103,8 @@ def deploy():
             context=context,
             use_jinja=True)
         fabric.contrib.files.upload_template(
-            "fab/tempRun.sh",
-            "{path}/tempRun.sh".format(**config),
+            "fab/temp_run.sh",
+            "{path}/temp_run.sh".format(**config),
             context=context,
             use_jinja=True)
         fabric.contrib.files.upload_template(
