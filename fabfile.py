@@ -15,7 +15,7 @@ from fabric.api import *
 from fabric.colors import green, red
 
 
-def basicConfig(branch):
+def basic_config(branch):
     env.config = {
         "repository": "https://github.com/isi-metaphor/lcc-service.git",
         "branch": branch,
@@ -25,20 +25,20 @@ def basicConfig(branch):
     env.config["stage"] = env.config["context"]["STAGE"]
 
 
-def localConfig():
+def local_config():
     env.host_string = "localhost"
     env.user = "metaphor"
     env.local = True
 
 
-def remoteConfig():
+def remote_config():
     env.host_string = "colo-pm4.isi.edu"
     env.user = "metaphor"
     env.key_filename = "~/.ssh/id_dsa"
     env.local = False
 
 
-def generateBashConfig(file):
+def generate_bash_config(file):
     with open(file, "wb") as fo:
         fo.write("export METAPHOR_DIR=" +
                  env.config["context"]["PIPELINE_CONFIG"]["METAPHOR_DIR"] +
@@ -83,10 +83,10 @@ def deploy():
         run("git checkout {branch}".format(**config))
 
         print(green("Uploading bashrc"))
-        bashrcFile = "fab/bashrc.sh"
-        generateBashConfig(bashrcFile)
+        bashrc_file = "fab/bashrc.sh"
+        generate_bash_config(bashrc_file)
         fabric.contrib.files.upload_template(
-            bashrcFile,
+            bashrc_file,
             "{path}/bashrc.sh".format(**config),
             context=context,
             use_jinja=True)
@@ -131,6 +131,6 @@ def deploy():
 
 
 def install(branch):
-    basicConfig(branch)
-    localConfig()
+    basic_config(branch)
+    local_config()
     deploy()
