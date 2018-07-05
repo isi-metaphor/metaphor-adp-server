@@ -39,7 +39,7 @@ def transitive_closure(A):
 
 
 # find index of SubStr in MainStr
-def findIndexes(SubStr, MainStr):
+def find_indexes(SubStr, MainStr):
     if len(SubStr) == 0:
         return []
 
@@ -77,14 +77,16 @@ def createDStruc(superD, subD):
 
     for superd in superD:
         for superArgs in superD[superd]:
-            if (superd not in outputstrucs or superArgs[0] not in outputstrucs[superd]):
+            if (superd not in outputstrucs or
+                superArgs[0] not in outputstrucs[superd]):
                 outputstrucs[superd][superArgs[0]] = []
 
             if subD:
                 for subd in subD:
                     for subArgs in subD[subd]:
                         if len(subArgs) > 1 and superArgs[0] == subArgs[1]:
-                            outputstrucs[superd][superArgs[0]].append((subd, subArgs[0]))
+                            outputstrucs[superd][superArgs[0]].append(
+                                (subd, subArgs[0]))
             else:
                 outputstrucs[superd][superArgs[0]].append(('', superArgs[0]))
     return outputstrucs
@@ -282,9 +284,9 @@ def extract_CM_mapping(sid, inputString, parse, DESCRIPTION, LCCannotation):
     # print json.dumps(subsources, ensure_ascii=False)
     # print json.dumps(word_props, ensure_ascii=False)
     # print json.dumps(mappings, ensure_ascii=False)
-    # print(json.dumps(equalities, ensure_ascii=False))
+    # print json.dumps(equalities, ensure_ascii=False)
 
-    # transitive closure of equalities
+    # Transitive closure of equalities
     equalities = transitive_closure(equalities)
 
     target_strucs = createDStruc(subtargets, subsubtargets)
@@ -324,7 +326,7 @@ def extract_CM_mapping(sid, inputString, parse, DESCRIPTION, LCCannotation):
                     if (targetS, tsubd) not in Tdomains:
                         Tdomains.append((targetS, tsubd))
 
-        # print "Tdomans:"
+        # print "Tdomains:"
         # print json.dumps(Tdomains, ensure_ascii=False)
         # print json.dumps(tV, ensure_ascii=False)
 
@@ -380,7 +382,8 @@ def extract_CM_mapping(sid, inputString, parse, DESCRIPTION, LCCannotation):
                                   parts[3], CMs[TSpair])
     explanationAppendix += "%%END_CM_LIST"
 
-    output_struct_item['isiAbductiveExplanation'] = inputString + explanationAppendix.encode("utf-8")
+    output_struct_item['isiAbductiveExplanation'] \
+        = inputString + explanationAppendix.encode("utf-8")
     data = bestCM.split(',')
     l = len(data)
     output_struct_item["targetConceptDomain"] = data[0] if l > 0 else ''

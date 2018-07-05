@@ -12,7 +12,7 @@ SSforS = {
     'CONFINEMENT': 'EXIT',
     'ENSLAVEMENT': 'OPPRESSION',
     'MAZE': 'OBSTRUCTION',
-    'PARASITE': 'DESTRUCTUVE_BEING',
+    'PARASITE': 'DESTRUCTIVE_BEING',
     'PHYSICAL_BURDEN': 'RELIEF',
     'PHYSICAL_LOCATION': 'DEFINED_REGION',
     'DARKNESS': 'DARK_END_OF_RANGE_OF_DARKNESS_LIGHT',
@@ -41,14 +41,14 @@ SSforS = {
 }
 
 
-# find index of SubStr in MainStr
-def findIndexes(SubStr, MainStr):
-    if len(SubStr) == 0:
+# Find index of sub_str in main_str
+def find_indexes(sub_str, main_str):
+    if len(sub_str) == 0:
         return []
 
     inds = []
-    ss_toks = nltk.word_tokenize(SubStr.rstrip().lower())
-    ms_toks = nltk.word_tokenize(MainStr.rstrip().lower())
+    ss_toks = nltk.word_tokenize(sub_str.rstrip().lower())
+    ms_toks = nltk.word_tokenize(main_str.rstrip().lower())
 
     # print ss_toks
     # print ms_toks
@@ -100,8 +100,8 @@ def extractWordsIds(parse):
     return Wids
 
 
-# find prop arguments for input IDs
-def findArgs(inputIDs, wordIDs):
+# Find prop arguments for input IDs
+def find_args(inputIDs, wordIDs):
     oArgs = []
 
     for iid in inputIDs:
@@ -118,7 +118,7 @@ def wordStr2print(Args, WordProps, Equalities):
 
     words = []
     for arg in Args:
-        newwords = findWords(arg, WordProps, Equalities, False)
+        newwords = find_words(arg, WordProps, Equalities, False)
         for word in newwords:
             if word not in words:
                 words.append(word)
@@ -142,7 +142,7 @@ def wordStr2print_Mapping(mappings, WordProps, Equalities):
             # for arg in args:
             # output only first ARG instead of all
             firstargs.append(args[0])
-            newwords = findWords(args[0], WordProps, Equalities, True)
+            newwords = find_words(args[0], WordProps, Equalities, True)
             for word in newwords:
                 if word not in words:
                     words.append(word)
@@ -161,7 +161,7 @@ def wordStr2print_Mapping(mappings, WordProps, Equalities):
     return output_str[2:]
 
 
-def findWords(ARG, WordProps, Equalities, isMapping):
+def find_words(ARG, WordProps, Equalities, isMapping):
     all_args = []
     if isMapping and ARG in Equalities:
         all_args = Equalities[ARG].keys()
@@ -191,7 +191,7 @@ def findWords(ARG, WordProps, Equalities, isMapping):
                             words.append('person')
                 # TODO: enable when Boxer starts working correctly
                 # elif propName=='subset-of' and arg==args[2]:
-                #    output_str += ',' + findWords(args[1],WordProps,Equalities,isMapping)
+                #    output_str += ',' + find_words(args[1], WordProps, Equalities, isMapping)
 
     if len(words) == 0 and isMapping:
         return [ARG]
@@ -276,9 +276,10 @@ def isLinkedbyParse(v1, v2, word_props, equalities, input_been, pathlength):
     been.append((v1, v2))
     been.append((v2, v1))
 
-    # print (v1,v2,pathlength)
+    # print (v1, v2, pathlength)
 
-    # if equalities.has_key(v1) and equalities[v1].has_key(v2): return 2
+    # if equalities.has_key(v1) and equalities[v1].has_key(v2):
+    #     return 2
 
     nbrs = []
     for (propName, args) in word_props:
@@ -470,35 +471,35 @@ def extract_CM_mapping(sid, inputString, parse, DESCRIPTION, LCCannotation):
 
     # print json.dumps(equalities, ensure_ascii=False)
 
-    # transitive closure of equalities
+    # Transitive closure of equalities
     equalities = transitive_closure(equalities)
 
-    # find arguments for the input target and source words
-    inputTargetArgs = []
-    inputSourceArgs = []
+    # Find arguments for the input target and source words
+    input_target_args = []
+    input_source_args = []
     checkVars = False
     if LCCannotation and 'annotationMappings' in LCCannotation and \
        len(LCCannotation['annotationMappings']) > 0:
         firstAnn = LCCannotation['annotationMappings'][0]
         if 'target' in firstAnn and 'source' in firstAnn:
             checkVars = True
-            inputSourceIds = findIndexes(firstAnn['source'],
+            inputSourceIds = find_indexes(firstAnn['source'],
                                          LCCannotation['linguisticMetaphor'])
-            inputTargetIds = findIndexes(firstAnn['target'],
+            inputTargetIds = find_indexes(firstAnn['target'],
                                          LCCannotation['linguisticMetaphor'])
 
             # extract words with ids from parse
             Wids = extractWordsIds(parse)
             # find arguments for input and source target words
-            inputTargetArgs = findArgs(inputTargetIds, Wids)
-            inputSourceArgs = findArgs(inputSourceIds, Wids)
+            input_target_args = find_args(inputTargetIds, Wids)
+            input_source_args = find_args(inputSourceIds, Wids)
 
-    # print json.dumps(inputTargetArgs, ensure_ascii=False)
-    # print json.dumps(inputSourceArgs, ensure_ascii=False)
+    # print json.dumps(input_target_args, ensure_ascii=False)
+    # print json.dumps(input_source_args, ensure_ascii=False)
 
-    target_strucs = createDStruc(subtargets, subsubtargets, inputTargetArgs,
+    target_strucs = createDStruc(subtargets, subsubtargets, input_target_args,
                                  checkVars)
-    source_strucs = createDStruc(sources, subsources, inputSourceArgs,
+    source_strucs = createDStruc(sources, subsources, input_source_args,
                                  checkVars)
 
     # print json.dumps(target_strucs, ensure_ascii=False)
@@ -535,7 +536,7 @@ def extract_CM_mapping(sid, inputString, parse, DESCRIPTION, LCCannotation):
                     if (targetS, tsubd) not in Tdomains:
                         Tdomains.append((targetS, tsubd))
 
-        # print "Tdomans:"
+        # print "Tdomains:"
         # print json.dumps(Tdomains, ensure_ascii=False)
         # print json.dumps(tV, ensure_ascii=False)
 
