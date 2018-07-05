@@ -10,7 +10,6 @@ import os
 import git
 import glob
 import json
-import base64
 import logging
 import traceback
 

@@ -142,7 +142,7 @@ python2.7 manage.py createsuperuser --username=username_to_create \
 - Edit the shell.sh script to set the name of the screen session it'll start
   (the -S option)
 - Run the `shell.sh` command
-- Within the screen it started, start `tempRun.sh`; for monitored mode
+- Within the screen it started, start `temp_run.sh`; for monitored mode
   run `run.sh`.
 - Disconnect from the screen (CTRL-A D)
 

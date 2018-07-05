@@ -4,8 +4,6 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="">
 
     <title>Item #{{item.id}}</title>
 
@@ -13,156 +11,202 @@
     <link href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Custom styles for this template -->
-    <link href="/static/css/item.css" rel="stylesheet">
+    <link href="/static/css/app.css" rel="stylesheet">
 
     <script src="/static/js/jquery-3.3.1.min.js"></script>
     <script src="/static/bootstrap/js/bootstrap.min.js"></script>
 
-
-    <!-- Just for debugging purposes. Don't actually copy this line! -->
-    <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
-
-    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and
+         media queries -->
     <!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
       <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
-
-
   </head>
 
   <body>
 
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <button class="navbar-toggler" type="button" data-toggle="collapse"
+              data-target="#navbarNav" aria-controls="navbarNav"
+              aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <a class="navbar-brand" href="#">Metaphor</a>
+        <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+          <li class="nav-item">
+            <a class="nav-link" href="/app/status">Status</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/app/logs">Show Logs</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/app/request">Make Request</a>
+          </li>
+        </ul>
+        <ul class="navbar-nav my-2 my-lg-0v">
+          <li class="nav-item">
+            <a class="nav-link" href="/logout">Logout</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
     <!-- Begin page content -->
     <div class="container">
       <div class="page-header">
-        <h1><a href="/app/logs">←</a> Log Item #{{item.id}}</h1>
-        <br/>
-
-        <div class="col-md-12">
-
-
-<div class="panel-group" id="accordion">
-
-
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h4 class="panel-title">
-        <a data-toggle="collapse" data-parent="#accordion" href="#requetJSON">
-          Request JSON
-        </a>
-      </h4>
-    </div>
-    <div id="requetJSON" class="panel-collapse collapse">
-      <div class="panel-body">
-        <pre>{{item.request_body}}</pre>
+        <h1>Log Item {{item.id}}</h1>
       </div>
-    </div>
-  </div>
 
+      <div class="col-md-12">
 
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h4 class="panel-title">
-        <a data-toggle="collapse" data-parent="#accordion" href="#responseJSON">
-          Response JSON
-        </a>
-      </h4>
-    </div>
-    <div id="responseJSON" class="panel-collapse collapse">
-      <div class="panel-body">
-        <pre>{{item.response_body}}</pre>
-      </div>
-    </div>
-  </div>
+        <div id="accordion">
 
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h4 class="panel-title">
-        <a data-toggle="collapse" data-parent="#accordion" href="#parseOutput">
-          Parser Output
-        </a>
-      </h4>
-    </div>
-    <div id="parseOutput" class="panel-collapse collapse">
-      <div class="panel-body">
-        <pre>{{item.parse_out}}</pre>
-      </div>
-    </div>
-  </div>
+          <div class="card">
+            <div class="card-header" id="requestJSONHead">
+              <h4 class="mb-0">
+                <button class="btn btn-link" data-toggle="collapse"
+                        data-target="#requestJSON"
+                        aria-expanded="true" aria-controls="requestJSON">
+                  Request JSON
+                </button>
+              </h4>
+            </div>
 
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h4 class="panel-title">
-        <a data-toggle="collapse" data-parent="#accordion" href="#graphOutput">
-          Proof Graphs
-        </a>
-      </h4>
-    </div>
-    <div id="graphOutput" class="panel-collapse collapse">
-      <div class="panel-body">
+            <div id="requestJSON" class="collapse show"
+                 aria-labelledby="requestJSONHead"
+                 data-parent="#accordion">
+              <div class="card-body">
+                <pre>{{item.request_body}}</pre>
+              </div>
+            </div>
+          </div>
 
-        <ul>
-        {% for key,value in item.dot_out.items %}
+          <div class="card">
+            <div class="card-header" id="responseJSONHead">
+              <h4 class="mb-0">
+                <button class="btn btn-link" data-toggle="collapse"
+                        data-target="#responseJSON"
+                        aria-expanded="false" aria-controls="responseJSON">
+                  Response JSON
+                </button>
+              </h4>
+            </div>
 
-          <li> {{key}}<br/>
+            <div id="responseJSON" class="collapse"
+                 aria-labelledby="responseJSONHead"
+                 data-parent="#accordion">
+              <div class="card-body">
+                <pre>{{item.response_body}}</pre>
+              </div>
+            </div>
+          </div>
 
-               <img src="data:image/png;base64,{{value}}" style="width:1024px;" />
-          </li>
+          <div class="card">
+            <div class="card-header" id="parseOutputHead">
+              <h4 class="mb-0">
+                <button class="btn btn-link" data-toggle="collapse"
+                        data-target="#parseOutput"
+                        aria-expanded="false" aria-controls="parseOutput">
+                  Parser Output
+                </button>
+              </h4>
+            </div>
 
-        {% endfor %}
-        </ul>
+            <div id="parseOutput" class="collapse"
+                 aria-labelledby="parseOutputHead"
+                 data-parent="#accordion">
+              <div class="card-body">
+                <pre>{{item.parse_out}}</pre>
+              </div>
+            </div>
+          </div>
 
-      </div>
-    </div>
-  </div>
+          <div class="card">
+            <div class="card-header" id="graphOutputHead">
+              <h4 class="mb-0">
+                <button class="btn btn-link" data-toggle="collapse"
+                        data-target="#graphOutput"
+                        aria-expanded="false" aria-controls="graphOutput">
+                  Proof Graphs
+                </button>
+              </h4>
+            </div>
+            <div id="graphOutput" class="collapse"
+                 aria-labelledby="graphOutputHead"
+                 data-parent="#accordion">
+              <div class="card-body">
+                <dl>
+                  {% for key,value in item.dot_out.items %}
 
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h4 class="panel-title">
-        <a data-toggle="collapse" data-parent="#accordion" href="#henryOutput">
-          Henry Output
-        </a>
-      </h4>
-    </div>
-    <div id="henryOutput" class="panel-collapse collapse">
-      <div class="panel-body">
-        <pre>{{item.henry_out}}</pre>
-      </div>
-    </div>
-  </div>
+                  <dt>Graph {{key}}</dt>
+                  <dd>
+                    <img src="data:image/png;base64,{{value}}" style="width:1024px;" />
+                  </dd>
+                  {% endfor %}
+                </dl>
+              </div>
+            </div>
+          </div>
 
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h4 class="panel-title">
-        <a data-toggle="collapse" data-parent="#accordion" href="#responseError">
-          Error Message
-        </a>
-      </h4>
-    </div>
-    <div id="responseError" class="panel-collapse collapse">
-      <div class="panel-body">
-        <pre>{{item.task_error_message}}</pre>
-      </div>
-    </div>
-  </div>
+          <div class="card">
+            <div class="card-header" id="henryOutputHead">
+              <h4 class="mb-0">
+                <button class="btn btn-link" data-toggle="collapse"
+                        data-target="#henryOutput"
+                        aria-expanded="false" aria-controls="henryOutput">
+                  Henry Output
+                </button>
+              </h4>
+            </div>
+            <div id="henryOutput" class="collapse"
+                 aria-labelledby="henryOutputHead"
+                 data-parent="#accordion">
+              <div class="card-body">
+                <pre>{{item.henry_out}}</pre>
+              </div>
+            </div>
+          </div>
 
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h4 class="panel-title">
-        <a data-toggle="collapse" data-parent="#accordion" href="#itemLog">
-          Log
-        </a>
-      </h4>
-    </div>
-    <div id="itemLog" class="panel-collapse collapse">
-      <div class="panel-body">
-        <pre>{{item.log_body}}</pre>
-      </div>
-    </div>
-  </div>
-</div>
+          <div class="card">
+            <div class="card-header" id="responseErrorHead">
+              <h4 class="mb-0">
+                <button class="btn btn-link" data-toggle="collapse"
+                        data-target="#responseError"
+                        aria-expanded="false" aria-controls="responseError">
+                  Error Message
+                </button>
+              </h4>
+            </div>
+            <div id="responseError" class="collapse"
+                 aria-labelledby="responseErrorHead"
+                 data-parent="#accordion">
+              <div class="card-body">
+                <pre>{{item.task_error_message}}</pre>
+              </div>
+            </div>
+          </div>
 
+          <div class="card">
+            <div class="card-header" id="itemLogHead">
+              <h4 class="mb-0">
+                <button class="btn btn-link" data-toggle="collapse"
+                        data-target="#itemLog"
+                        aria-expanded="false" aria-controls="itemLog">
+                  Log
+                </button>
+              </h4>
+            </div>
+            <div id="itemLog" class="collapse"
+                 aria-labelled-by="itemLogHead"
+                 data-parent="#accordion">
+              <div class="card-body">
+                <pre>{{item.log_body}}</pre>
+              </div>
+            </div>
+          </div>
         </div>
 
       </div>
@@ -171,13 +215,9 @@
     <div id="footer">
       <div class="container">
         <p class="text-muted">&copy; 2014&ndash;2018 University of Southern
-California Information Sciences Institute.</p>
+          California Information Sciences Institute.</p>
       </div>
     </div>
 
-
-    <!-- Bootstrap core JavaScript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
   </body>
 </html>
