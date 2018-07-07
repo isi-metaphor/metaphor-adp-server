@@ -36,11 +36,13 @@ class Annotator(object):
 
     def normalize(self, string, language):
         if language == "EN":
-            # Replacing single quote, double quote (start/end), dash
+            # Replacing single quote, double quote (start/end), dash,
+            # non-breaking space.
             ascii_metaphor = string.replace(u"\u2019", u"\u0027")\
                 .replace(u"\u201c", u"\u0022")\
                 .replace(u"\u201d", u"\u0022")\
-                .replace(u"\u2014", u"\u002d")
+                .replace(u"\u2014", u"\u002d")\
+                .replace(u"\u00A0", u" ")
             return ascii_metaphor
         else:
             return string
