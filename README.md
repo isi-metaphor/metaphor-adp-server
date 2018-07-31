@@ -24,7 +24,15 @@ git clone https://github.com/isi-metaphor/lcc-service
 ./build
 ```
 
-4. Run the Docker image for the metaphor server:
+4. Get a license for Gurobi for the virtual machine. Go to
+   https://user.gurobi.com/download/licenses/free-academic to get a key
+   and then run
+
+```
+./run-license [key]
+```
+
+5. Run the Docker image for the metaphor server:
 
 ```
 ./run
