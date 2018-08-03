@@ -57,13 +57,13 @@ WORKDIR /research/ext
 
 RUN git clone https://github.com/jgordon/boxer
 
-RUN cd boxer && \
-    make && \
+WORKDIR /research/ext/boxer
+
+RUN make && \
     make bin/boxer && \
     make bin/tokkie
 
-RUN cd boxer && \
-    tar xvjf models-1.02.tar.bz2 && \
+RUN tar xvjf models-1.02.tar.bz2 && \
     rm models-1.02.tar.bz2
 
 ENV BOXER_DIR=/research/ext/boxer
