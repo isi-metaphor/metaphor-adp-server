@@ -24,17 +24,19 @@ git clone https://github.com/isi-metaphor/lcc-service
 ./build
 ```
 
-4. Run the Docker image for the metaphor server:
+4. Put Gurobi license file in the `lic` directory.
+
+5. Run the Docker image for the metaphor server:
 
 ```
 ./run
 ```
 
 The server will now be started on localhost, port 8000. You can send JSON
-requests (see, e.g., the 'testing' directory in the Metaphor-ADP
+requests (see, e.g., the `testing` directory in the Metaphor-ADP
 repository) or use the Web interface: http://localhost:8000/app
 
-The default username and password are both "metaphor".
+The default username and password are both `metaphor`.
 
 
 ### Legacy
@@ -43,7 +45,7 @@ The directory structure should look like this:
 
 ![Directory tree](docs/directories.png)
 
-The instructions below assume you're installing in /research, but this can
+The instructions below assume you're installing in `/research`, but this can
 be any directory you prefer.
 
 This is how to install the entire metaphor pipeline, including the web
@@ -139,12 +141,13 @@ python2.7 manage.py createsuperuser --username=username_to_create \
 ```
 
 9. Run:
-- Edit the shell.sh script to set the name of the screen session it'll start
-  (the -S option)
+- Edit the `shell.sh` script to set the name of the screen session it'll start
+  (the `-S` option)
 - Run the `shell.sh` command
 - Within the screen it started, start `temp_run.sh`; for monitored mode
   run `run.sh`.
-- Disconnect from the screen (CTRL-A D)
+- Disconnect from the screen (`Ctrl-A D`)
+
 
 ## Acknowledgments
 
