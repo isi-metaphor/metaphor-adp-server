@@ -12,8 +12,8 @@ import traceback
 
 from lccsrv.paths import *
 from subprocess import Popen, PIPE
-from manage import getParserStatus, setParserStatus, getParserLock, \
-    setParserLock, getParserFlag, setParserFlag
+from manage import get_parser_status, set_parser_status, get_parser_lock, \
+    set_parser_lock, get_parser_flag, set_parser_flag
 import pexpect
 import re
 import imp
@@ -354,8 +354,8 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
     parser_start_time = time.time()
     annotations = request_body_dict["metaphorAnnotationRecords"]
     while True:
-        if getParserLock(language):
-            setParserLock(language, False)
+        if get_parser_lock(language):
+            set_parser_lock(language, False)
             for key in input_metaphors.keys():
                 metaphor_count += 1
                 if "parser_output" in annotations[metaphor_count - 1] and \
@@ -399,11 +399,11 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
                 logger.info("Running parsing command: '%s'." % parser_proc)
                 logger.info("Input: %s" % tokenizer_output)
                 logger.info(language + " parser running: " +
-                            str(getParserStatus(language)))
-                if not getParserStatus(language):
+                            str(get_parser_status(language)))
+                if not get_parser_status(language):
                     child[language] = pexpect.spawn(
                         '/bin/bash', ['-c', parser_proc], timeout=30)
-                    setParserStatus(language, True)
+                    set_parser_status(language, True)
 
                 child[language].send(tokenizer_output)
                 reattempts = 0
@@ -436,14 +436,14 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
                                        " parser not working.\n")
                         reattempts = 2
                         child[language].terminate()
-                        setParserStatus(language, False)
-                logger.info("Parser flag: " + str(getParserFlag()))
-                if not getParserFlag():
+                        set_parser_status(language, False)
+                logger.info("Parser flag: " + str(get_parser_flag()))
+                if not get_parser_flag():
                     logger.info("\nTerminating " + language +
                                 " parser process.\n")
                     child[language].terminate()
                     child[language] = ""
-                    setParserStatus(language, False)
+                    set_parser_status(language, False)
 
                 if language == "EN":
                     parser_output_inter = re.sub("\n", "\t",
@@ -501,7 +501,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
                     annotations[metaphor_count-1]["parser_output"] \
                         = createLF_output_temp
                 createLF_output += createLF_output_temp
-            setParserLock(language, True)
+            set_parser_lock(language, True)
             break
 
     parser_end_time = time.time()
