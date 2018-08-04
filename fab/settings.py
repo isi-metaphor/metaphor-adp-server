@@ -19,11 +19,11 @@ PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 DEBUG = {{DJANGO_DEBUG}}
 TEMPLATE_DEBUG = DEBUG
 
+ALLOWED_HOSTS = ["*"]
 
 ADMINS = (
     ("{{ADMIN_NAME}}", "{{ADMIN_EMAIL}}"),
 )
-
 
 MANAGERS = ADMINS
 DATABASES = {
