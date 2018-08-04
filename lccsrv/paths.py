@@ -27,12 +27,31 @@ LD_LIBRARY_PATH = "/research/ext/gurobi/linux64/lib:${LD_LIBRARY_PATH}"
 LIBRARY_PATH = "/research/ext/gurobi/linux64/lib:${LIBRARY_PATH}"
 UPLOADS_DIR = "/research/temp/uploads"
 
-FARSI_PIPELINE = path.join(METAPHOR_DIR, "pipelines/Farsi/run-fa.sh")
-SPANISH_PIPELINE = path.join(METAPHOR_DIR, "pipelines/Spanish/run-es.sh")
-RUSSIAN_PIPELINE = path.join(METAPHOR_DIR, "pipelines/Russian/run-ru.sh")
+SPANISH_PIPELINE = path.join(
+    METAPHOR_DIR,
+    "pipelines/Spanish/run-es.sh"
+)
 
-BOXER2HENRY = path.join(METAPHOR_DIR, "pipelines/English/parse-to-lf/Boxer2Henry.py")
-PARSER2HENRY = path.join(METAPHOR_DIR, "pipelines/common/IntParser2Henry.py")
+FARSI_PIPELINE = path.join(
+    METAPHOR_DIR,
+    "pipelines/Farsi/run-fa.sh"
+)
+
+RUSSIAN_PIPELINE = path.join(
+    METAPHOR_DIR,
+    "pipelines/Russian/run-ru.sh"
+)
+
+
+BOXER2HENRY = path.join(
+    METAPHOR_DIR,
+    "pipelines/English/parse-to-lf/Boxer2Henry.py"
+)
+
+PARSER2HENRY = path.join(
+    METAPHOR_DIR,
+    "pipelines/common/IntParser2Henry.py"
+)
 
 KBS_DIR = path.join(METAPHOR_DIR, "KBs")
 
@@ -51,27 +70,30 @@ CODE_COMMON = path.join(METAPHOR_DIR, "pipelines/common")
 sys.path.extend([CODE_RU, CODE_EN, CODE_ES, CODE_FA, CODE_COMMON])
 
 
-logger.info("METAPHOR_DIR:          %r" % os.environ.get("METAPHOR_DIR"))
-logger.info("HENRY_DIR:             %r" % os.environ.get("HENRY_DIR"))
-logger.info("BOXER_DIR:             %r" % os.environ.get("BOXER_DIR"))
-logger.info("TMP_DIR:               %r" % os.environ.get("TMP_DIR"))
-logger.info("GUROBI_HOME:           %r" % os.environ.get("GUROBI_HOME"))
-logger.info("GRB_LICENSE_FILE:      %r" % os.environ.get("GRB_LICENSE_FILE"))
-logger.info("CPLUS_INCLUDE_PATH:    %r" % os.environ.get("CPLUS_INCLUDE_PATH"))
-logger.info("PATH:                  %r" % os.environ.get("PATH"))
-logger.info("LD_LIBRARY_PATH:       %r" % os.environ.get("LD_LIBRARY_PATH"))
-logger.info("LIBRARY_PATH:          %r" % os.environ.get("LIBRARY_PATH"))
+logger.info("METAPHOR_DIR: %r" % os.environ.get("METAPHOR_DIR"))
+logger.info("HENRY_DIR: %r" % os.environ.get("HENRY_DIR"))
+logger.info("BOXER_DIR: %r" % os.environ.get("BOXER_DIR"))
+logger.info("TMP_DIR: %r" % os.environ.get("TMP_DIR"))
+logger.info("GUROBI_HOME: %r" % os.environ.get("GUROBI_HOME"))
+logger.info("GRB_LICENSE_FILE: %r" % os.environ.get("GRB_LICENSE_FILE"))
+logger.info("CPLUS_INCLUDE_PATH: %r" % os.environ.get("CPLUS_INCLUDE_PATH"))
+logger.info("PATH: %r" % os.environ.get("PATH"))
+logger.info("LD_LIBRARY_PATH: %r" % os.environ.get("LD_LIBRARY_PATH"))
+logger.info("LIBRARY_PATH: %r" % os.environ.get("LIBRARY_PATH"))
 
-logger.info("FARSI_PIPELINE:        %s" % FARSI_PIPELINE)
-logger.info("SPANISH_PIPELINE:      %s" % SPANISH_PIPELINE)
-logger.info("RUSSIAN_PIPELINE:      %s" % RUSSIAN_PIPELINE)
-logger.info("PARSER2HENRY:          %s" % PARSER2HENRY)
-logger.info("EN_KBPATH:             %s" % EN_KBPATH)
-logger.info("ES_KBPATH:             %s" % ES_KBPATH)
-logger.info("RU_KBPATH:             %s" % RU_KBPATH)
-logger.info("FA_KBPATH:             %s" % FA_KBPATH)
-logger.info("CODE_RU:               %s" % CODE_RU)
-logger.info("CODE_EN:               %s" % CODE_EN)
-logger.info("CODE_ES:               %s" % CODE_ES)
-logger.info("CODE_FA:               %s" % CODE_FA)
-logger.info("CODE_COMMON:           %s" % CODE_COMMON)
+logger.info("SPANISH_PIPELINE: %s" % SPANISH_PIPELINE)
+logger.info("FARSI_PIPELINE: %s" % FARSI_PIPELINE)
+logger.info("RUSSIAN_PIPELINE: %s" % RUSSIAN_PIPELINE)
+logger.info("PARSER2HENRY: %s" % PARSER2HENRY)
+
+logger.info("EN_KBPATH: %s" % EN_KBPATH)
+logger.info("ES_KBPATH: %s" % ES_KBPATH)
+logger.info("FA_KBPATH: %s" % FA_KBPATH)
+logger.info("RU_KBPATH: %s" % RU_KBPATH)
+
+logger.info("CODE_EN: %s" % CODE_EN)
+logger.info("CODE_ES: %s" % CODE_ES)
+logger.info("CODE_FA: %s" % CODE_FA)
+logger.info("CODE_RU: %s" % CODE_RU)
+
+logger.info("CODE_COMMON: %s" % CODE_COMMON)

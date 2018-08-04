@@ -79,7 +79,7 @@ logger.info("GRB_LICENSE_FILE: %r" % os.environ.get("GRB_LICENSE_FILE"))
 logger.info("CPLUS_INCLUDE_PATH: %r" % os.environ.get("CPLUS_INCLUDE_PATH"))
 logger.info("PATH: %r" % os.environ.get("PATH"))
 logger.info("LD_LIBRARY_PATH: %r" % os.environ.get("LD_LIBRARY_PATH"))
-logger.info("LIBRARY_PATH:%r" % os.environ.get("LIBRARY_PATH"))
+logger.info("LIBRARY_PATH: %r" % os.environ.get("LIBRARY_PATH"))
 
 logger.info("SPANISH_PIPELINE: %s" % SPANISH_PIPELINE)
 logger.info("FARSI_PIPELINE: %s" % FARSI_PIPELINE)
