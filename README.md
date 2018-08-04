@@ -24,7 +24,15 @@ git clone https://github.com/isi-metaphor/lcc-service
 ./build
 ```
 
-4. Put Gurobi license file in the `lic` directory.
+4. Get a license for Gurobi for the virtual machine. Go to
+   https://user.gurobi.com/download/licenses/free-academic to get a key
+   and then run
+
+```
+./run-license [key]
+```
+
+The license file will be stored in the `lic` directory.
 
 5. Run the Docker image for the metaphor server:
 
