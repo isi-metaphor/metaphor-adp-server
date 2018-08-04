@@ -11,39 +11,39 @@ import os
 import sys
 
 
-ParserRunning = {'FA': False, 'ES': False, 'RU': False, 'EN': False}
-ParserLock = {'FA': True, 'ES': True, 'RU': True, 'EN': True}
-ParserFlag = True
+PARSER_RUNNING = {'FA': False, 'ES': False, 'RU': False, 'EN': False}
+PARSER_LOCK = {'FA': True, 'ES': True, 'RU': True, 'EN': True}
+PARSER_FLAG = True
 
 
-def getParserFlag():
-    global ParserFlag
-    # print "Value of ParserFlag is", ParserFlag
-    return ParserFlag
+def get_parser_flag():
+    global PARSER_FLAG
+    # print "Value of PARSER_FLAG is", PARSER_FLAG
+    return PARSER_FLAG
 
 
-def setParserFlag(value):
-    global ParserFlag
-    ParserFlag = value
+def set_parser_flag(value):
+    global PARSER_FLAG
+    PARSER_FLAG = value
     # print "Parser Flag value set to", value
 
 
-def getParserStatus(language):
-    return ParserRunning[language]
+def get_parser_status(language):
+    return PARSER_RUNNING[language]
 
 
-def setParserStatus(language, value):
-    global ParserRunning
-    ParserRunning[language] = value
+def set_parser_status(language, value):
+    global PARSER_RUNNING
+    PARSER_RUNNING[language] = value
 
 
-def getParserLock(language):
-    return ParserLock[language]
+def get_parser_lock(language):
+    return PARSER_LOCK[language]
 
 
-def setParserLock(language, value):
-    global ParserLock
-    ParserLock[language] = value
+def set_parser_lock(language, value):
+    global PARSER_LOCK
+    PARSER_LOCK[language] = value
 
 
 if __name__ == "__main__":

@@ -73,6 +73,8 @@ def app_status(request):
         return redirect("/app/")
     repo = git.Repo(".")
     return render(request, "app_status.html", {
+        # The branch is in repo.active_branch, but this gives us information
+        # on tags as well as branches.
         "branch": repo.git.execute(["git", "describe", "--all",
                                     "--exact-match", str(repo.head.commit)]),
         "commit": str(repo.head.commit),
