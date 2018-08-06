@@ -312,7 +312,7 @@ def extract_CM_mapping(sid, input_string, parse, description, lcc_annotation):
                     print(source_s, ssub_s, sargs)
                     link = test(set(t_v), set(sargs), equalities, other_args)
                     print(link)
-                    s_domains.append((source_s, ssub_s, (1 - 0.05 - 0.1 * link)))
+                    s_domains.add((source_s, ssub_s, (1 - 0.05 - 0.1 * link)))
 
                     # for domain in targets:
                     for (t, ts) in t_domains:
