@@ -55,10 +55,10 @@ PARSER2HENRY = path.join(
 
 KBS_DIR = path.join(METAPHOR_DIR, "KBs")
 
-EN_KBPATH = path.join(KBS_DIR, "English/English_compiled_KB.da")
-ES_KBPATH = path.join(KBS_DIR, "Spanish/Spanish_compiled_KB.da")
-RU_KBPATH = path.join(KBS_DIR, "Russian/Russian_compiled_KB.da")
-FA_KBPATH = path.join(KBS_DIR, "Farsi/Farsi_compiled_KB.da")
+EN_KB_PATH = path.join(KBS_DIR, "English/English_compiled_KB.da")
+ES_KB_PATH = path.join(KBS_DIR, "Spanish/Spanish_compiled_KB.da")
+RU_KB_PATH = path.join(KBS_DIR, "Russian/Russian_compiled_KB.da")
+FA_KB_PATH = path.join(KBS_DIR, "Farsi/Farsi_compiled_KB.da")
 
 CODE_RU = path.join(METAPHOR_DIR, "pipelines/Russian")
 CODE_EN = path.join(METAPHOR_DIR, "pipelines/English")
@@ -86,10 +86,10 @@ logger.info("FARSI_PIPELINE: %s" % FARSI_PIPELINE)
 logger.info("RUSSIAN_PIPELINE: %s" % RUSSIAN_PIPELINE)
 logger.info("PARSER2HENRY: %s" % PARSER2HENRY)
 
-logger.info("EN_KBPATH: %s" % EN_KBPATH)
-logger.info("ES_KBPATH: %s" % ES_KBPATH)
-logger.info("FA_KBPATH: %s" % FA_KBPATH)
-logger.info("RU_KBPATH: %s" % RU_KBPATH)
+logger.info("EN_KB_PATH: %s" % EN_KB_PATH)
+logger.info("ES_KB_PATH: %s" % ES_KB_PATH)
+logger.info("FA_KB_PATH: %s" % FA_KB_PATH)
+logger.info("RU_KB_PATH: %s" % RU_KB_PATH)
 
 logger.info("CODE_EN: %s" % CODE_EN)
 logger.info("CODE_ES: %s" % CODE_ES)

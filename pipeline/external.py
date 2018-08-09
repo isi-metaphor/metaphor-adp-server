@@ -309,7 +309,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
             = ":- op(601, xfx, (/)).\n:- op(601, xfx, (\\)).\n" + \
             ":- multifile ccg/2, id/2.\n:- discontiguous ccg/2, id/2.\n"
         b2h_proc = BOXER2HENRY + " --nonmerge sameid freqpred"
-        KBPATH = kb or EN_KBPATH
+        KBPATH = kb or EN_KB_PATH
 
     elif language == "ES":
         MALT_PARSER_DIR = os.path.join(METAPHOR_DIR,
@@ -323,7 +323,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
         createLF_proc = METAPHOR_DIR + "/pipelines/Spanish/create-lf.sh"
         parser_output_append = ""
         b2h_proc = PARSER2HENRY + " --nonmerge sameid freqpred"
-        KBPATH = kb or ES_KBPATH
+        KBPATH = kb or ES_KB_PATH
 
     elif language == "FA":
         MALT_PARSER_DIR = os.path.join(METAPHOR_DIR, "external-tools/malt-1.5")
@@ -336,7 +336,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
         createLF_proc = METAPHOR_DIR + "/pipelines/Farsi/create-lf.sh"
         parser_output_append = ""
         b2h_proc = PARSER2HENRY + " --nonmerge sameid freqpred"
-        KBPATH = kb or FA_KBPATH
+        KBPATH = kb or FA_KB_PATH
 
     elif language == "RU":
         MALT_PARSER_DIR = os.path.join(METAPHOR_DIR, "external-tools/malt-1.5")
@@ -349,7 +349,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
         createLF_proc = METAPHOR_DIR + "/pipelines/Russian/create-lf.sh"
         parser_output_append = ""
         b2h_proc = PARSER2HENRY + " --nonmerge sameid freqpred"
-        KBPATH = kb or RU_KBPATH
+        KBPATH = kb or RU_KB_PATH
 
     parser_start_time = time.time()
     annotations = request_body_dict["metaphorAnnotationRecords"]

@@ -129,10 +129,10 @@ def app_request(request):
 def app_list_kbs(request):
     default_kbs = glob.glob(paths.KBS_DIR + "/*/*.da")
     default_kbs = [
-        paths.EN_KBPATH,
-        paths.RU_KBPATH,
-        paths.ES_KBPATH,
-        paths.FA_KBPATH,
+        paths.EN_KB_PATH,
+        paths.RU_KB_PATH,
+        paths.ES_KB_PATH,
+        paths.FA_KB_PATH,
     ]
     default_kbs = [
         os.path.join(
