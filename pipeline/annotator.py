@@ -15,7 +15,7 @@ import simplejson as json
 
 from lccsrv import paths
 import pipeline.external as adp
-from pipeline.models import TASK_STATUS
+from pipeline.models import TaskStatus
 
 
 class Annotator(object):
@@ -222,7 +222,7 @@ class Annotator(object):
 
         self.logger.info("Task %d language=%s" % (self.task.id, language))
         self.task.language = language
-        self.task.task_status = TASK_STATUS.PREPROCESSED
+        self.task.task_status = TaskStatus.PREPROCESSED
         self.task.response_status = 200
 
         # 6. If there are no metaphors for annotation, return error.
@@ -281,6 +281,6 @@ class Annotator(object):
             os.unlink(output_handle_and_name[1])
 
         self.task.response_body = result
-        self.task.task_status = TASK_STATUS.PROCESSED
+        self.task.task_status = TaskStatus.PROCESSED
 
         return debug_option

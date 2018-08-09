@@ -6,17 +6,19 @@
 # For more information, see README.md
 # For license information, see LICENSE
 
-import lz4
+
 import json
 import StringIO as stringio
 
 from datetime import datetime
 
+import lz4
+
 from django.db import models
 from django.http import HttpResponse
 
 
-class TASK_STATUS:
+class TaskStatus:
     DOCUMENT_RECEIVED = 0
     PREPROCESSED = 1
     PROCESSED = 2
@@ -25,6 +27,7 @@ class TASK_STATUS:
 class LogsDisplay(models.Model):
     class Meta:
         db_table = "light_t_tasks"
+
     id = models.IntegerField(primary_key=True)
     request_addr = models.CharField(null=True, blank=True, max_length=16)
     request_time = models.DateTimeField(auto_now_add=True, null=False)
@@ -32,16 +35,19 @@ class LogsDisplay(models.Model):
     response_time = models.DateTimeField(null=True)
     response_status = models.IntegerField(null=False, default=500)
 
-    task_status = models.SmallIntegerField(null=False, default=TASK_STATUS.DOCUMENT_RECEIVED)
+    task_status = models.SmallIntegerField(
+        null=False,
+        default=TaskStatus.DOCUMENT_RECEIVED
+    )
     task_error_count = models.IntegerField(default=0, null=False)
     task_error_code = models.IntegerField(null=False, default=0)
 
     def status_str(self):
-        if self.task_status == TASK_STATUS.DOCUMENT_RECEIVED:
+        if self.task_status == TaskStatus.DOCUMENT_RECEIVED:
             return "RECEIVED"
-        if self.task_status == TASK_STATUS.PREPROCESSED:
+        if self.task_status == TaskStatus.PREPROCESSED:
             return "PREPROCESSED"
-        if self.task_status == TASK_STATUS.PROCESSED:
+        if self.task_status == TaskStatus.PROCESSED:
             return "PROCESSED"
         return "UNKNOWN"
 
@@ -72,7 +78,6 @@ class LogsDisplay(models.Model):
 
 
 class AnnotationTask(models.Model):
-
     class Meta:
         db_table = "t_tasks"
 
@@ -89,10 +94,17 @@ class AnnotationTask(models.Model):
     response_time = models.DateTimeField(null=True)
     response_status = models.IntegerField(null=False, default=500)
 
-    task_status = models.SmallIntegerField(null=False, default=TASK_STATUS.DOCUMENT_RECEIVED)
+    task_status = models.SmallIntegerField(
+        null=False,
+        default=TaskStatus.DOCUMENT_RECEIVED
+    )
     task_error_count = models.IntegerField(default=0, null=False)
     task_log_blob = models.BinaryField(null=False)
-    task_error_message = models.CharField(max_length=256, null=True, blank=True)
+    task_error_message = models.CharField(
+        max_length=256,
+        null=True,
+        blank=True
+    )
     task_error_code = models.IntegerField(null=False, default=0)
 
     def __init__(self, *args, **kwargs):
@@ -100,11 +112,11 @@ class AnnotationTask(models.Model):
         self.log = stringio.StringIO()
 
     def status_str(self):
-        if self.task_status == TASK_STATUS.DOCUMENT_RECEIVED:
+        if self.task_status == TaskStatus.DOCUMENT_RECEIVED:
             return "RECEIVED"
-        if self.task_status == TASK_STATUS.PREPROCESSED:
+        if self.task_status == TaskStatus.PREPROCESSED:
             return "PREPROCESSED"
-        if self.task_status == TASK_STATUS.PROCESSED:
+        if self.task_status == TaskStatus.PROCESSED:
             return "PROCESSED"
         return "UNKNOWN"
 
