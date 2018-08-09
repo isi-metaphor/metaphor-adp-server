@@ -15,6 +15,7 @@ def printerr(*objs):
 
 def transitive_closure(A):
     """Compute the transitive closure of a hash."""
+
     while True:
         newlink = False
 
