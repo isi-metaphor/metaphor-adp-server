@@ -245,7 +245,7 @@ class Annotator(object):
 
         # 9. Select which extractor code to run
         extractor = request_document.get(
-            "extractor", "extractor-2014-06-no-span"
+            "extractor", "extractor"
         )
         log_msg = "Using this extractor code: legacy/{0}.py".format(extractor)
         self.logger.info(log_msg)
