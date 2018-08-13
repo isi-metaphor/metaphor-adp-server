@@ -11,7 +11,6 @@ import time
 import traceback
 import re
 
-from sets import Set
 from collections import defaultdict
 from subprocess import Popen, PIPE
 
@@ -166,12 +165,12 @@ def remove_thousands(pid):
 idPattern = re.compile(r"^.*\[([^\]]+)\].*$")
 
 
-def filterParserOutput(parses, word2ids, sources, targets):
+def filter_parser_output(parses, word2ids, sources, targets):
     filtered = {}
     if sources and targets and parses and word2ids:
         for key in parses:
             allfound = False
-            toKeep = Set()
+            toKeep = set()
             if key in sources and key in targets and key in word2ids:
                 allfound = True
                 wids = word2ids[key]
@@ -377,7 +376,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
 
                 input_str = "<META>" + str(key) + "\n\n" + input_metaphors[key]
                 if language == "EN":
-                    input_str = input_str + "\n"
+                    input_str += "\n"
                 else:
                     input_str += "\n\n"
                 logger.info("Processing metaphor " + str(metaphor_count))
@@ -392,7 +391,8 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
                     stdin=PIPE,
                     stdout=PIPE,
                     stderr=None,
-                    close_fds=True)
+                    close_fds=True
+                )
                 tokenizer_output, tokenizer_stderr \
                     = tokenizer_pipeline.communicate(input=input_str)
 
@@ -473,12 +473,6 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
                         final_parser_output = parser_output_append
                         ccg_split = ccgs[0].split("\r\t\r\t")
                         for i in range(len(ccg_split) - 2):
-                            # if i == 0:
-                            # regex = r'ccg\((\d+).*'
-                            # ccg_id = re.findall(regex, ccg_split[i])
-                            # print ccg_id[0]
-                            # ccg_split[i] = re.sub("ccg\(\d+", "ccg(1",
-                            #                        ccg_split[i])
                             ccg_replace = "ccg(" + str(i+1)
                             ccg_split[i] = re.sub(r"ccg\(\d+", ccg_replace,
                                                   ccg_split[i])
@@ -505,7 +499,8 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
                     stdin=PIPE,
                     stdout=PIPE,
                     stderr=None,
-                    close_fds=True)
+                    close_fds=True
+                )
                 create_lf_output_temp, create_lf_stderr_tmp \
                     = create_lf_pipeline.communicate(input=parser_output_inter)
                 if "parser_output" in annotations[metaphor_count-1]:
@@ -530,7 +525,8 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
         stdin=PIPE,
         stdout=PIPE,
         stderr=None,
-        close_fds=True)
+        close_fds=True
+    )
     parser_output, parser_stderr = b2h_pipeline.communicate(
         input=create_lf_output)
     logger.info("B2H output:\n%s\n" % parser_output)
@@ -558,7 +554,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
     logger.info(msg)
     task.log_error(msg)
 
-    parser_output = filterParserOutput(parses, word2ids, sources, targets)
+    parser_output = filter_parser_output(parses, word2ids, sources, targets)
     msg = "Final parser output: \n" + parser_output
     logger.info(msg)
     task.log_error(msg)
@@ -573,32 +569,46 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
 
     if need_to_generate_graph(with_pdf_content):
         # Time for graph generation subtracted from Henry time in seconds
-        time_all_henry -= - 3
+        time_all_henry += 3
 
     # Time for one interpretation in Henry in seconds
     time_unit_henry = str(int(time_all_henry / len(input_metaphors)))
     if time_unit_henry < 20:
         time_unit_henry = 20
+
     # Henry processing
     if KB_COMPILED:
-        henry_proc = HENRY_DIR + "/bin/henry -m infer -e " + HENRY_DIR + \
-                     "/models/h93.py -d " + depth + " -t 4 " + \
-                     "-O proofgraph,statistics -T " +  \
-                     time_unit_henry + " -b " + kb_path
+        henry_proc = (
+            HENRY_DIR + "/bin/henry " +
+            "-m infer " +
+            "-e " + HENRY_DIR + "/models/h93.py " +
+            "-d " + depth +
+            " -t 4 " +
+            "-O proofgraph,statistics " +
+            "-T " +  time_unit_henry +
+            " -b " + kb_path
+        )
     else:
-        henry_proc = HENRY_DIR + "/bin/henry -m infer -e " + HENRY_DIR + \
-                     "/models/h93.py -d " + depth + " -t 4 " + \
-                     "-O proofgraph,statistics -T " +  \
-                     time_unit_henry
+        henry_proc = (
+            HENRY_DIR + "/bin/henry " +
+            "-m infer " +
+            "-e " + HENRY_DIR + "/models/h93.py " +
+            "-d " + depth +
+            " -t 4 " +
+            "-O proofgraph,statistics " +
+            "-T " + time_unit_henry
+        )
 
     logger.info("Running Henry command: '%s'." % henry_proc)
-    henry_pipeline = Popen(henry_proc,
-                           env=ENV,
-                           shell=True,
-                           stdin=PIPE,
-                           stdout=PIPE,
-                           stderr=None,
-                           close_fds=True)
+    henry_pipeline = Popen(
+        henry_proc,
+        env=ENV,
+        shell=True,
+        stdin=PIPE,
+        stdout=PIPE,
+        stderr=None,
+        close_fds=True
+    )
     henry_output, henry_stderr \
         = henry_pipeline.communicate(input=parser_output)
     hypotheses = extract_hypotheses(henry_output)
@@ -608,15 +618,17 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
     logger.info("Hypotheses output:\n%s\n" % hypotheses)
     task.log_error("Hypotheses: \n%r" % hypotheses)
     henry_end_time = time.time()
+
     if "henry_time" in request_body_dict:
         request_body_dict["henry_time"] \
             = str((henry_end_time - henry_start_time))
+
     if last_step == 2:
-        return json.dumps(henry_output, encoding="utf-8", indent=4)
+        return json.dumps(henry_output, encoding="utf-8", indent=2)
 
     processed, failed, empty = 0, 0, 0
 
-    # Merge ADP result and input json document
+    # Merge ADP result and input JSON document
     input_annotations = request_body_dict["metaphorAnnotationRecords"]
 
     if need_to_generate_graph(with_pdf_content):
@@ -652,8 +664,10 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
 
                 except Exception:
                     failed += 1
-                    error_msg = "Failed sentence #%s.\n %s" % \
-                                (sID, traceback.format_exc())
+                    error_msg = "Failed sentence #%s.\n %s" % (
+                        sID,
+                        traceback.format_exc()
+                    )
                     logger.error(error_msg)
                     task.log_error(error_msg)
                     task.log_error("Failed annotation: %s" % str(annotation))
@@ -689,7 +703,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
                             key = ",".join(r[0:5])
                             value = float(r[5])
                             if key in answer:
-                                answer[key] = answer[key] + value
+                                answer[key] += value
                             else:
                                 answer[key] = value
     msg = "number of sentences: %d" % count
@@ -699,7 +713,7 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
     logger.info(msg)
     task.log_error(msg)
     for key in answer:
-        answer[key] = answer[key]/count
+        answer[key] /= count
     best = -1
     bestkey = ''
     if answer:
@@ -729,8 +743,10 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
                 else:
                     exp += "\n%%BEGIN_CM_LIST\n" + bestkey + "," + \
                            repr(best) + "\n%%END_CM_LIST"
-                msg = "changing interpretation from:\n%s\n to:\n%s" \
-                      % (annotation["isiAbductiveExplanation"], exp)
+                msg = "Changing interpretation from:\n%s\n to:\n%s" % (
+                    annotation["isiAbductiveExplanation"],
+                    exp
+                )
                 logger.info(msg)
                 task.log_error(msg)
                 annotation["isiAbductiveExplanation"] = exp
@@ -748,8 +764,8 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
                 annotation["sourceConceptSubDomain"] = get_element(data, 4)
 
     # request_body_dict["kb"] = kb_path
-    # removes json fields that can be added by the code. (compliance with
-    # lcc json format)
+
+    # Remove JSON debugging fields from JSON.
     if "kb" in request_body_dict:
         del request_body_dict["kb"]
     if "step" in request_body_dict:
@@ -758,9 +774,11 @@ def run_annotation(request_body_dict, input_metaphors, language, task,
         request_body_dict["task_id"] = task.id
     if "enableDebug" in request_body_dict:
         del request_body_dict["enableDebug"]
+
     # task_id contains the id used to access the log entry for this request.
     if "task_id" in request_body_dict:
         request_body_dict["task_id"] = task.id
+
     result = json.dumps(request_body_dict, encoding="utf-8", indent=2)
     logger.info("Processed: %d." % processed)
     logger.info("Failed: %d." % failed)
@@ -791,8 +809,14 @@ def generate_graph(input_dict, henry_output, unique_id, graphtype):
             viz = "python2.7 " + HENRY_DIR + "/tools/proofgraph.py " + \
                   "--graph " + key + " | dot -T png > " + graph_output
 
-        graphical_processing = Popen(viz, shell=True, stdin=PIPE, stdout=PIPE,
-                                     stderr=None, close_fds=True)
+        graphical_processing = Popen(
+            viz,
+            shell=True,
+            stdin=PIPE,
+            stdout=PIPE,
+            stderr=None,
+            close_fds=True
+        )
 
         graphical_processing.communicate(input=henry_output)
         # print "sleep"

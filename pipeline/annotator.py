@@ -199,13 +199,13 @@ class Annotator(object):
                 metaphors[str(annotation_id)] = self.normalize(
                     metaphor, language
                 ).encode("utf-8")
-
             except KeyError:
                 error_msg = (
                     "Ann #%d. No metaphor available (skip it). Task=%d"
                     % (annotation_no, self.task.id)
                 )
                 self.task_error(error_msg, error_code=None, count_error=True)
+
             am = annotation
             if "annotationMappings" in annotation:
                 ams = annotation["annotationMappings"]
