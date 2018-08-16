@@ -312,17 +312,17 @@ def extract_CM_mapping(sid, input_string, parse, description, lcc_annotation):
     explanation_appendix += "%%END_CM_LIST"
     output["isiAbductiveExplanation"] += explanation_appendix.encode("utf-8")
 
-    def get_elem(d, n):
+    def get_element(d, n):
         if len(d) > n:
             return d[n]
         return ""
 
     data = best_cm.split(",")
 
-    output["targetConceptDomain"] = get_elem(data, 0)
-    output["targetConceptSubDomain"] = get_elem(data, 1)
-    output["targetFrame"] = get_elem(data, 2)
-    output["sourceFrame"] = get_elem(data, 3)
-    output["sourceConceptSubDomain"] = get_elem(data, 4)
+    output["targetConceptDomain"] = get_element(data, 0)
+    output["targetConceptSubDomain"] = get_element(data, 1)
+    output["targetFrame"] = get_element(data, 2)
+    output["sourceFrame"] = get_element(data, 3)
+    output["sourceConceptSubDomain"] = get_element(data, 4)
 
     return output
