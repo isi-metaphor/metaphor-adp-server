@@ -72,7 +72,7 @@ ENV BOXER_DIR=/research/ext/boxer
 # Install Metaphor-ADP.
 
 WORKDIR /research/repo
-RUN git clone https://github.com/isi-metaphor/Metaphor-ADP.git metaphor
+RUN git clone https://github.com/isi-metaphor/metaphor-adp.git metaphor
 
 # WORKDIR /research/repo/metaphor
 # RUN git checkout develop

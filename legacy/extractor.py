@@ -38,35 +38,6 @@ def transitive_closure(A):
     return A
 
 
-def find_indexes(sub_str, main_str):
-    """Find index of `sub_str` in `main_str`."""
-
-    if len(sub_str) == 0:
-        return []
-
-    inds = []
-    ss_toks = nltk.word_tokenize(sub_str.rstrip().lower())
-    ms_toks = nltk.word_tokenize(main_str.rstrip().lower())
-
-    for mi, mt in enumerate(ms_toks):
-        if ss_toks[0] == mt and len(ms_toks) >= mi + len(ss_toks) - 1:
-            inds.append(mi)
-            found = True
-            if len(ss_toks) > 1:
-                for si in range(1, len(ss_toks)):
-                    if ss_toks[si] != ms_toks[mi + si]:
-                        found = False
-                        break
-                    else:
-                        inds.append(mi + si)
-            if found:
-                return inds
-            else:
-                inds = []
-
-    return inds
-
-
 # hash with key the domain(subdomain) and value ta list of list of arguments
 # output <domain,<domain_arg,((subdomain,subdomain_arg)...)>>
 def create_d_struc(super_d, sub_d):
@@ -74,10 +45,7 @@ def create_d_struc(super_d, sub_d):
 
     for superd in super_d:
         for super_args in super_d[superd]:
-            if (
-                superd not in output
-                or super_args[0] not in output[superd]
-            ):
+            if superd not in output or super_args[0] not in output[superd]:
                 output[superd][super_args[0]] = []
 
             if sub_d:
@@ -85,7 +53,8 @@ def create_d_struc(super_d, sub_d):
                     for sub_args in sub_d[subd]:
                         if len(sub_args) > 1 and super_args[0] == sub_args[1]:
                             output[superd][super_args[0]].append(
-                                (subd, sub_args[0]))
+                                (subd, sub_args[0])
+                            )
             else:
                 output[superd][super_args[0]].append(("", super_args[0]))
     return output
@@ -101,7 +70,7 @@ def collect_vars(struc, superkey, equalities):
             if arg in equalities:
                 for a in equalities[arg]:
                     output.append(a)
-        for (subd, subarg) in struc[superkey][arg]:
+        for subd, subarg in struc[superkey][arg]:
             if not subarg.startswith("_") and subarg not in output:
                 output.append(subarg)
                 if subarg in equalities:
@@ -163,7 +132,7 @@ def is_linked_by_parse(v1, v2, word_props, equalities, input_been, path_len):
     been.append((v2, v1))
 
     nbrs = []
-    for (prop_name, args) in word_props:
+    for prop_name, args in word_props:
         if v1 in args:
             if v2 in args:
                 return path_len
@@ -201,10 +170,10 @@ def extract_CM_mapping(sid, input_string, parse, description, lcc_annotation):
     equalities = defaultdict(dict)
     other_args = defaultdict(set)
 
-    prop_pattern = re.compile('([^\(]+)\(([^\)]+)\)')
+    prop_pattern = re.compile("([^\(]+)\(([^\)]+)\)")
 
     # Process the input
-    propositions = input_string.split(' ^ ')
+    propositions = input_string.split(" ^ ")
     prop_list = []
     for item in propositions:
         prop_match_obj = prop_pattern.match(item)
@@ -212,26 +181,26 @@ def extract_CM_mapping(sid, input_string, parse, description, lcc_annotation):
             continue
         prop_name = prop_match_obj.group(1)
         arg_str = prop_match_obj.group(2)
-        args = arg_str.split(',')
+        args = arg_str.split(",")
 
-        if prop_name.startswith('T#'):
+        if prop_name.startswith("T#"):
             dname = prop_name[2:]
             if args not in targets[dname]:
                 targets[dname].append(args)
-        elif prop_name.startswith('TS#'):
+        elif prop_name.startswith("TS#"):
             dname = prop_name[3:]
             if args not in subtargets[dname]:
                 subtargets[dname].append(args)
-        elif prop_name.startswith('TSS#'):
+        elif prop_name.startswith("TSS#"):
             dname = prop_name[4:]
             if args not in subsubtargets[dname]:
                 subsubtargets[dname].append(args)
-        elif prop_name.startswith('S#'):
+        elif prop_name.startswith("S#"):
             dname = prop_name[2:]
             if args not in sources[dname]:
                 sources[dname].append(args)
-        elif prop_name.startswith('SS#'):
-            ss_data = prop_name[3:].split('%')
+        elif prop_name.startswith("SS#"):
+            ss_data = prop_name[3:].split("%")
             if len(ss_data) > 1:
                 prop_name = ss_data[1]
             else:
@@ -239,15 +208,15 @@ def extract_CM_mapping(sid, input_string, parse, description, lcc_annotation):
 
             if args not in subsources[prop_name]:
                 subsources[prop_name].append(args)
-        elif prop_name.startswith('M#'):
+        elif prop_name.startswith("M#"):
             mname = prop_name[2:]
             if args not in mappings[mname]:
                 mappings[mname].append(args)
-        elif prop_name.startswith('R#'):
+        elif prop_name.startswith("R#"):
             pass
-        elif prop_name.startswith('I#'):
+        elif prop_name.startswith("I#"):
             pass
-        elif prop_name == '=':
+        elif prop_name == "=":
             for i in range(len(args)):
                 arg1 = args[i]
                 j = i + 1
@@ -256,9 +225,9 @@ def extract_CM_mapping(sid, input_string, parse, description, lcc_annotation):
                     equalities[arg1][arg2] = 1
                     equalities[arg2][arg1] = 1
                     j += 1
-        elif prop_name == '!=':
+        elif prop_name == "!=":
             continue
-        elif prop_name == 'equal':
+        elif prop_name == "equal":
             equalities[args[1]][args[2]] = 1
             equalities[args[2]][args[1]] = 1
         else:
@@ -275,12 +244,7 @@ def extract_CM_mapping(sid, input_string, parse, description, lcc_annotation):
 
     output = {
         "isiDescription": description,
-        "isiAbductiveExplanation": input_string,
-        "sourceConceptSubDomain": "",
-        "targetConceptDomain": "",
-        "targetConceptSubDomain": "",
-        "sourceFrame": "",
-        "targetFrame": ""
+        "isiAbductiveExplanation": input_string
     }
     if not lcc_annotation:
         output["sid"] = sid
@@ -295,30 +259,32 @@ def extract_CM_mapping(sid, input_string, parse, description, lcc_annotation):
         t_domains = set()
 
         for targ in target_strucs[target_s]:
-            if len(target_strucs[target_s][targ]) == 0 and \
-               (target_s, target_s) not in t_domains:
+            if (
+                len(target_strucs[target_s][targ]) == 0
+                and (target_s, target_s) not in t_domains
+            ):
                 t_domains.add((target_s, target_s))
             else:
-                for (tsubd, tsubarg) in target_strucs[target_s][targ]:
+                for tsubd, tsubarg in target_strucs[target_s][targ]:
                     if (target_s, tsubd) not in t_domains:
                         t_domains.add((target_s, tsubd))
 
         s_domains = set()
         for source_s in source_strucs:
             for sarg in source_strucs[source_s]:
-                for (ssub_s, ssarg) in source_strucs[source_s][sarg]:
+                for ssub_s, ssarg in source_strucs[source_s][sarg]:
                     sargs = [ssarg]
                     sargs += equalities[ssarg].keys()
                     link = -1
                     print(source_s, ssub_s, sargs)
                     link = test(set(t_v), set(sargs), equalities, other_args)
                     print(link)
-                    s_domains.add((source_s, ssub_s, (1 - 0.05 - 0.1 * link)))
+                    s_domains.add((source_s, ssub_s, (0.95 - 0.1 * link)))
 
                     # for domain in targets:
-                    for (t, ts) in t_domains:
+                    for t, ts in t_domains:
                         domain = t
-                        for (s, ss, c) in s_domains:
+                        for s, ss, c in s_domains:
                             ts_pair = "%s,%s,%s,%s,%s" % (domain, t, ts, s, ss)
                             if ts_pair in CMs:
                                 if CMs[ts_pair] < c:
@@ -328,28 +294,35 @@ def extract_CM_mapping(sid, input_string, parse, description, lcc_annotation):
 
                             if c > bestlink:
                                 bestlink = c
-                                best_cm = "%s,%s,%s,%s,%s" % (domain, t, ts, s, ss)
+                                best_cm = "%s,%s,%s,%s,%s" % (
+                                    domain, t, ts, s, ss
+                                )
 
     explanation_appendix = "\n%%BEGIN_CM_LIST\n"
     for ts_pair in CMs.keys():
         parts = ts_pair.split(",")
-        explanation_appendix += "%s,%s,%s,%s,%s,%s\n" \
-                               % (parts[1], parts[1], parts[1], parts[3],
-                                  parts[3], CMs[ts_pair])
+        explanation_appendix += "%s,%s,%s,%s,%s,%s\n" % (
+            parts[1],
+            parts[1],
+            parts[1],
+            parts[3],
+            parts[3],
+            CMs[ts_pair]
+        )
     explanation_appendix += "%%END_CM_LIST"
     output["isiAbductiveExplanation"] += explanation_appendix.encode("utf-8")
 
+    def get_element(d, n):
+        if len(d) > n:
+            return d[n]
+        return ""
+
     data = best_cm.split(",")
-    l = len(data)
-    if l > 0:
-        output["targetConceptDomain"] = data[0]
-    if l > 1:
-        output["targetConceptSubDomain"] = data[1]
-    if l > 2:
-        output["targetFrame"] = data[2]
-    if l > 3:
-        output["sourceFrame"] = data[3]
-    if l > 4:
-        output["sourceConceptSubDomain"] = data[4]
+
+    output["targetConceptDomain"] = get_element(data, 0)
+    output["targetConceptSubDomain"] = get_element(data, 1)
+    output["targetFrame"] = get_element(data, 2)
+    output["sourceFrame"] = get_element(data, 3)
+    output["sourceConceptSubDomain"] = get_element(data, 4)
 
     return output
