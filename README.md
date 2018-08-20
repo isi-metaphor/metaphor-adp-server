@@ -9,13 +9,13 @@ JSON API for handling requests to interpret metaphors.
 
 The easiest way to install the server is using Docker.
 
-1. Follow the [instructions](https://docs.docker.com/install/) to install
+1. Follow the [instructions](https://docs.docker.com/install) to install
    Docker.
 
 2. Clone the lcc-service repository:
 
 ```
-git clone https://github.com/isi-metaphor/lcc-service
+git clone https://github.com/isi-metaphor/metaphor-adp-server
 ```
 
 3. Build the Docker image for the metaphor server:
@@ -65,7 +65,7 @@ service in this repository:
 ```
 mkdir -p /research/repo
 cd /research/repo
-git clone https://github.com/isi-metaphor/Metaphor-ADP.git metaphor
+git clone https://github.com/isi-metaphor/metaphor-adp.git metaphor
 git clone https://github.com/isi-metaphor/henry-n700.git henry
 ```
 
@@ -123,18 +123,18 @@ sudo pip install jinja2 django lz4 gitpython pexpect regex sexpdata simplejson
 7. Deploy the web service: The git clone command just downloads the code
    but then it needs to be configured and deployed.
 
-- Edit the file `lcc-service/fab/config.{branch_name}.json` depending on if
+- Edit the file `fab/config.{branch_name}.json` depending on if
   you want to install the prod or dev branch of the web service
 - For local deployment -- that is, on the same machine:
   - Check the function install in fabfile.py to make sure it runs:
-    `basicConfig(branch_name)`, `localConfig()`, `deploy()`
+    `basic_config(branch_name)`, `local_config()`, `deploy()`
   - Execute `fab install:branch_name`
 - For remote deployment -- that is, the deployment directory is on another
   machine to which you have ssh access without password:
-  - Edit the ssh username and ssh private key to use (`remoteConfig` function
+  - Edit the ssh username and ssh private key to use (`remote_config` function
     in fabfile.py)
-  - Make sure you replace `localConfig()` with `remoteConfig()` in the install
-    function in fabfile.py
+  - Make sure you replace `local_config()` with `remote_config()` in the install
+    function in `fabfile.py`
   - Execute `fab install:branch_name`
 
 8. Initialize the database file:
