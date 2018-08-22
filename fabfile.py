@@ -17,7 +17,7 @@ from fabric.colors import green, red
 
 def basic_config(branch):
     env.config = {
-        "repository": "https://github.com/isi-metaphor/lcc-service.git",
+        "repository": "https://github.com/isi-metaphor/metaphor-adp-server.git",
         "branch": branch,
         "context": json.load(open("fab/config." + branch + ".json", "r")),
     }
@@ -94,12 +94,12 @@ def deploy():
         print(green("Uploading setting.py"))
         fabric.contrib.files.upload_template(
             "fab/settings.py",
-            "{path}/lccsrv/settings.py".format(**config),
+            "{path}/adpsrv/settings.py".format(**config),
             context=context,
             use_jinja=True)
         fabric.contrib.files.upload_template(
             "fab/paths.py",
-            "{path}/lccsrv/paths.py".format(**config),
+            "{path}/adpsrv/paths.py".format(**config),
             context=context,
             use_jinja=True)
         fabric.contrib.files.upload_template(
@@ -124,10 +124,10 @@ def deploy():
             use_jinja=True)
 
         # print(green("Syncing database."))
-        # # run("python manage.py syncdb --noinput")
+        # run("python manage.py syncdb --noinput")
 
         # print(green("Creating indexes."))
-        # run("python manage.py syncdb --noinput --settings=lccsrv.settings")
+        # run("python manage.py syncdb --noinput --settings=adpsrv.settings")
 
 
 def install(branch):

@@ -13,7 +13,7 @@ import regex
 
 import simplejson as json
 
-from lccsrv import paths
+from adpsrv import paths
 import pipeline.external as adp
 from pipeline.models import TaskStatus
 

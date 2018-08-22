@@ -149,11 +149,11 @@ def is_linked_by_parse(v1, v2, word_props, equalities, input_been, path_len):
     return pl
 
 
-def extract_CM_mapping(sid, input_string, parse, description, lcc_annotation):
+def extract_CM_mapping(sid, input_string, parse, description, annotation):
     # input_string: the abduction output
     # parse: the parser output
     # description: the description of how to interpret the ISI output
-    # lcc_annotation: input json request
+    # annotation: input json request
 
     sources = defaultdict(list)
     subsources = defaultdict(list)
@@ -246,7 +246,7 @@ def extract_CM_mapping(sid, input_string, parse, description, lcc_annotation):
         "isiDescription": description,
         "isiAbductiveExplanation": input_string
     }
-    if not lcc_annotation:
+    if not annotation:
         output["sid"] = sid
 
     best_cm = ""
