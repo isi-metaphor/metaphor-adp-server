@@ -6,10 +6,9 @@
 # For more information, see README.md
 # For license information, see LICENSE
 
-
 import os
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "lccsrv.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "adpsrv.settings")
 
 application = get_wsgi_application()

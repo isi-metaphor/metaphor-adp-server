@@ -19,7 +19,7 @@ import sexpdata
 
 import simplejson as json
 
-from lccsrv.paths import *
+from adpsrv.paths import *
 import manage as mng
 
 

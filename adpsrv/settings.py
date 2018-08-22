@@ -73,8 +73,8 @@ MIDDLEWARE_CLASSES = (
 )
 
 
-ROOT_URLCONF = "lccsrv.urls"
-WSGI_APPLICATION = "lccsrv.wsgi.application"
+ROOT_URLCONF = "adpsrv.urls"
+WSGI_APPLICATION = "adpsrv.wsgi.application"
 
 TEMPLATE_DIRS = (project_dir("templates"),)
 
@@ -107,21 +107,21 @@ LOGGING = {
         },
         "pipeline-file": {
             "class": "logging.handlers.RotatingFileHandler",
-            "filename": "/research/logs/lcc-service/pipeline.log",
+            "filename": "/research/logs/metaphor-adp-server/pipeline.log",
             "formatter": "verbose",
             "backupCount": 3,
             "maxBytes": 1024 * 1024 * 16,
         },
         "django-file": {
             "class": "logging.handlers.RotatingFileHandler",
-            "filename": "/research/logs/lcc-service/django.log",
+            "filename": "/research/logs/metaphor-adp-server/django.log",
             "formatter": "verbose",
             "backupCount": 3,
             "maxBytes": 1024 * 1024 * 16,
         },
         "requests-file": {
             "class": "logging.handlers.RotatingFileHandler",
-            "filename": "/research/logs/lcc-service/requests.log",
+            "filename": "/research/logs/metaphor-adp-server/requests.log",
             "formatter": "verbose",
             "backupCount": 3,
             "maxBytes": 1024 * 1024 * 16,

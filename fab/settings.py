@@ -72,8 +72,8 @@ MIDDLEWARE_CLASSES = (
 )
 
 
-ROOT_URLCONF = "lccsrv.urls"
-WSGI_APPLICATION = "lccsrv.wsgi.application"
+ROOT_URLCONF = "adpsrv.urls"
+WSGI_APPLICATION = "adpsrv.wsgi.application"
 
 TEMPLATE_DIRS = (
     project_dir("templates"),

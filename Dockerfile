@@ -69,14 +69,10 @@ RUN tar xvjf models-1.02.tar.bz2 && \
 ENV BOXER_DIR=/research/ext/boxer
 
 
-# Install Metaphor-ADP.
+# Install Metaphor ADP.
 
 WORKDIR /research/repo
 RUN git clone https://github.com/isi-metaphor/metaphor-adp.git metaphor
-
-# WORKDIR /research/repo/metaphor
-# RUN git checkout develop
-# RUN git pull
 
 ENV METAPHOR_DIR=/research/repo/metaphor
 ENV PYTHONPATH=$PYTHONPATH:$METAPHOR_DIR/pipelines/common
@@ -86,7 +82,7 @@ ENV PYTHONPATH=$PYTHONPATH:$METAPHOR_DIR/pipelines/Farsi
 ENV PYTHONPATH=$PYTHONPATH:$METAPHOR_DIR/pipelines/Russian
 
 
-# Install lcc-service.
+# Install Metaphor ADP server.
 
 RUN apt-get install -q -y --fix-missing --no-install-recommends \
         fabric python-django python-jinja2 python-git python-lz4 \
@@ -94,21 +90,21 @@ RUN apt-get install -q -y --fix-missing --no-install-recommends \
 
 RUN pip install sexpdata
 
-COPY . /research/repo/lcc-service
+COPY . /research/repo/metaphor-adp-server
 
 #
 
 RUN mkdir -p /research/temp/uploads
 ENV TMP_DIR=/research/temp
-RUN mkdir -p /research/logs/lcc-service
-RUN mkdir -p /research/data/lcc-service
+RUN mkdir -p /research/logs/metaphor-adp-server
+RUN mkdir -p /research/data/metaphor-adp-server
 
 
 #
 
-WORKDIR /research/repo/lcc-service
+WORKDIR /research/repo/metaphor-adp-server
 
-ENV DJANGO_SETTINGS_MODULE=lccsrv.settings
+ENV DJANGO_SETTINGS_MODULE=adpsrv.settings
 
 RUN ./manage.py syncdb --noinput
 

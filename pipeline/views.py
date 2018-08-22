@@ -29,8 +29,8 @@ from django.contrib.auth import authenticate
 
 from django.views.decorators.csrf import csrf_exempt
 
-from lccsrv import paths
-from lccsrv import settings
+from adpsrv import paths
+from adpsrv import settings
 
 from pipeline.models import AnnotationTask, LogsDisplay
 from pipeline.annotator import Annotator

@@ -1,7 +1,7 @@
-# Metaphor Interpretation Web Service
+# Metaphor ADP Server
 
-The code in this repository provides both the end-user interface and the
-JSON API for handling requests to interpret metaphors.
+This repository contains a server for running abductive interpretation of
+metaphors. It includes a web interface and a JSON API.
 
 ## Installation
 
@@ -12,7 +12,7 @@ The easiest way to install the server is using Docker.
 1. Follow the [instructions](https://docs.docker.com/install) to install
    Docker.
 
-2. Clone the lcc-service repository:
+2. Clone the Metaphor ADP server repository:
 
 ```
 git clone https://github.com/isi-metaphor/metaphor-adp-server
@@ -41,7 +41,7 @@ The license file will be stored in the `lic` directory.
 ```
 
 The server will now be started on localhost, port 8000. You can send JSON
-requests (see, e.g., the `testing` directory in the Metaphor-ADP
+requests (see, e.g., the `testing` directory in the Metaphor ADP
 repository) or use the Web interface: http://localhost:8000/app
 
 The default username and password are both `metaphor`.
@@ -59,7 +59,7 @@ be any directory you prefer.
 This is how to install the entire metaphor pipeline, including the web
 service in this repository:
 
-1. Clone repositories for the Metaphor pipeline and for the Henry
+1. Clone repositories for the Metaphor ADP pipeline and for the Henry
    abductive reasoner:
 
 ```
@@ -105,12 +105,12 @@ tar xvjf models-1.02.tar.bz2
 
 ```
 cd /research/rep
-git clone https://github.com/isi-metaphor/lcc-service.git
+git clone https://github.com/isi-metaphor/metaphor-adp-server.git
 
-mkdir -p /research/temp/lcc-service.tmp
+mkdir -p /research/temp/metaphor-adp-server.tmp
 mkdir -p /research/data/metaphor_kbs
-mkdir -p /research/data/lcc-service
-mkdir -p /research/logs/lcc-service
+mkdir -p /research/data/metaphor-adp-server
+mkdir -p /research/logs/metaphor-adp-server
 ```
 
 6. Install dependencies:
@@ -133,19 +133,19 @@ sudo pip install jinja2 django lz4 gitpython pexpect regex sexpdata simplejson
   machine to which you have ssh access without password:
   - Edit the ssh username and ssh private key to use (`remote_config` function
     in fabfile.py)
-  - Make sure you replace `local_config()` with `remote_config()` in the install
-    function in `fabfile.py`
+  - Make sure you replace `local_config()` with `remote_config()` in the
+    install function in `fabfile.py`
   - Execute `fab install:branch_name`
 
 8. Initialize the database file:
 - Go into the deployed directory and run:
 ```
-python2.7 manage.py syncdb --noinput --settings=lccsrv.settings
+python2.7 manage.py syncdb --noinput --settings=adpsrv.settings
 ```
 - Create a user for the web interface by running:
 ```
 python2.7 manage.py createsuperuser --username=username_to_create \
-    --email=whatever@whatever --settings=lccsrv.settings
+    --email=whatever@whatever --settings=adpsrv.settings
 ```
 
 9. Run:
