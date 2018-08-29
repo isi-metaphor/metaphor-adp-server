@@ -3,4 +3,4 @@
 docker run -it \
        -v $PWD/lic:/research/ext/gurobi/license \
        --rm --name metaphor-server metaphor-server \
-       /research/repo/lcc-service/store-license $1
+       /research/repo/metaphor-adp-server/store-license $1
