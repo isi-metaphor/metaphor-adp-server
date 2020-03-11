@@ -6,8 +6,8 @@ OUTPUT_FILE="/tmp/${$}-`date +%s`.tmp"
 
 run_check() {
     ./testing/client.py -g 0.0.0.0 -p {{NGINX_PORT}} \
-        -j checkServiceFiles/$1.json > $OUTPUT_FILE
-    if diff checkServiceFiles/$1_output.json $OUTPUT_FILE; then
+        -j check_service_files/$1.json > $OUTPUT_FILE
+    if diff check_service_files/$1_output.json $OUTPUT_FILE; then
         sleep 20
     else
         body="Unexpected JSON response."
