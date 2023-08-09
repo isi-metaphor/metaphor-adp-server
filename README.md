@@ -25,7 +25,7 @@ git clone https://github.com/isi-metaphor/metaphor-adp-server
 ```
 
 4. Get a license for Gurobi for the virtual machine. Go to
-   https://user.gurobi.com/download/licenses/free-academic to get a key
+   https://www.gurobi.com/features/academic-named-user-license to get a key
    and then run
 
 ```
